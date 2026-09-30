@@ -1,0 +1,36 @@
+services:
+  styx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: styx-harness
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - STYX_HOST=0.0.0.0
+      - STYX_PORT=3000
+      - STYX_MEMORY_DIR=/app/memory
+      - STYX_DATA_DIR=/app/data
+      - DOCKER_SOCKET=/var/run/docker.sock
+      - HOST_HOME=${HOST_HOME:-${HOME}}
+      - HOST_LOCAL_MODELS_DIR=${HOST_LOCAL_MODELS_DIR:-${HOME}/localLLM/models}
+      - STYX_ALLOWED_ORIGINS=${STYX_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      - STYX_ACCESS_KEY=${STYX_ACCESS_KEY:-styx-local-dev-key}
+    volumes:
+      - ./memory:/app/memory
+      - ./data:/app/data
+      - ./ui/dist:/app/ui/dist
+      - ./target/release/styx:/usr/local/bin/styx
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.cache/huggingface:/root/.cache/huggingface
+      - ${HOST_LOCAL_MODELS_DIR:-${HOME}/localLLM/models}:/models:ro
+      - ${STYX_TOOLS_DIR:-../styx_tools}:/tools:ro
+    devices:
+      - /dev/kfd:/dev/kfd
+      - /dev/dri:/dev/dri
+    group_add:
+      - video
+      - render
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
