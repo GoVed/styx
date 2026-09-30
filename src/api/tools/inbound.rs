@@ -129,24 +129,61 @@ pub async fn handle_inbound_tool_event(
     let target_mode = payload.mode.as_deref().unwrap_or(default_mode);
 
     let extracted_channel_id = payload.channel_id.as_deref().or_else(|| {
-        extract_field(&payload.payload, &["chat_jid", "from", "sender_jid", "sender"])
+        extract_field(&payload.payload, &["channel_id", "chat_jid", "from", "sender_jid", "sender"])
     });
 
     let sender_display = extract_field(&payload.payload, &["sender_name", "sender"])
         .or(payload.source_id.as_deref())
         .unwrap_or("External Contact");
 
-    let group_subject = extract_field(&payload.payload, &["group_name", "chat_name", "subject"]);
+    let group_subject = extract_field(&payload.payload, &["group_name", "group_subject", "chat_name", "subject"]);
     let is_group = payload.payload.get("is_group").and_then(|v| v.as_bool()).unwrap_or_else(|| group_subject.is_some());
 
-    if let Some(cid) = extracted_channel_id {
-        if state.memory.is_channel_ignored(cid) {
-            info!(channel_id = %cid, protocol = %payload.protocol, "Ignoring inbound event per memory directives");
-            return (
-                StatusCode::OK,
-                Json(json!({"success": true, "ignored": true, "reason": "Channel marked as ignored in operator memory"})),
-            );
-        }
+    let text = extract_field(&payload.payload, &["message", "text", "body"]).unwrap_or("");
+    let reply_info = extract_reply_info(&payload.payload);
+
+    let is_memory_ignored = extracted_channel_id
+        .map(|cid| state.memory.is_channel_ignored(cid))
+        .unwrap_or(false);
+
+    let (should_trigger, effective_policy, reason) = if let Some(cid) = extracted_channel_id {
+        let op_name = state.db.get_setting("operator_name").await.unwrap_or(None).unwrap_or_default();
+        let ch_name = group_subject.or(Some(sender_display));
+        state
+            .db
+            .evaluate_channel_trigger(
+                cid,
+                &payload.protocol,
+                ch_name,
+                is_group,
+                text,
+                &reply_info,
+                &op_name,
+                is_memory_ignored,
+            )
+            .await
+            .unwrap_or((true, "all".into(), "Defaulted due to evaluation error".into()))
+    } else {
+        (true, "all".into(), "No channel identifier present".into())
+    };
+
+    if !should_trigger {
+        info!(
+            channel_id = ?extracted_channel_id,
+            protocol = %payload.protocol,
+            policy = %effective_policy,
+            reason = %reason,
+            "Inbound tool event ignored per granular channel trigger policy"
+        );
+        return (
+            StatusCode::OK,
+            Json(json!({
+                "success": true,
+                "ignored": true,
+                "policy": effective_policy,
+                "reason": reason
+            })),
+        );
     }
 
     let target_session_id = match payload.session_id.as_deref() {
@@ -159,9 +196,6 @@ pub async fn handle_inbound_tool_event(
             resolve_or_create_session(&state.db, &payload.protocol, extracted_channel_id, group_subject, sender_display, target_mode, is_group).await
         }
     };
-
-    let text = extract_field(&payload.payload, &["message", "text", "body"]).unwrap_or("");
-    let reply_info = extract_reply_info(&payload.payload);
 
     let channel_desc = if is_group {
         match (group_subject, extracted_channel_id) {

@@ -1,3 +1,4 @@
+pub mod channels;
 pub mod discovery;
 pub mod inbound;
 pub mod inspect;
@@ -7,6 +8,7 @@ use axum::routing::{delete, get, post};
 use axum::Router;
 
 use crate::state::AppState;
+pub use channels::{get_channel_defaults, list_channels, update_channel_defaults, update_channel_policy};
 pub use discovery::{discover_local_tools, install_tool};
 pub use inbound::handle_inbound_tool_event;
 pub use inspect::inspect_tool;
@@ -25,4 +27,7 @@ pub fn router() -> Router<AppState> {
         .route("/discover", get(discover_local_tools))
         .route("/inspect", post(inspect_tool))
         .route("/install", post(install_tool))
+        .route("/channels", get(list_channels))
+        .route("/channels/policy", post(update_channel_policy))
+        .route("/channels/defaults", get(get_channel_defaults).post(update_channel_defaults))
 }

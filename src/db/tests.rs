@@ -106,4 +106,156 @@ mod tests {
 
         let _ = std::fs::remove_file(db_path);
     }
+
+    #[tokio::test]
+    async fn test_channel_trigger_policies_and_evaluation() {
+        let temp_dir = std::env::temp_dir();
+        let db_path = temp_dir.join(format!("test_styx_channels_{}.db", uuid::Uuid::new_v4()));
+        let db = Database::init(&db_path).expect("Failed to create test db");
+
+        // 1. Direct chat defaults to Always Respond ('all')
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "15551112222@s.whatsapp.net",
+                "whatsapp",
+                Some("Alice"),
+                false,
+                "Hey how are you?",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(trigger, "Direct chat should trigger by default");
+        assert_eq!(pol, "all");
+
+        // 2. Group chat defaults to Mentions Only ('mentions')
+        // 2a. Regular group chatter without mention -> Should NOT trigger
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "Good morning everyone! Check out this link.",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(!trigger, "Group chat without mention should NOT trigger");
+        assert_eq!(pol, "mentions");
+
+        // 2b. Group chat with mention of Styx -> Should trigger
+        let (trigger, pol, reason) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "Hey @Styx, can you summarize our meeting?",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(trigger, "Group chat with mention of Styx SHOULD trigger");
+        assert_eq!(pol, "mentions");
+        assert!(reason.contains("Mention"));
+
+        // 2c. Group chat with mention of operator name ("Operator") -> Should trigger
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "Operator, what do you think about the architecture?",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(trigger, "Group chat with mention of operator name SHOULD trigger");
+        assert_eq!(pol, "mentions");
+
+        // 3. Explicitly Muted Group
+        db.set_channel_policy(
+            "120363028840427086@g.us",
+            "whatsapp",
+            Some("Computer Scientist"),
+            true,
+            "muted",
+            None,
+        )
+        .await
+        .unwrap();
+
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "@Styx please help!",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(!trigger, "Muted group must NEVER trigger even if mentioned");
+        assert_eq!(pol, "muted");
+
+        // 4. Explicitly Set Group to Always Respond ('all')
+        db.set_channel_policy(
+            "120363028840427086@g.us",
+            "whatsapp",
+            Some("Computer Scientist"),
+            true,
+            "all",
+            None,
+        )
+        .await
+        .unwrap();
+
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "Just general chat",
+                "",
+                "Operator",
+                false,
+            )
+            .await
+            .unwrap();
+        assert!(trigger, "Group set to 'all' should trigger on any message");
+        assert_eq!(pol, "all");
+
+        // 5. Memory-level ignore override
+        let (trigger, pol, _) = db
+            .evaluate_channel_trigger(
+                "120363028840427086@g.us",
+                "whatsapp",
+                Some("Computer Scientist"),
+                true,
+                "Hello",
+                "",
+                "Operator",
+                true, // memory ignored
+            )
+            .await
+            .unwrap();
+        assert!(!trigger, "Memory ignored channel must not trigger");
+        assert_eq!(pol, "muted");
+
+        let _ = std::fs::remove_file(db_path);
+    }
 }

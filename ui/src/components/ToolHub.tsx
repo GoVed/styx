@@ -5,6 +5,7 @@ import { DragDropZone } from './tool-hub/DragDropZone';
 import { ToolInspectionCard } from './tool-hub/ToolInspectionCard';
 import { ConnectedServers } from './tool-hub/ConnectedServers';
 import { PolicyMatrix } from './tool-hub/PolicyMatrix';
+import { ChannelTriggerMatrix } from './tool-hub/ChannelTriggerMatrix';
 import { TestToolDrawer } from './tool-hub/TestToolDrawer';
 import { ManualServerModal } from './tool-hub/ManualServerModal';
 import { useToolHub } from './tool-hub/useToolHub';
@@ -161,6 +162,9 @@ export const ToolHub: React.FC<ToolHubProps> = ({
           onTriggerSimulatedInbound={handleTriggerSimulatedInbound}
           onRemoveServer={handleRemoveServer}
         />
+
+        {/* INBOUND CHANNEL TRIGGER RULES & FILTERING */}
+        <ChannelTriggerMatrix />
 
         {/* THREE-TIER POLICY MATRIX & TOOL CATALOG */}
         <PolicyMatrix

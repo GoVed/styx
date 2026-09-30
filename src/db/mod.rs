@@ -1,4 +1,5 @@
 pub mod auth;
+pub mod channels;
 pub mod messages;
 pub mod models;
 pub mod sessions;
@@ -9,6 +10,8 @@ mod tests;
 
 #[allow(unused_imports)]
 pub use auth::*;
+#[allow(unused_imports)]
+pub use channels::*;
 #[allow(unused_imports)]
 pub use messages::ChatMessage;
 #[allow(unused_imports)]
@@ -121,6 +124,16 @@ impl Database {
             CREATE TABLE IF NOT EXISTS system_settings (
                 key TEXT PRIMARY KEY,
                 value TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS channel_policies (
+                channel_id TEXT PRIMARY KEY,
+                protocol TEXT NOT NULL,
+                channel_name TEXT,
+                is_group INTEGER NOT NULL DEFAULT 0,
+                policy TEXT NOT NULL DEFAULT 'mentions',
+                mention_keywords TEXT,
                 updated_at TEXT NOT NULL
             );
             "#,

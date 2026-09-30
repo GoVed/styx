@@ -221,4 +221,23 @@ export interface DiscoveredLocalTool {
   has_docker: boolean;
 }
 
+export type ChannelTriggerPolicy = 'all' | 'mentions' | 'muted' | 'manual';
+
+export interface ChannelPolicyRecord {
+  channel_id: string;
+  protocol: string;
+  channel_name: string | null;
+  is_group: boolean;
+  policy: ChannelTriggerPolicy;
+  mention_keywords: string | null;
+  updated_at: string;
+}
+
+export interface ChannelDefaultsRecord {
+  default_group_policy: ChannelTriggerPolicy;
+  default_direct_policy: ChannelTriggerPolicy;
+  mention_keywords: string;
+}
+
+
 
