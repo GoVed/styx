@@ -9,10 +9,10 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MemoryFileNode {
-    pub path: String,       // relative path e.g. "skills/email_triage.md"
+    pub path: String,       // relative path e.g. "skills/custom_task.md"
     pub category: String,   // "core", "skills", "scratchpad"
-    pub filename: String,   // "email_triage.md"
-    pub title: String,      // "# Skillset: Email Triage" or filename
+    pub filename: String,   // "custom_task.md"
+    pub title: String,      // "# Skillset: Custom Task" or filename
     pub size_bytes: u64,
     pub updated_at: String,
 }
