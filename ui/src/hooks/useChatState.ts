@@ -187,7 +187,7 @@ export const useChatState = ({
     }
 
     if (!isForActiveSession) {
-      if (evt.type === 'done') {
+      if (evt.type === 'queued' || evt.type === 'queue_started' || evt.type === 'done') {
         fetch('/api/chat/sessions')
           .then(r => r.json())
           .then(sData => {
@@ -196,7 +196,8 @@ export const useChatState = ({
             }
           })
           .catch(() => {});
-      } else if (evt.type === 'tool_completed') {
+      }
+      if (evt.type === 'tool_completed') {
         refreshAuditData();
       }
       return;
@@ -211,6 +212,9 @@ export const useChatState = ({
       setIsStreaming(true);
       setLiveStreamingText('');
       setLiveThought('');
+      if (targetSessionId) {
+        loadMessages(targetSessionId);
+      }
     } else if (evt.type === 'thought') {
       setIsStreaming(true);
       setLiveThought(prev => prev + (evt.content || ''));
