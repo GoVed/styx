@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Layers, FileText } from 'lucide-react';
 import { MemoryFileNode } from '../types';
 import { FileTreeSidebar } from './memory/FileTreeSidebar';
 import { MemoryEditor } from './memory/MemoryEditor';
@@ -11,6 +12,7 @@ export interface MemoryHubProps {
 
 export const MemoryHub: React.FC<MemoryHubProps> = ({ files, onRefreshFiles }) => {
   const [selectedPath, setSelectedPath] = useState<string>(files[0]?.path || 'core/user_profile.md');
+  const [mobileTab, setMobileTab] = useState<'files' | 'editor'>('files');
   const [fileContent, setFileContent] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -121,29 +123,68 @@ export const MemoryHub: React.FC<MemoryHubProps> = ({ files, onRefreshFiles }) =
     }
   };
 
-  return (
-    <div className="flex h-full w-full overflow-hidden bg-styx-950 font-sans text-xs">
-      <FileTreeSidebar
-        files={files}
-        selectedPath={selectedPath}
-        searchQuery={searchQuery}
-        searchResults={searchResults}
-        onSelectPath={setSelectedPath}
-        onOpenNewModal={() => setShowNewModal(true)}
-        onDeleteFile={handleDelete}
-        onChangeSearchQuery={setSearchQuery}
-        onSearch={handleSearch}
-      />
+  const handleSelectPath = (path: string) => {
+    setSelectedPath(path);
+    setMobileTab('editor');
+  };
 
-      <MemoryEditor
-        selectedPath={selectedPath}
-        fileContent={fileContent}
-        saveStatus={saveStatus}
-        activeView={activeView}
-        onChangeActiveView={setActiveView}
-        onChangeContent={setFileContent}
-        onSave={handleSave}
-      />
+  return (
+    <div className="flex flex-col h-full w-full overflow-hidden bg-styx-950 font-sans text-xs">
+      {/* Mobile Top Segmented Bar */}
+      <div className="md:hidden flex border-b border-styx-800 bg-styx-900/90 px-3 py-1.5 gap-2 flex-shrink-0 font-mono select-none">
+        <button
+          type="button"
+          onClick={() => setMobileTab('files')}
+          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+            mobileTab === 'files'
+              ? 'bg-styx-800 text-emerald-300 shadow-sm border border-styx-700/80'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Files ({files.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab('editor')}
+          className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
+            mobileTab === 'editor'
+              ? 'bg-styx-800 text-cyan-300 shadow-sm border border-styx-700/80'
+              : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <FileText className="w-3.5 h-3.5 text-cyan-400" />
+          <span className="truncate max-w-[130px]">{selectedPath ? selectedPath.split('/').pop() : 'Editor'}</span>
+        </button>
+      </div>
+
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        <FileTreeSidebar
+          files={files}
+          selectedPath={selectedPath}
+          searchQuery={searchQuery}
+          searchResults={searchResults}
+          onSelectPath={handleSelectPath}
+          onOpenNewModal={() => setShowNewModal(true)}
+          onDeleteFile={handleDelete}
+          onChangeSearchQuery={setSearchQuery}
+          onSearch={handleSearch}
+          onViewEditor={() => setMobileTab('editor')}
+          className={mobileTab === 'files' ? 'w-full md:w-72 flex' : 'hidden md:flex md:w-72'}
+        />
+
+        <MemoryEditor
+          selectedPath={selectedPath}
+          fileContent={fileContent}
+          saveStatus={saveStatus}
+          activeView={activeView}
+          onChangeActiveView={setActiveView}
+          onChangeContent={setFileContent}
+          onSave={handleSave}
+          onBackToList={() => setMobileTab('files')}
+          className={mobileTab === 'editor' ? 'flex-1 flex w-full' : 'hidden md:flex md:flex-1'}
+        />
+      </div>
 
       {showNewModal && (
         <NewMemoryFileModal

@@ -11,6 +11,7 @@ import {
   BookOpen,
   Users,
   MessageSquare,
+  ChevronRight,
 } from 'lucide-react';
 import { MemoryFileNode } from '../../types';
 
@@ -24,6 +25,8 @@ export interface FileTreeSidebarProps {
   onDeleteFile: (path: string) => void;
   onChangeSearchQuery: (val: string) => void;
   onSearch: (e: React.FormEvent) => void;
+  className?: string;
+  onViewEditor?: () => void;
 }
 
 const getCategoryMeta = (cat: string) => {
@@ -55,6 +58,8 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
   onDeleteFile,
   onChangeSearchQuery,
   onSearch,
+  className,
+  onViewEditor,
 }) => {
   const categories = Array.from(new Set(files.map(f => f.category)));
   const priority = ['core', 'dictionary', 'people', 'groups', 'skills', 'scratchpad'];
@@ -68,20 +73,33 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
   });
 
   return (
-    <aside className="w-72 border-r border-styx-800 bg-styx-900 flex flex-col flex-shrink-0 font-mono h-full overflow-hidden">
-      <div className="p-3 border-b border-styx-800 flex items-center justify-between">
+    <aside className={`border-r border-styx-800 bg-styx-900 flex flex-col flex-shrink-0 font-mono h-full overflow-hidden select-none ${className || 'w-full md:w-72'}`}>
+      <div className="p-3 border-b border-styx-800 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center space-x-2">
           <Layers className="w-4 h-4 text-emerald-400" />
           <span className="font-bold text-slate-200">MEMORY HUB</span>
         </div>
-        <button
-          type="button"
-          onClick={onOpenNewModal}
-          className="px-2 py-1 rounded bg-styx-800 hover:bg-styx-700 text-emerald-400 border border-styx-700 text-[10px] flex items-center space-x-1"
-        >
-          <Plus className="w-3 h-3" />
-          <span>New File</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          {onViewEditor && selectedPath && (
+            <button
+              type="button"
+              onClick={onViewEditor}
+              className="md:hidden px-2.5 py-1 rounded bg-styx-800 hover:bg-styx-750 text-cyan-400 border border-styx-700 text-xs font-semibold flex items-center space-x-1 active:scale-95 transition-all"
+              title="Switch to file editor"
+            >
+              <span>Editor</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onOpenNewModal}
+            className="px-2.5 py-1 rounded bg-styx-800 hover:bg-styx-700 text-emerald-400 border border-styx-700 text-xs flex items-center space-x-1 font-semibold active:scale-95 transition-all"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New File</span>
+          </button>
+        </div>
       </div>
 
       {/* Dynamic Category Tree List */}
@@ -101,15 +119,15 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
                   <div
                     key={f.path}
                     onClick={() => onSelectPath(f.path)}
-                    className={`group flex items-center justify-between p-1.5 rounded cursor-pointer transition-colors ${
+                    className={`group flex items-center justify-between p-2 sm:p-1.5 rounded cursor-pointer transition-colors active:scale-[0.99] ${
                       selectedPath === f.path
                         ? `bg-styx-800 ${meta.activeBorder} font-semibold border`
                         : 'text-slate-400 hover:bg-styx-850 hover:text-slate-200'
                     }`}
                   >
-                    <div className="flex items-center space-x-1.5 truncate">
+                    <div className="flex items-center space-x-2 truncate">
                       <FileText className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span className="truncate">{f.filename}</span>
+                      <span className="truncate text-xs">{f.filename}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <span className="text-[10px] text-slate-500 group-hover:hidden">
