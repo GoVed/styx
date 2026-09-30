@@ -66,7 +66,7 @@ Styx unifies personal agent orchestration, local Dockerized inference engines, d
 ### 2. Markdown-Based Knowledge & Memory Store (`/memory/`)
 A completely transparent, file-based memory system editable with standard text editors and version-controlled via git:
 - `/memory/core/`: Long-term user preferences, profile context, and operational guidelines (`user_profile.md`, `system_instructions.md`).
-- `/memory/skills/`: Domain-specific modular skillsets (`email_triage.md`, `code_review.md`, `whatsapp_tone.md`) defining multi-step heuristics.
+- `/memory/skills/`: Domain-specific modular skillsets (`code_review.md`, `email_triage.md`, `styx_architecture.md`) defining multi-step heuristics.
 - `/memory/scratchpad/`: Daily working notes and active project scratchpads (`daily_log.md`, `active_projects.md`).
 - **Memory Engine Tools:**
   - `read_memory(path)`: Autonomous read-only access.
@@ -240,14 +240,8 @@ styx/
 │   │   └── user_profile.md
 │   ├── skills/
 │   │   ├── code_review.md
-│   │   ├── crawler.md
 │   │   ├── email_triage.md
-│   │   ├── messaging_etiquette.md
-│   │   ├── notify.md
-│   │   ├── search.md
-│   │   ├── stickers.md
-│   │   ├── styx_architecture.md
-│   │   └── whatsapp.md
+│   │   └── styx_architecture.md
 │   └── scratchpad/
 │       ├── active_projects.md
 │       └── daily_log.md
