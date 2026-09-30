@@ -137,14 +137,32 @@ pub async fn add_server(
         .register_server(&record.id, transport, &policy_map)
         .await
     {
-        Ok(tools) => (
-            StatusCode::OK,
-            Json(json!({
-                "success": true,
-                "server": record,
-                "discovered_tools": tools
-            })),
-        ),
+        Ok(tools) => {
+            // Automatically fetch and install tool instructions/skills if an HTTP endpoint is provided
+            if let Some(ref url) = payload.url {
+                let client = reqwest::Client::builder()
+                    .timeout(std::time::Duration::from_millis(1500))
+                    .build()
+                    .unwrap_or_default();
+                let inst_url = url.replace("/mcp", "/instructions");
+                if let Ok(resp) = client.get(&inst_url).send().await
+                    && let Ok(val) = resp.json::<Value>().await
+                        && let Some(inst) = val.get("instructions").and_then(|i| i.as_str()) {
+                            let clean_name = payload.name.to_lowercase().replace('@', "").replace('/', "_");
+                            let rel_path = format!("skills/{}.md", clean_name);
+                            let _ = state.memory.write_file(&rel_path, inst, None).await;
+                        }
+            }
+
+            (
+                StatusCode::OK,
+                Json(json!({
+                    "success": true,
+                    "server": record,
+                    "discovered_tools": tools
+                })),
+            )
+        }
         Err(e) => (
             StatusCode::BAD_REQUEST,
             Json(

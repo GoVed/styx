@@ -35,3 +35,7 @@ Thumbs.db
 memory/people/
 memory/groups/
 memory/dictionary/
+
+# Runtime-installed tool skillsets (auto-ingested by Styx at runtime when tools connect)
+memory/skills/*.md
+!memory/skills/.gitkeep
