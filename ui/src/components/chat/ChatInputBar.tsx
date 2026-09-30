@@ -30,7 +30,7 @@ export const ChatInputBar: React.FC<ChatInputBarProps> = ({
   };
 
   return (
-    <div className="p-2 sm:p-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] border-t border-styx-800 bg-styx-900 font-mono flex-shrink-0 space-y-1.5 sm:space-y-2">
+    <div className="p-2 sm:p-3 pb-[max(0.6rem,env(safe-area-inset-bottom))] sm:pb-3 md:pb-3.5 border-t border-styx-800 bg-styx-900 font-mono flex-shrink-0 space-y-1.5 sm:space-y-2">
       {chatError && (
         <div className="p-2.5 sm:p-3 rounded-lg bg-rose-950/80 border border-rose-800 text-rose-200 text-xs font-mono shadow-lg flex items-start space-x-2.5">
           <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0 mt-0.5" />

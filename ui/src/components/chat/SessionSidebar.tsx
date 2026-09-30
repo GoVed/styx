@@ -41,12 +41,11 @@ export const SessionSidebar: React.FC<SessionSidebarProps> = ({
 
       {/* Session Drawer / Sidebar */}
       <aside
-        className={`flex-shrink-0 fixed top-0 bottom-auto left-0 z-50 w-72 bg-styx-900 border-r border-styx-800 shadow-2xl flex flex-col md:h-full overflow-hidden transition-transform duration-300 md:relative md:w-64 md:translate-x-0 md:shadow-none ${
+        className={`flex-shrink-0 fixed top-0 bottom-auto left-0 z-50 w-72 bg-styx-900 border-r border-styx-800 shadow-2xl flex flex-col overflow-hidden transition-transform duration-300 md:relative md:w-64 md:h-full md:shadow-none max-md:h-[var(--app-height,100dvh)] max-md:max-h-[var(--app-height,100dvh)] ${
           mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
-        style={{ height: 'var(--app-height, 100svh)', maxHeight: 'var(--app-height, 100svh)' }}
       >
-        <div className="p-3 pt-[max(0.75rem,env(safe-area-inset-top))] border-b border-styx-800 flex items-center justify-between flex-shrink-0">
+        <div className="p-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:pt-3 border-b border-styx-800 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center space-x-2">
             <button
               type="button"

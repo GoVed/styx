@@ -133,7 +133,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
       {/* Central Chat Stream */}
       <main className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-styx-950">
         {/* Chat Header / Mode Bar with Safe Area Top Support */}
-        <div className="p-2 sm:p-2.5 px-3 sm:px-4 pt-[max(0.6rem,env(safe-area-inset-top))] border-b border-styx-800 bg-styx-900 flex items-center justify-between font-mono text-xs flex-shrink-0 z-20">
+        <div className="p-2 sm:p-2.5 px-3 sm:px-4 pt-[max(0.6rem,env(safe-area-inset-top))] md:pt-2.5 border-b border-styx-800 bg-styx-900 flex items-center justify-between font-mono text-xs flex-shrink-0 z-20">
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <button
               type="button"
