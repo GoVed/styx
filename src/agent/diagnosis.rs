@@ -33,6 +33,24 @@ pub async fn diagnose_inference_failure(
     model_cfg: &ModelConfigRecord,
     err_msg: &str,
 ) -> String {
+    if err_msg.contains("exceeds the available context size")
+        || err_msg.contains("exceed_context_size_error")
+        || err_msg.contains("context_length_exceeded")
+    {
+        return format!(
+            "⚠️ **Model Context Window Exceeded ({ctx} tokens)**\n\n\
+            The conversation history and active tool definitions exceeded the engine's current allocation ({ctx} tokens).\n\n\
+            **Why this happened:** The active container was launched with a `{ctx}` token context size (`-c {ctx}`). Extensive message histories or multi-turn tool dumps required more tokens than allocated.\n\n\
+            **Recommended Solution:** Re-deploy or switch to **Qwen 3.5 9B with full 128k context window (131,072 tokens)**, which fits comfortably in GPU memory with Q8/Q4 KV cache.\n\n\
+            <options>\n\
+            <option>Deploy Qwen 3.5 9B (128k Local GGUF)</option>\n\
+            <option>Re-deploy with 16k context window (Recommended)</option>\n\
+            <option>Switch to Cloud AI</option>\n\
+            </options>",
+            ctx = model_cfg.context_length
+        );
+    }
+
     let is_docker = model_cfg.provider.starts_with("docker_")
         || model_cfg
             .base_url
@@ -186,7 +204,24 @@ pub fn format_diagnosis_from_logs(
             );
         }
 
-        // 3b. CLI argument or engine parameter validation failure
+        // 3b. Unknown or unsupported model architecture in engine
+        if log_str.contains("unknown model architecture") {
+            return format!(
+                "⚠️ **Unsupported Model Architecture in llama.cpp**\n\n\
+                The architecture for model `{model}` is not yet supported in upstream mainline `llama.cpp`.\n\n\
+                **Details:**\n```\n{preview}\n```\n\n\
+                **Why this happened:** The K2-Horizon architecture was recently released (September 2026). Mainline llama.cpp has an open pull request but has not yet merged native `k2-horizon` support. The model authors currently maintain a dedicated fork (`MBZUAI-IFM/llama.cpp`).\n\n\
+                **Recommended Action:** Switch to a fully supported 128k local model (like Qwen 3.5 9B with 128k context) or use Cloud AI.\n\n\
+                <options>\n\
+                <option>Deploy Qwen 3.5 9B (128k Local GGUF)</option>\n\
+                <option>Open Model Manager</option>\n\
+                <option>Switch to Cloud AI</option>\n\
+                </options>",
+                preview = if recent_preview.is_empty() { "unknown model architecture" } else { recent_preview }
+            );
+        }
+
+        // 3c. CLI argument or engine parameter validation failure
         if log_str.contains("unrecognized arguments")
             || log_str.contains("invalid choice:")
             || log_str.contains("argument --")

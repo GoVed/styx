@@ -1,5 +1,6 @@
 import React from 'react';
 import { Layers, CheckCircle, XCircle } from 'lucide-react';
+import { ReasoningSelector } from './ReasoningSelector';
 
 export interface CloudModelConfigsProps {
   extName: string;
@@ -134,6 +135,9 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
           <div>{testResult.message}</div>
         </div>
       )}
+
+      {/* Reasoning Effort Configuration */}
+      <ReasoningSelector />
 
       <div className="flex items-center justify-between pt-2">
         <button

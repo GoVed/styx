@@ -31,6 +31,9 @@ impl DeployModelRequest {
                 _ => "vllm/vllm-openai:latest".to_string(),
             },
             EngineKind::LlamaCpp => match vendor {
+                GpuVendor::Amd if self.hf_repo.to_lowercase().contains("k2-horizon") => {
+                    "styx-llama-k2:server-rocm".to_string()
+                }
                 GpuVendor::Amd => "ghcr.io/ggml-org/llama.cpp:server-rocm".to_string(),
                 _ => "ghcr.io/ggerganov/llama.cpp:server".to_string(),
             },
@@ -155,7 +158,13 @@ impl DeployModelRequest {
                     args.push(model_path);
                 } else {
                     args.push("-hf".to_string());
-                    args.push(self.hf_repo.clone());
+                    let (repo, url_q) = crate::api::models::hf::sanitize_hf_repo_input(&self.hf_repo);
+                    let q = self.quantization.as_deref().filter(|q| !q.is_empty() && *q != "none").or(url_q.as_deref());
+                    let hf_arg = match (repo.contains(':'), q) {
+                        (false, Some(quant)) => format!("{repo}:{quant}"),
+                        _ => repo,
+                    };
+                    args.push(hf_arg);
                 }
 
                 args.push("--host".to_string());
@@ -231,6 +240,9 @@ impl DeployModelRequest {
                         } else {
                             args.push("/models/mmproj-Qwen3.8-27B-f16.gguf".to_string());
                         }
+                    } else if self.hf_repo.contains("Qwen2-VL") || self.hf_repo.contains("qwen2-vl") {
+                        args.push("--mmproj".to_string());
+                        args.push("/models/mmproj-Qwen2-VL-2B-Instruct-f16.gguf".to_string());
                     }
                 }
 
@@ -280,15 +292,11 @@ impl DeployModelRequest {
 
         let vendor = self.resolved_gpu_vendor();
         let gpu_flag = match vendor {
-            GpuVendor::Amd => {
-                "--device=/dev/kfd --device=/dev/dri --group-add=video --security-opt seccomp=unconfined --ipc=host"
-            }
-            GpuVendor::Nvidia => {
-                match self.gpu_devices.as_deref().unwrap_or("all") {
-                    "all" => "--gpus all --ipc=host",
-                    devs => &format!("--gpus '\"device={}\"' --ipc=host", devs),
-                }
-            }
+            GpuVendor::Amd => "--device=/dev/kfd --device=/dev/dri --group-add=video --security-opt seccomp=unconfined --ipc=host",
+            GpuVendor::Nvidia => match self.gpu_devices.as_deref().unwrap_or("all") {
+                "all" => "--gpus all --ipc=host",
+                devs => &format!("--gpus '\"device={}\"' --ipc=host", devs),
+            },
             GpuVendor::None => "",
             GpuVendor::Auto => "--ipc=host",
         };
@@ -310,17 +318,9 @@ impl DeployModelRequest {
             })
             .collect();
         let cmd_args = formatted_cmd_args.join(" ");
-        let cmd_str = if cmd_args.is_empty() {
-            String::new()
-        } else {
-            format!(" \\\n  {}", cmd_args)
-        };
-
+        let cmd_str = if cmd_args.is_empty() { String::new() } else { format!(" \\\n  {}", cmd_args) };
         let image = self.image_name();
-
-        let mut parts = vec![
-            format!("docker run -d --name styx-{}", self.name),
-        ];
+        let mut parts = vec![format!("docker run -d --name styx-{}", self.name)];
         if !gpu_flag.is_empty() {
             parts.push(format!("  {}", gpu_flag));
         }

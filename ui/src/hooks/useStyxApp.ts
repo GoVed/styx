@@ -87,16 +87,21 @@ export const useStyxApp = () => {
     },
     onChatEvent: chat.handleIncomingChatEvent,
     onNotification: notif => {
-      playNotificationChime();
-      sendBrowserNotification(notif.title, {
-        body: notif.message,
-        onClick: () => {
-          if (notif.sessionId) {
-            chat.setActiveSession({ id: notif.sessionId } as any);
-            setActiveTab('chat');
-          }
-        },
-      });
+      // Only chime and trigger OS push/vibrate for actionable or urgent notifications
+      if (notif.urgency === 'alert' || notif.urgency === 'action_required') {
+        playNotificationChime();
+        sendBrowserNotification(notif.title, {
+          body: notif.message,
+          urgency: notif.urgency,
+          sessionId: notif.sessionId,
+          onClick: () => {
+            if (notif.sessionId) {
+              chat.setActiveSession({ id: notif.sessionId } as any);
+              setActiveTab('chat');
+            }
+          },
+        });
+      }
       setActiveNotification(notif);
     },
     onAuthEvent: () => {

@@ -7,14 +7,14 @@ const mockChannels = [
   {
     channel_id: '120363040000000000@g.us',
     protocol: 'whatsapp',
-    channel_name: 'Computer Scientists Group',
+    channel_name: 'Engineering Team Group',
     is_group: true,
     policy: 'mentions',
     mention_keywords: null,
     updated_at: '2026-09-30T12:00:00Z',
   },
   {
-    channel_id: '261799882539190@lid',
+    channel_id: '155500011122233@lid',
     protocol: 'whatsapp',
     channel_name: 'Direct Contact',
     is_group: false,
@@ -77,7 +77,7 @@ describe('ChannelTriggerMatrix Component', () => {
     expect(screen.getByText('GLOBAL TRIGGER DEFAULTS')).toBeDefined();
 
     await waitFor(() => {
-      expect(screen.getByText('Computer Scientists Group')).toBeDefined();
+      expect(screen.getByText('Engineering Team Group')).toBeDefined();
       expect(screen.getByText('Direct Contact')).toBeDefined();
       expect(screen.getByText('120363040000000000@g.us')).toBeDefined();
     });
@@ -87,7 +87,7 @@ describe('ChannelTriggerMatrix Component', () => {
     render(<ChannelTriggerMatrix />);
 
     await waitFor(() => {
-      expect(screen.getByText('Computer Scientists Group')).toBeDefined();
+      expect(screen.getByText('Engineering Team Group')).toBeDefined();
     });
 
     const mutedButtons = screen.getAllByRole('button', { name: 'Muted' });
@@ -111,13 +111,13 @@ describe('ChannelTriggerMatrix Component', () => {
     render(<ChannelTriggerMatrix />);
 
     await waitFor(() => {
-      expect(screen.getByText('Computer Scientists Group')).toBeDefined();
+      expect(screen.getByText('Engineering Team Group')).toBeDefined();
     });
 
     const searchInput = screen.getByPlaceholderText('Search group name, JID...');
-    fireEvent.change(searchInput, { target: { value: 'Computer' } });
+    fireEvent.change(searchInput, { target: { value: 'Engineering' } });
 
-    expect(screen.getByText('Computer Scientists Group')).toBeDefined();
+    expect(screen.getByText('Engineering Team Group')).toBeDefined();
     expect(screen.queryByText('Direct Contact')).toBeNull();
 
     // Clear search and test Direct filter
@@ -125,7 +125,7 @@ describe('ChannelTriggerMatrix Component', () => {
     const directFilterBtn = screen.getByRole('button', { name: /Direct/ });
     fireEvent.click(directFilterBtn);
 
-    expect(screen.queryByText('Computer Scientists Group')).toBeNull();
+    expect(screen.queryByText('Engineering Team Group')).toBeNull();
     expect(screen.getByText('Direct Contact')).toBeDefined();
   });
 
@@ -133,7 +133,7 @@ describe('ChannelTriggerMatrix Component', () => {
     render(<ChannelTriggerMatrix />);
 
     await waitFor(() => {
-      expect(screen.getByText('Computer Scientists Group')).toBeDefined();
+      expect(screen.getByText('Engineering Team Group')).toBeDefined();
     });
 
     const input = screen.getByPlaceholderText('styx, assistant, ai, bot') as HTMLInputElement;

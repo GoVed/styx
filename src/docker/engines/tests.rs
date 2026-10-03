@@ -265,4 +265,44 @@ mod tests {
         let de_cpu: GpuVendor = serde_json::from_str("\"cpu\"").unwrap();
         assert_eq!(de_cpu, GpuVendor::None);
     }
+
+    #[test]
+    fn test_llamacpp_dynamic_hf_gguf_args() {
+        // Test with full HF tree URL and dynamic quant selection
+        let req_url = DeployModelRequest {
+            name: "k2-horizon".to_string(),
+            engine: EngineKind::LlamaCpp,
+            hf_repo: "https://huggingface.co/IFM/K2-Horizon-7B-GGUF/tree/main".to_string(),
+            hf_token: None,
+            context_window: Some(32768),
+            gpu_vendor: Some(GpuVendor::Amd),
+            gpu_devices: None,
+            tensor_parallel_size: None,
+            gpu_memory_utilization: None,
+            quantization: Some("Q4_K_M".to_string()),
+            enable_mtp: Some(false),
+            speculative_model: None,
+            num_speculative_tokens: None,
+            enable_vision: Some(false),
+            port: Some(8080),
+            kv_cache_dtype: None,
+            max_num_seqs: None,
+            extra_args: None,
+            custom_image: None,
+        };
+        let args_url = req_url.build_cmd_args();
+        assert!(args_url.contains(&"-hf".to_string()));
+        let hf_idx = args_url.iter().position(|a| a == "-hf").unwrap();
+        assert_eq!(args_url[hf_idx + 1], "IFM/K2-Horizon-7B-GGUF:Q4_K_M");
+
+        // Test with owner/repo and quantization
+        let mut req_repo = req_url.clone();
+        req_repo.hf_repo = "IFM/K2-Horizon-7B-GGUF".to_string();
+        req_repo.quantization = Some("Q5_K_M".to_string());
+        let args_repo = req_repo.build_cmd_args();
+        let hf_idx_repo = args_repo.iter().position(|a| a == "-hf").unwrap();
+        assert_eq!(args_repo[hf_idx_repo + 1], "IFM/K2-Horizon-7B-GGUF:Q5_K_M");
+        assert_eq!(req_url.image_name(), "styx-llama-k2:server-rocm");
+        assert_eq!(req_repo.image_name(), "styx-llama-k2:server-rocm");
+    }
 }

@@ -240,3 +240,62 @@ pub async fn test_connection(
         "models": res.models,
     }))
 }
+
+#[derive(Deserialize)]
+pub struct ConfigureRoleRequest {
+    pub role: String, // "vision" or "translation" or "main"
+    pub name: String,
+    pub provider: String,
+    pub base_url: Option<String>,
+    pub api_key: Option<String>,
+    pub model_id: String,
+}
+
+pub async fn get_roles_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let main_cfg = state.db.get_active_model_config().await.unwrap_or(None);
+    let vision_cfg = state.db.get_active_vision_model_config().await.unwrap_or(None);
+    let trans_cfg = state.db.get_active_translation_model_config().await.unwrap_or(None);
+
+    Json(json!({
+        "success": true,
+        "main": main_cfg,
+        "vision": vision_cfg,
+        "translation": trans_cfg,
+    }))
+}
+
+pub async fn configure_role_handler(
+    State(state): State<AppState>,
+    Json(payload): Json<ConfigureRoleRequest>,
+) -> impl IntoResponse {
+    let flags = json!({ "role": payload.role }).to_string();
+    let res = state
+        .db
+        .add_model_config(
+            &payload.name,
+            &payload.provider,
+            payload.base_url.as_deref(),
+            payload.api_key.as_deref(),
+            &payload.model_id,
+            4096,
+            Some(&flags),
+        )
+        .await;
+
+    match res {
+        Ok(cfg) => {
+            if payload.role == "vision" {
+                let _ = state.db.set_active_vision_model(&cfg.id).await;
+            } else if payload.role == "translation" {
+                let _ = state.db.set_active_translation_model(&cfg.id).await;
+            } else {
+                let _ = state.db.set_active_model(&cfg.id).await;
+            }
+            (StatusCode::OK, Json(json!({ "success": true, "config": cfg })))
+        }
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({ "success": false, "error": e.to_string() })),
+        ),
+    }
+}

@@ -110,9 +110,35 @@ impl TurnQueue {
         let active = self.active.lock().await;
         let max = self.max_concurrent.load(Ordering::Relaxed);
 
-        let is_immediate = active.len() < max && queue.is_empty();
-        let position = if is_immediate { 0 } else { queue.len() + 1 };
+        // Prune stale tool jobs (> 300s old)
+        let now = Utc::now();
+        queue.retain(|j| {
+            if j.source.starts_with("tool_") && (now - j.queued_at).num_seconds() > 300 {
+                info!("Pruned stale queued tool turn {} for session {}", j.turn_id, j.session_id);
+                false
+            } else {
+                true
+            }
+        });
 
+        // Debounce background tool triggers: keep at most 2 queued tool jobs per session
+        if source.starts_with("tool_") {
+            let session_tool_jobs = queue
+                .iter()
+                .filter(|j| j.session_id == session_id && j.source.starts_with("tool_"))
+                .count();
+            if session_tool_jobs >= 2 {
+                info!("Debouncing inbound tool turn for session {}: dropping surplus queued trigger", session_id);
+                let _ = event_tx
+                    .send(AgentEvent::Error {
+                        message: "Debounced: session has pending tool turns".to_string(),
+                    })
+                    .await;
+                return (turn_id, 0, false);
+            }
+        }
+
+        let is_immediate = active.len() < max && queue.is_empty();
         let job = QueuedJob {
             turn_id: turn_id.clone(),
             session_id: session_id.to_string(),
@@ -120,29 +146,62 @@ impl TurnQueue {
             mode: mode.to_string(),
             source: source.to_string(),
             images,
-            queued_at: Utc::now(),
+            queued_at: now,
             event_tx,
         };
 
+        let position = if is_immediate {
+            queue.push_back(job);
+            0
+        } else if source == "user" {
+            // User prompts jump ahead of background tool turns
+            let insert_idx = queue.iter().position(|j| j.source != "user").unwrap_or(queue.len());
+            queue.insert(insert_idx, job);
+            insert_idx + 1
+        } else {
+            queue.push_back(job);
+            queue.len()
+        };
+
         if !is_immediate {
-            let _ = job.event_tx.send(AgentEvent::Queued {
-                turn_id: turn_id.clone(),
-                queue_position: position,
-                total_queued: position,
-            }).await;
             info!(
-                "Turn {} for session {} queued at position {} (active: {}, max: {})",
-                turn_id, session_id, position, active.len(), max
+                "Turn {} ({}) for session {} queued at position {}/{} (active: {}, max: {})",
+                turn_id, source, session_id, position, queue.len(), active.len(), max
             );
+
+            // Re-broadcast updated positions to all queued jobs
+            for (idx, waiting) in queue.iter().enumerate() {
+                let _ = waiting
+                    .event_tx
+                    .send(AgentEvent::Queued {
+                        turn_id: waiting.turn_id.clone(),
+                        queue_position: idx + 1,
+                        total_queued: queue.len(),
+                    })
+                    .await;
+            }
         }
 
-        queue.push_back(job);
         drop(active);
         drop(queue);
-
         self.notify.notify_one();
 
         (turn_id, position, is_immediate)
+    }
+
+    pub async fn clear_queue(&self) -> usize {
+        let mut queue = self.queue.lock().await;
+        let count = queue.len();
+        for job in queue.drain(..) {
+            let _ = job
+                .event_tx
+                .send(AgentEvent::Error {
+                    message: "Turn canceled: queue was cleared by operator".to_string(),
+                })
+                .await;
+        }
+        info!("TurnQueue: cleared {} pending jobs", count);
+        count
     }
 
     pub async fn get_status(&self) -> QueueStatusResponse {
@@ -185,6 +244,16 @@ impl TurnQueue {
                 }
 
                 let mut queue = self.queue.lock().await;
+                let now = Utc::now();
+                queue.retain(|j| {
+                    if j.source.starts_with("tool_") && (now - j.queued_at).num_seconds() > 300 {
+                        info!("Pruning stale queued background turn {} for session {} (age > 300s)", j.turn_id, j.session_id);
+                        false
+                    } else {
+                        true
+                    }
+                });
+
                 let job = match queue.pop_front() {
                     Some(j) => j,
                     None => break,

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, Code, Play } from 'lucide-react';
-import { calculateModelWeightsGb } from './vram';
+import { Box, Code, Play, Sparkles } from 'lucide-react';
+import { HfQuantVariant } from './types';
 import { KvCacheSelector } from './KvCacheSelector';
+import { QuantizationSelector } from './QuantizationSelector';
 
 export interface ProvisionerCardProps {
   containerName: string;
@@ -17,12 +18,16 @@ export interface ProvisionerCardProps {
   previewCmd: string;
   isDeploying: boolean;
   selectedModelSize: number;
+  availableQuants?: HfQuantVariant[];
+  isInspectingHf?: boolean;
+  isGgufRepo?: boolean;
+  selectedGgufSizeGb?: number;
   onChangeContainerName: (name: string) => void;
   onChangeEngine: (engine: string) => void;
   onChangeHfRepo: (repo: string) => void;
   onChangeContextWindow: (ctx: number) => void;
   onChangePort: (port: number) => void;
-  onChangeQuantization: (quant: string) => void;
+  onChangeQuantization: (quant: string, sizeGb?: number) => void;
   onChangeKvCacheDtype: (dtype: string) => void;
   onChangeEnableMtp: (val: boolean) => void;
   onChangeEnableVision: (val: boolean) => void;
@@ -45,6 +50,10 @@ export const ProvisionerCard: React.FC<ProvisionerCardProps> = ({
   previewCmd,
   isDeploying,
   selectedModelSize,
+  availableQuants = [],
+  isInspectingHf = false,
+  isGgufRepo = false,
+  selectedGgufSizeGb,
   onChangeContainerName,
   onChangeEngine,
   onChangeHfRepo,
@@ -77,7 +86,15 @@ export const ProvisionerCard: React.FC<ProvisionerCardProps> = ({
           />
         </div>
         <div>
-          <label className="text-[11px] text-slate-400">Inference Engine:</label>
+          <div className="flex items-center space-x-1.5">
+            <label className="text-[11px] text-slate-400">Inference Engine:</label>
+            {isGgufRepo && (
+              <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold flex items-center space-x-1">
+                <Sparkles className="w-2.5 h-2.5 text-emerald-400" />
+                <span>GGUF Auto-Switched</span>
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-1.5 mt-1">
             <button
               type="button"
@@ -208,35 +225,15 @@ export const ProvisionerCard: React.FC<ProvisionerCardProps> = ({
       </div>
 
       {/* Model Quantization */}
-      <div className="space-y-1 pt-1 border-t border-styx-800">
-        <div className="flex items-center justify-between">
-          <label className="text-[11px] text-slate-400">Model Quantization:</label>
-          <span className="text-[10px] text-emerald-400 font-bold">
-            Weights VRAM: ~{calculateModelWeightsGb(selectedModelSize, quantization)} GB
-          </span>
-        </div>
-        <div className="flex flex-wrap items-center gap-1.5">
-          {[
-            { id: 'awq', label: 'AWQ (4-bit)' },
-            { id: 'fp8', label: 'FP8 (8-bit)' },
-            { id: 'gptq', label: 'GPTQ (4-bit)' },
-            { id: 'none', label: 'None (FP16)' },
-          ].map(q => (
-            <button
-              key={q.id}
-              type="button"
-              onClick={() => onChangeQuantization(q.id)}
-              className={`px-2.5 py-1 rounded text-xs border ${
-                quantization === q.id
-                  ? 'bg-emerald-950 border-emerald-500 text-emerald-200 font-bold'
-                  : 'bg-styx-950 border-styx-800 text-slate-400'
-              }`}
-            >
-              {q.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <QuantizationSelector
+        quantization={quantization}
+        availableQuants={availableQuants || []}
+        isInspectingHf={Boolean(isInspectingHf)}
+        isGgufRepo={Boolean(isGgufRepo)}
+        selectedModelSize={selectedModelSize}
+        selectedGgufSizeGb={selectedGgufSizeGb}
+        onChangeQuantization={onChangeQuantization}
+      />
 
       {/* KV Cache Quantization */}
       <KvCacheSelector

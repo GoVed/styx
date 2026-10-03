@@ -161,6 +161,29 @@ pub async fn prepare_openai_messages(messages: &[ChatMessageParam]) -> Vec<Value
     out
 }
 
+#[allow(dead_code)]
+pub fn strip_images_from_prepared_messages(messages: &[Value]) -> Vec<Value> {
+    messages.iter().map(|msg| {
+        let mut cloned = msg.clone();
+        if let Some(content_array) = cloned.get("content").and_then(|c| c.as_array()) {
+            let mut text_parts = Vec::new();
+            for part in content_array {
+                if let Some(p_type) = part.get("type").and_then(|t| t.as_str()) {
+                    if p_type == "text" {
+                        if let Some(txt) = part.get("text").and_then(|t| t.as_str()) {
+                            text_parts.push(txt.to_string());
+                        }
+                    } else if p_type == "image_url" {
+                        text_parts.push("[Image attached]".to_string());
+                    }
+                }
+            }
+            cloned["content"] = json!(text_parts.join("\n"));
+        }
+        cloned
+    }).collect()
+}
+
 pub async fn inspect_image_with_model(
     base_url: &str,
     api_key: &str,
@@ -301,6 +324,10 @@ mod tests {
         assert_eq!(content_parts[1]["type"], "image_url");
         let url_str = content_parts[1]["image_url"]["url"].as_str().unwrap();
         assert!(url_str.starts_with("data:image/jpeg;base64,"));
+
+        let stripped = strip_images_from_prepared_messages(&prepared);
+        assert_eq!(stripped.len(), 1);
+        assert_eq!(stripped[0]["content"], "What color is this?\n[Image attached]");
     }
 }
 

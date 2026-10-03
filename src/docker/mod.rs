@@ -115,7 +115,12 @@ impl DockerOrchestrator {
     }
 
     pub async fn pull_image_if_missing(&self, image: &str) -> Result<()> {
-        info!("Ensuring image exists: {}", image);
+        if self.docker.inspect_image(image).await.is_ok() {
+            info!("Image already present locally: {}", image);
+            return Ok(());
+        }
+
+        info!("Image not found locally, pulling: {}", image);
         let options = CreateImageOptions {
             from_image: image,
             ..Default::default()

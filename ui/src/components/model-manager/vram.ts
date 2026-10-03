@@ -48,7 +48,8 @@ export const calculateTargetQuantization = (
   vramGb: number,
   context: number = 65536,
   selectedQuant?: string,
-  selectedKvDtype?: string
+  selectedKvDtype?: string,
+  exactWeightsGb?: number,
 ) => {
   let recommendedQuant = 'awq';
   if (vramGb <= 12) {
@@ -64,7 +65,9 @@ export const calculateTargetQuantization = (
   const effectiveQuant = selectedQuant || recommendedQuant;
   const effectiveKv = selectedKvDtype || 'fp8';
 
-  const weightsGb = calculateModelWeightsGb(modelSizeB, effectiveQuant);
+  const weightsGb = exactWeightsGb && exactWeightsGb > 0
+    ? Math.round(exactWeightsGb * 10) / 10
+    : calculateModelWeightsGb(modelSizeB, effectiveQuant);
   const kvCacheGb = calculateKvCacheGb(context, effectiveKv);
   const totalGb = Math.round((weightsGb + kvCacheGb) * 10) / 10;
   const fits = totalGb <= vramGb * 0.95;
@@ -94,9 +97,12 @@ export const safeFetchJson = async (res: Response): Promise<any> => {
       try {
         return JSON.parse(text);
       } catch {
+        const cleanError = text.includes('<html') || text.includes('<!DOCTYPE')
+          ? (text.match(/<title>([^<]+)<\/title>/i)?.[1] || text.match(/<h1>([^<]+)<\/h1>/i)?.[1] || `Server error (${res.status} ${res.statusText || 'Error'})`).trim()
+          : text.trim();
         return {
           success: false,
-          error: text.trim() || `Server error (${res.status} ${res.statusText || 'Error'})`,
+          error: cleanError || `Server error (${res.status} ${res.statusText || 'Error'})`,
         };
       }
     } else if (typeof (res as any).json === 'function') {

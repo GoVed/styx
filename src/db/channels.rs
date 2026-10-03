@@ -184,7 +184,7 @@ impl Database {
         let defaults = self.get_channel_defaults().await.unwrap_or(ChannelDefaultsRecord {
             default_group_policy: "mentions".into(),
             default_direct_policy: "all".into(),
-            mention_keywords: "styx,ved,ai,bot".into(),
+            mention_keywords: "styx,assistant,ai,bot".into(),
         });
 
         let policy_record = self.get_channel_policy(channel_id).await?;

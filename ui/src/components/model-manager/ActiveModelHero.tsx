@@ -1,6 +1,7 @@
 import React from 'react';
 import { Zap, MessageSquare, Terminal, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { ContainerSummaryInfo, ModelConfigRecord, SystemTelemetry } from '../../types';
+import { ReasoningSelector } from './ReasoningSelector';
 
 interface ActiveModelHeroProps {
   activeModelTitle: string;
@@ -88,6 +89,9 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Model Reasoning Level Selector */}
+      <ReasoningSelector />
 
       {/* Two User-Requested Options: Advance Info & Logs / Load a Different Model */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-styx-800/80 font-mono">

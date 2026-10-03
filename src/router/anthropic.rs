@@ -13,14 +13,24 @@ pub struct AnthropicClient {
     client: Client,
     api_key: String,
     model: String,
+    reasoning_effort: Option<String>,
 }
 
 impl AnthropicClient {
     pub fn new(api_key: String, model: String) -> Self {
+        Self::new_with_reasoning(api_key, model, None)
+    }
+
+    pub fn new_with_reasoning(
+        api_key: String,
+        model: String,
+        reasoning_effort: Option<String>,
+    ) -> Self {
         Self {
             client: Client::builder().build().unwrap_or_default(),
             api_key,
             model,
+            reasoning_effort,
         }
     }
 
@@ -148,6 +158,17 @@ impl AnthropicClient {
 
         if !system_prompt.is_empty() {
             body["system"] = json!(system_prompt);
+        }
+
+        if let Some(ref re) = self.reasoning_effort {
+            if re != "off" && self.model.contains("claude-3-7") {
+                let budget = match re.as_str() {
+                    "low" => 1024,
+                    "medium" => 4096,
+                    _ => 8192,
+                };
+                body["thinking"] = json!({ "type": "enabled", "budget_tokens": budget });
+            }
         }
 
         if !tools.is_empty() {

@@ -18,6 +18,7 @@ pub fn router() -> Router<AppState> {
         .route("/send", post(send_message))
         .route("/queue", get(get_queue_status).post(update_queue_config))
         .route("/queue/config", post(update_queue_config))
+        .route("/queue/clear", post(clear_queue))
 }
 
 #[derive(Deserialize)]
@@ -134,8 +135,8 @@ async fn send_message(
     let actual_session = match state.db.get_session(&session_id).await {
         Ok(Some(s)) => s,
         _ => {
-            let title = if prompt.len() > 30 {
-                format!("{}...", &prompt[..30])
+            let title = if prompt.chars().count() > 30 {
+                format!("{}...", prompt.chars().take(30).collect::<String>())
             } else {
                 prompt.clone()
             };
@@ -207,6 +208,18 @@ async fn update_queue_config(
             "success": true,
             "max_concurrent_turns": state.turn_queue.max_concurrent(),
             "message": format!("Max concurrent turns updated to {}", state.turn_queue.max_concurrent())
+        })),
+    )
+}
+
+async fn clear_queue(State(state): State<AppState>) -> impl IntoResponse {
+    let cleared = state.turn_queue.clear_queue().await;
+    (
+        StatusCode::OK,
+        Json(json!({
+            "success": true,
+            "cleared_count": cleared,
+            "message": format!("Successfully cleared {} queued turns", cleared)
         })),
     )
 }

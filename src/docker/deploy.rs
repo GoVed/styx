@@ -20,7 +20,7 @@ impl DockerOrchestrator {
             engines::EngineKind::Ollama => 11434,
         };
 
-        let bind_ip = std::env::var("STYX_DOCKER_HOST_IP").unwrap_or_else(|_| "127.0.0.1".to_string());
+        let bind_ip = std::env::var("STYX_DOCKER_HOST_IP").unwrap_or_else(|_| "0.0.0.0".to_string());
         let port_key = format!("{}/tcp", target_port);
         let mut port_bindings = HashMap::new();
         port_bindings.insert(

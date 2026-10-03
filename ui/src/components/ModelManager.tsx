@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Layers, AlertTriangle } from 'lucide-react';
+import { Box, Layers, AlertTriangle, Sparkles } from 'lucide-react';
 import { ContainerSummaryInfo, EnginePreset, ModelConfigRecord, SystemTelemetry } from '../types';
 import {
   calculateModelWeightsGb,
@@ -18,6 +18,8 @@ import { ProvisionerCard } from './model-manager/ProvisionerCard';
 import { LocalContainersCard } from './model-manager/LocalContainersCard';
 import { DeploymentStepper } from './model-manager/DeploymentStepper';
 import { CloudModelConfigs } from './model-manager/CloudModelConfigs';
+import { ToolModelsCard } from './model-manager/ToolModelsCard';
+import { ReasoningSelector } from './model-manager/ReasoningSelector';
 
 export {
   calculateModelWeightsGb,
@@ -48,7 +50,7 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
   });
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-styx-950 text-slate-100 flex flex-col items-center">
+    <div className="flex-1 h-full w-full min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 pb-16 bg-styx-950 text-slate-100 flex flex-col items-center">
       <div className="w-full max-w-6xl space-y-4">
         {/* Navigation Bar & Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-styx-800 gap-3">
@@ -96,13 +98,26 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
               <Layers className="w-3.5 h-3.5" />
               <span>External & Cloud Providers</span>
             </button>
+            <button
+              onClick={() => m.setActiveSubTab('tools')}
+              className={`px-3 py-1.5 rounded flex items-center space-x-1.5 ${
+                m.activeSubTab === 'tools'
+                  ? 'bg-styx-800 text-amber-400 font-bold'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>Tool Models (Vision & Translation)</span>
+            </button>
           </div>
         </div>
 
-        {m.activeSubTab === 'docker' ? (
+        {m.activeSubTab === 'tools' ? (
+          <ToolModelsCard onRefresh={onRefresh} />
+        ) : m.activeSubTab === 'docker' ? (
           <div className="space-y-4">
-            {/* Scenario 2: Active Model Hero */}
-            {m.hasActiveModel && (
+            {/* Scenario 2: Active Model Hero or Reasoning Selector */}
+            {m.hasActiveModel ? (
               <ActiveModelHero
                 activeModelTitle={m.activeModelTitle}
                 activeModelPort={m.activeModelPort}
@@ -117,6 +132,8 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
                   el?.scrollIntoView({ behavior: 'smooth' });
                 }}
               />
+            ) : (
+              <ReasoningSelector />
             )}
 
             {/* Stepper if deploying or starting up */}
@@ -163,12 +180,16 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
                   previewCmd={m.previewCmd}
                   isDeploying={m.isDeploying}
                   selectedModelSize={m.selectedModelSize}
+                  availableQuants={m.availableQuants}
+                  isInspectingHf={m.isInspectingHf}
+                  isGgufRepo={m.isGgufRepo}
+                  selectedGgufSizeGb={m.selectedGgufSizeGb}
                   onChangeContainerName={m.setContainerName}
                   onChangeEngine={m.setSelectedEngine}
                   onChangeHfRepo={m.setHfRepo}
                   onChangeContextWindow={m.setContextWindow}
                   onChangePort={m.setPort}
-                  onChangeQuantization={m.setQuantization}
+                  onChangeQuantization={(quant, sizeGb) => m.handleSelectQuantization(quant, sizeGb)}
                   onChangeKvCacheDtype={m.setKvCacheDtype}
                   onChangeEnableMtp={m.setEnableMtp}
                   onChangeEnableVision={m.setEnableVision}

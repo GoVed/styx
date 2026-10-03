@@ -210,10 +210,65 @@ pub async fn handle_inbound_tool_event(
         "Direct Chat".to_string()
     };
 
+    let received_time = payload
+        .payload
+        .get("timestamp")
+        .and_then(|v| {
+            if let Some(ts_num) = v.as_i64() {
+                chrono::DateTime::from_timestamp(ts_num, 0)
+                    .map(|dt| dt.format("%Y-%m-%d %H:%M:%S UTC").to_string())
+            } else {
+                v.as_str().map(|s| s.to_string())
+            }
+        })
+        .or_else(|| {
+            payload.payload.get("date").and_then(|v| v.as_str()).map(|s| s.to_string())
+        })
+        .unwrap_or_else(|| chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string());
+
+    let mentions_info = if let Some(m_val) = payload.payload.get("mentions") {
+        if let Some(arr) = m_val.as_array() {
+            if !arr.is_empty() {
+                let mut is_self_tagged = payload.payload.get("is_self_tagged").and_then(|v| v.as_bool()).unwrap_or(false);
+                let mention_names: Vec<String> = arr.iter().filter_map(|m| {
+                    if let Some(obj) = m.as_object() {
+                        if obj.get("is_me").and_then(|v| v.as_bool()).unwrap_or(false) {
+                            is_self_tagged = true;
+                        }
+                        if let Some(d_tag) = obj.get("display_tag").and_then(|v| v.as_str()) {
+                            Some(d_tag.to_string())
+                        } else if let Some(name) = obj.get("name").and_then(|v| v.as_str()) {
+                            Some(format!("@{name}"))
+                        } else {
+                            None
+                        }
+                    } else if let Some(s) = m.as_str() {
+                        Some(if s.starts_with('@') { s.to_string() } else { format!("@{s}") })
+                    } else {
+                        None
+                    }
+                }).collect();
+
+                if !mention_names.is_empty() {
+                    let tag_notice = if is_self_tagged { " [YOU WERE TAGGED]" } else { "" };
+                    format!("\nMentions: {}{}", mention_names.join(", "), tag_notice)
+                } else {
+                    String::new()
+                }
+            } else {
+                String::new()
+            }
+        } else {
+            String::new()
+        }
+    } else {
+        String::new()
+    };
+
     let turn_prompt = match payload.event_type.as_str() {
         "new_message" | "message_received" => format!(
-            "[INCOMING TOOL EVENT: {}]\nSender: {}\nChannel: {}{}\nMessage: \"{}\"",
-            payload.protocol.to_uppercase(), sender_display, channel_desc, reply_info, text
+            "[INCOMING TOOL EVENT: {}]\nSender: {}\nChannel: {}{}\nReceived: {}{}\nMessage: \"{}\"",
+            payload.protocol.to_uppercase(), sender_display, channel_desc, reply_info, received_time, mentions_info, text
         ),
         _ => {
             let pretty = serde_json::to_string_pretty(&payload.payload).unwrap_or_else(|_| "{}".to_string());

@@ -1,9 +1,39 @@
 use serde_json::Value;
 
-use crate::db::Database;
+use crate::db::{Database, ModelConfigRecord};
 use crate::mcp::{McpRegistry, ToolCallOutput};
 use crate::memory::MemoryManager;
 use crate::telemetry::TelemetryCollector;
+
+pub fn is_main_model_vision_capable(model_cfg: &ModelConfigRecord) -> bool {
+    let p = model_cfg.provider.to_lowercase();
+    let m = model_cfg.model_id.to_lowercase();
+    let name = model_cfg.name.to_lowercase();
+    let extra = model_cfg.extra_flags_json.as_deref().unwrap_or("").to_lowercase();
+
+    if p == "anthropic" || m.contains("claude-3") || m.contains("sonnet") || m.contains("opus") {
+        return true;
+    }
+    if p == "gemini" || m.contains("gemini") {
+        return true;
+    }
+    if p == "openai" && (m.contains("gpt-4") || m.contains("o1") || m.contains("vision")) {
+        return true;
+    }
+
+    if m.contains("qwen3.5") || m.contains("qwen-3.5")
+        || m.contains("qwen2.5-vl") || m.contains("qwen2-vl") || m.contains("qwen-vl")
+        || m.contains("pixtral") || m.contains("llava") || m.contains("minicpm")
+        || m.contains("paligemma") || m.contains("molmo")
+        || m.contains("vision") || m.contains("-vl") || m.contains("_vl")
+        || name.contains("vision") || name.contains("vl")
+    {
+        return true;
+    }
+
+    extra.contains("\"enable_vision\":true") || extra.contains("\"enable_vision\": true")
+        || extra.contains("\"vision\":true") || extra.contains("\"vision\": true")
+}
 
 pub struct AgentToolExecutor<'a> {
     pub db: &'a Database,
@@ -168,10 +198,20 @@ impl<'a> AgentToolExecutor<'a> {
                     is_error: false,
                 }
             }
-            "inspect_image" => {
+            "inspect_image" | "describe_image" | "ocr_image" => {
+                let active_cfg = self.db.get_active_model_config().await.ok().flatten();
+                if let Some(ref cfg) = active_cfg && is_main_model_vision_capable(cfg) {
+                    return ToolCallOutput {
+                        tool_name: name.to_string(),
+                        success: true,
+                        content: "The active model has native vision capabilities and analyzes attached images directly in the prompt. External vision inspection tool execution is disabled.".to_string(),
+                        is_error: false,
+                    };
+                }
                 let url = args
                     .get("url")
                     .or_else(|| args.get("image_url"))
+                    .or_else(|| args.get("image"))
                     .and_then(|u| u.as_str())
                     .unwrap_or("");
                 let question = args
@@ -189,27 +229,18 @@ impl<'a> AgentToolExecutor<'a> {
                     };
                 }
 
-                let model_cfg = match self.db.get_active_model_config().await {
-                    Ok(Some(cfg)) => cfg,
-                    _ => crate::db::ModelConfigRecord {
-                        id: "default".to_string(),
-                        name: "Local llama.cpp (128k Local GGUF)".to_string(),
-                        provider: "docker_llamacpp".to_string(),
-                        base_url: Some("http://localhost:8080/v1".to_string()),
-                        api_key: None,
-                        model_id: "/models/Qwen3.5-9B-UD-Q4_K_XL.gguf".to_string(),
-                        context_length: 131072,
-                        is_active: true,
-                        extra_flags_json: None,
-                        created_at: chrono::Utc::now().to_rfc3339(),
-                    },
-                };
+                let custom_model = args.get("model").and_then(|m| m.as_str());
+                let custom_endpoint = args
+                    .get("endpoint")
+                    .or_else(|| args.get("base_url"))
+                    .and_then(|e| e.as_str());
 
-                let base_url = model_cfg.base_url.as_deref().unwrap_or("http://localhost:8080/v1");
-                let api_key = model_cfg.api_key.as_deref().unwrap_or("");
-                let model_id = &model_cfg.model_id;
+                let (def_base, def_key, def_model) = crate::router::perceiver::resolve_vision_endpoint(&self.db).await;
+                let base_url = custom_endpoint.unwrap_or(&def_base);
+                let model_id = custom_model.unwrap_or(&def_model);
+                let api_key = if custom_endpoint.is_some() { "" } else { &def_key };
 
-                match crate::router::vision::inspect_image_with_model(
+                match crate::router::perceiver::inspect_image_with_model(
                     base_url,
                     api_key,
                     model_id,

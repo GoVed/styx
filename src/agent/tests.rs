@@ -215,3 +215,119 @@ fn test_format_diagnosis_invalid_choice() {
     assert!(diag.contains("Invalid Engine Configuration Argument"));
     assert!(diag.contains("<option>Re-deploy with recommended engine defaults</option>"));
 }
+
+#[test]
+fn test_format_diagnosis_unknown_architecture() {
+    let log = "llama_model_load: error loading model: unknown model architecture: 'k2-horizon'";
+    let diag = format_diagnosis_from_logs(
+        "IFM/K2-Horizon-7B-GGUF",
+        131072,
+        log,
+        false,
+        "exited (1)",
+        log,
+    );
+    assert!(diag.contains("Unsupported Model Architecture in llama.cpp"));
+    assert!(diag.contains("Qwen 3.5 9B (128k Local GGUF)"));
+}
+
+#[test]
+fn test_find_repetition_cutoff_detects_repeated_phrase() {
+    use super::reasoning::{find_repetition_cutoff, arrest_repetition};
+
+    let normal_text = "Hello there! How can I help you today? Let me know if you need anything.";
+    assert_eq!(find_repetition_cutoff(normal_text), None);
+
+    let repeated = "Let me try with the correct source language setting.\n\nLet me try with the correct source language setting.\n\nLet me try with the correct source language setting.\n\n";
+    let cutoff = find_repetition_cutoff(repeated);
+    assert!(cutoff.is_some());
+    let cutoff_idx = cutoff.unwrap();
+    let truncated = &repeated[..cutoff_idx];
+    assert!(truncated.contains("Let me try with the correct source language setting."));
+    assert_eq!(truncated.matches("Let me try with the correct source language setting.").count(), 1);
+
+    let mut current = repeated.to_string();
+    let mut accumulated = repeated.to_string();
+    let arrested = arrest_repetition(&mut current, &mut accumulated);
+    assert!(arrested);
+    assert_eq!(current.matches("Let me try with the correct source language setting.").count(), 1);
+    assert_eq!(accumulated.matches("Let me try with the correct source language setting.").count(), 1);
+}
+
+#[test]
+fn test_queue_priority_and_pruning_logic() {
+    use std::collections::VecDeque;
+    use chrono::{Utc, Duration};
+
+    struct TestJob {
+        id: &'static str,
+        source: &'static str,
+        session_id: &'static str,
+        queued_at: chrono::DateTime<Utc>,
+    }
+
+    let now = Utc::now();
+    let mut queue: VecDeque<TestJob> = VecDeque::new();
+
+    // 1. Add background tool jobs
+    queue.push_back(TestJob { id: "bg1", source: "tool_whatsapp", session_id: "s1", queued_at: now - Duration::seconds(400) });
+    queue.push_back(TestJob { id: "bg2", source: "tool_whatsapp", session_id: "s1", queued_at: now - Duration::seconds(100) });
+
+    // 2. Prune stale tool jobs (> 300s)
+    queue.retain(|j| !(j.source.starts_with("tool_") && (now - j.queued_at).num_seconds() > 300));
+    assert_eq!(queue.len(), 1);
+    assert_eq!(queue[0].id, "bg2");
+
+    // 3. Debounce: if >= 2 queued tool jobs for same session, reject 3rd
+    queue.push_back(TestJob { id: "bg3", source: "tool_whatsapp", session_id: "s1", queued_at: now });
+    let count_s1 = queue.iter().filter(|j| j.session_id == "s1" && j.source.starts_with("tool_")).count();
+    assert_eq!(count_s1, 2);
+    // 3rd trigger for s1 would be debounced
+    let should_debounce = count_s1 >= 2;
+    assert!(should_debounce);
+
+    // 4. User priority insertion: user prompt must jump ahead of background tool jobs
+    let user_job = TestJob { id: "user1", source: "user", session_id: "s1", queued_at: now };
+    let insert_idx = queue.iter().position(|j| j.source != "user").unwrap_or(queue.len());
+    assert_eq!(insert_idx, 0); // Jumps to index 0 ahead of bg2 and bg3!
+    queue.insert(insert_idx, user_job);
+    assert_eq!(queue[0].id, "user1");
+    assert_eq!(queue[1].id, "bg2");
+    assert_eq!(queue[2].id, "bg3");
+
+    // Second user prompt inserts after user1 but before background jobs
+    let user_job2 = TestJob { id: "user2", source: "user", session_id: "s2", queued_at: now };
+    let insert_idx2 = queue.iter().position(|j| j.source != "user").unwrap_or(queue.len());
+    assert_eq!(insert_idx2, 1);
+    queue.insert(insert_idx2, user_job2);
+    assert_eq!(queue[0].id, "user1");
+    assert_eq!(queue[1].id, "user2");
+    assert_eq!(queue[2].id, "bg2");
+    assert_eq!(queue[3].id, "bg3");
+}
+
+#[test]
+fn test_is_main_model_vision_capable_detection() {
+    let mut cfg = crate::db::ModelConfigRecord {
+        id: "test".to_string(),
+        name: "Local llama.cpp (qwen-3-5-9b)".to_string(),
+        provider: "docker_llamacpp".to_string(),
+        base_url: Some("http://localhost:8080/v1".to_string()),
+        api_key: None,
+        model_id: "/models/Qwen3.5-9B-UD-Q4_K_XL.gguf".to_string(),
+        context_length: 131072,
+        is_active: true,
+        created_at: "".to_string(),
+        extra_flags_json: None,
+    };
+    assert!(super::tools::is_main_model_vision_capable(&cfg));
+
+    cfg.model_id = "meta-llama/Llama-3.1-8B-Instruct".to_string();
+    cfg.name = "Llama 3.1 8B".to_string();
+    assert!(!super::tools::is_main_model_vision_capable(&cfg));
+
+    cfg.provider = "anthropic".to_string();
+    cfg.model_id = "claude-3-7-sonnet-20250219".to_string();
+    assert!(super::tools::is_main_model_vision_capable(&cfg));
+}
+

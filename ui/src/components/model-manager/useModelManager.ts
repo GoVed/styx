@@ -4,6 +4,7 @@ import { calculateTargetQuantization, safeFetchJson } from './vram';
 import { LocalGgufFile } from './types';
 import { useExternalModels } from './useExternalModels';
 import { useContainerLogs } from './useContainerLogs';
+import { useHfInspector } from './useHfInspector';
 
 export interface UseModelManagerProps {
   containers?: ContainerSummaryInfo[];
@@ -44,7 +45,7 @@ export function useModelManager({
 
   const hasActiveModel = Boolean(activeConfig || (activeContainer && activeContainer.state === 'running'));
 
-  const [activeSubTab, setActiveSubTab] = useState<'docker' | 'external'>('docker');
+  const [activeSubTab, setActiveSubTab] = useState<'docker' | 'external' | 'tools'>('docker');
   const [showAdvancedActive, setShowAdvancedActive] = useState<boolean>(false);
   const [showTechnicalLogs, setShowTechnicalLogs] = useState<boolean>(false);
 
@@ -80,6 +81,16 @@ export function useModelManager({
   // External Endpoints Form State
   const externalState = useExternalModels(onRefresh);
 
+  // Hugging Face Dynamic Repo Inspection
+  const hfInspector = useHfInspector({
+    hfRepo,
+    setHfRepo,
+    setQuantization,
+    setSelectedEngine,
+    setSelectedModelSize,
+    setContainerName,
+  });
+
   useEffect(() => {
     fetchLocalFiles();
   }, []);
@@ -102,33 +113,33 @@ export function useModelManager({
     maxNumSeqs, speculativeModel, speculativeTokens, enableMtp, enableVision, port,
   ]);
 
+  const buildDeployPayload = () => ({
+    name: containerName,
+    engine: selectedEngine === 'llamacpp' ? 'llama_cpp' : selectedEngine,
+    hf_repo: hfRepo,
+    hf_token: hfToken || undefined,
+    context_window: contextWindow,
+    gpu_devices: gpuDevices,
+    gpu_vendor: gpuVendor,
+    custom_image: customImage || undefined,
+    tensor_parallel_size: tensorParallel,
+    gpu_memory_utilization: gpuMemoryUtil,
+    quantization: quantization === 'none' ? undefined : quantization,
+    kv_cache_dtype: kvCacheDtype,
+    max_num_seqs: maxNumSeqs,
+    speculative_model: enableMtp ? (speculativeModel || '[mtp]') : undefined,
+    num_speculative_tokens: enableMtp ? speculativeTokens : undefined,
+    enable_mtp: enableMtp,
+    enable_vision: enableVision,
+    port,
+  });
+
   const updatePreview = async () => {
     try {
-      const payload = {
-        name: containerName,
-        engine: selectedEngine === 'llamacpp' ? 'llama_cpp' : selectedEngine,
-        hf_repo: hfRepo,
-        hf_token: hfToken || undefined,
-        context_window: contextWindow,
-        gpu_devices: gpuDevices,
-        gpu_vendor: gpuVendor,
-        custom_image: customImage || undefined,
-        tensor_parallel_size: tensorParallel,
-        gpu_memory_utilization: gpuMemoryUtil,
-        quantization: quantization === 'none' ? undefined : quantization,
-        kv_cache_dtype: kvCacheDtype,
-        max_num_seqs: maxNumSeqs,
-        speculative_model: enableMtp ? (speculativeModel || '[mtp]') : undefined,
-        num_speculative_tokens: enableMtp ? speculativeTokens : undefined,
-        enable_mtp: enableMtp,
-        enable_vision: enableVision,
-        port,
-      };
-
       const res = await fetch('/api/models/preview-command', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(buildDeployPayload()),
       });
       const data = await safeFetchJson(res);
       if (data.success && data.command) setPreviewCmd(data.command);
@@ -157,11 +168,19 @@ export function useModelManager({
 
     const rec = calculateTargetQuantization(size, targetGpuVram, ctx);
     setQuantization(rec.recommendedQuant);
+    hfInspector.setSelectedGgufSizeGb(undefined);
   };
 
   const handleSelectGpuSize = (vramGb: number) => {
     setTargetGpuVram(vramGb);
-    const rec = calculateTargetQuantization(selectedModelSize, vramGb, contextWindow);
+    const rec = calculateTargetQuantization(
+      selectedModelSize,
+      vramGb,
+      contextWindow,
+      quantization,
+      kvCacheDtype,
+      hfInspector.selectedGgufSizeGb
+    );
     setQuantization(rec.recommendedQuant);
   };
 
@@ -189,27 +208,7 @@ export function useModelManager({
   };
 
   const handleDeploy = () => {
-    const payload = {
-      name: containerName,
-      engine: selectedEngine === 'llamacpp' ? 'llama_cpp' : selectedEngine,
-      hf_repo: hfRepo,
-      hf_token: hfToken || undefined,
-      context_window: contextWindow,
-      gpu_devices: gpuDevices,
-      gpu_vendor: gpuVendor,
-      custom_image: customImage || undefined,
-      tensor_parallel_size: tensorParallel,
-      gpu_memory_utilization: gpuMemoryUtil,
-      quantization: quantization === 'none' ? undefined : quantization,
-      kv_cache_dtype: kvCacheDtype,
-      max_num_seqs: maxNumSeqs,
-      speculative_model: enableMtp ? (speculativeModel || '[mtp]') : undefined,
-      num_speculative_tokens: enableMtp ? speculativeTokens : undefined,
-      enable_mtp: enableMtp,
-      enable_vision: enableVision,
-      port,
-    };
-    triggerDeployApi(payload, containerName);
+    triggerDeployApi(buildDeployPayload(), containerName);
   };
 
   const handleFixDeploy16k = () => {
@@ -219,23 +218,12 @@ export function useModelManager({
     setHfRepo('QuantTrio/Qwen3.5-9B-AWQ');
     setContainerName('qwen-3-5-9b');
     setPort(8000);
-    const payload = {
-      name: 'qwen-3-5-9b',
-      engine: 'vllm',
-      hf_repo: 'QuantTrio/Qwen3.5-9B-AWQ',
-      context_window: 16384,
-      gpu_devices: gpuDevices,
-      gpu_vendor: gpuVendor,
-      tensor_parallel_size: 1,
-      gpu_memory_utilization: 0.92,
-      quantization: 'awq',
-      kv_cache_dtype: 'fp8',
-      max_num_seqs: maxNumSeqs,
-      enable_mtp: false,
-      enable_vision: true,
-      port: 8000,
-    };
-    triggerDeployApi(payload, 'qwen-3-5-9b');
+    triggerDeployApi({
+      name: 'qwen-3-5-9b', engine: 'vllm', hf_repo: 'QuantTrio/Qwen3.5-9B-AWQ',
+      context_window: 16384, gpu_devices: gpuDevices, gpu_vendor: gpuVendor,
+      tensor_parallel_size: 1, gpu_memory_utilization: 0.92, quantization: 'awq',
+      kv_cache_dtype: 'fp8', max_num_seqs: maxNumSeqs, enable_mtp: false, enable_vision: true, port: 8000,
+    }, 'qwen-3-5-9b');
   };
 
   const handleFixDeployLlama128k = () => {
@@ -245,21 +233,12 @@ export function useModelManager({
     setHfRepo('/models/Qwen3.5-9B-UD-Q4_K_XL.gguf');
     setContainerName('qwen-3-5-9b-128k');
     setPort(8080);
-    const payload = {
-      name: 'qwen-3-5-9b-128k',
-      engine: 'llama_cpp',
-      hf_repo: '/models/Qwen3.5-9B-UD-Q4_K_XL.gguf',
-      context_window: 131072,
-      gpu_devices: gpuDevices,
-      gpu_vendor: gpuVendor,
-      tensor_parallel_size: 1,
-      gpu_memory_utilization: 0.95,
-      kv_cache_dtype: 'q4_0',
-      enable_mtp: false,
-      enable_vision: true,
-      port: 8080,
-    };
-    triggerDeployApi(payload, 'qwen-3-5-9b-128k');
+    triggerDeployApi({
+      name: 'qwen-3-5-9b-128k', engine: 'llama_cpp', hf_repo: '/models/Qwen3.5-9B-UD-Q4_K_XL.gguf',
+      context_window: 131072, gpu_devices: gpuDevices, gpu_vendor: gpuVendor,
+      tensor_parallel_size: 1, gpu_memory_utilization: 0.95, kv_cache_dtype: 'q4_0',
+      enable_mtp: false, enable_vision: true, port: 8080,
+    }, 'qwen-3-5-9b-128k');
   };
 
   const handleActivateContainer = async (containerId: string) => {
@@ -341,6 +320,7 @@ export function useModelManager({
     isContainerActive,
     activeModelTitle,
     activeModelPort,
+    ...hfInspector,
     ...logsState,
     ...externalState,
   };

@@ -87,6 +87,104 @@ impl Database {
         Ok(())
     }
 
+    pub async fn get_active_vision_model_config(&self) -> Result<Option<ModelConfigRecord>> {
+        let configs = self.list_model_configs().await?;
+        for c in &configs {
+            if let Some(ref flags) = c.extra_flags_json {
+                if flags.contains("\"role\":\"vision\"") || flags.contains("\"role\": \"vision\"") {
+                    return Ok(Some(c.clone()));
+                }
+            }
+        }
+        for c in &configs {
+            let lower_id = c.model_id.to_lowercase();
+            let lower_name = c.name.to_lowercase();
+            if lower_id.contains("moondream")
+                || lower_id.contains("qwen2-vl")
+                || lower_id.contains("qwen2.5-vl")
+                || lower_name.contains("vision sidecar")
+            {
+                return Ok(Some(c.clone()));
+            }
+        }
+        Ok(None)
+    }
+
+    #[allow(dead_code)]
+    pub async fn set_active_vision_model(&self, id: &str) -> Result<()> {
+        let conn = self.conn.lock().await;
+        let mut stmt = conn.prepare("SELECT id, extra_flags_json FROM model_configs WHERE extra_flags_json LIKE '%vision%'")?;
+        let rows = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, Option<String>>(1)?)))?;
+        let items: Vec<(String, Option<String>)> = rows.filter_map(|r| r.ok()).collect();
+        for (row_id, flags_opt) in items {
+            if let Some(flags) = flags_opt {
+                let cleaned = flags
+                    .replace("\"role\":\"vision\",", "")
+                    .replace(",\"role\":\"vision\"", "")
+                    .replace("\"role\":\"vision\"", "");
+                let _ = conn.execute(
+                    "UPDATE model_configs SET extra_flags_json = ?1 WHERE id = ?2",
+                    params![cleaned, row_id],
+                );
+            }
+        }
+        let flags = serde_json::json!({"role": "vision"}).to_string();
+        conn.execute(
+            "UPDATE model_configs SET extra_flags_json = ?1 WHERE id = ?2",
+            params![flags, id],
+        )?;
+        Ok(())
+    }
+
+    pub async fn get_active_translation_model_config(&self) -> Result<Option<ModelConfigRecord>> {
+        let configs = self.list_model_configs().await?;
+        for c in &configs {
+            if let Some(ref flags) = c.extra_flags_json {
+                if flags.contains("\"role\":\"translation\"") || flags.contains("\"role\": \"translation\"") {
+                    return Ok(Some(c.clone()));
+                }
+            }
+        }
+        for c in &configs {
+            let lower_id = c.model_id.to_lowercase();
+            let lower_name = c.name.to_lowercase();
+            if lower_id.contains("gemma2:2b")
+                || lower_id.contains("sarvam")
+                || lower_id.contains("indic")
+                || lower_name.contains("translation")
+                || lower_name.contains("gujarati")
+            {
+                return Ok(Some(c.clone()));
+            }
+        }
+        Ok(None)
+    }
+
+    pub async fn set_active_translation_model(&self, id: &str) -> Result<()> {
+        let conn = self.conn.lock().await;
+        let mut stmt = conn.prepare("SELECT id, extra_flags_json FROM model_configs WHERE extra_flags_json LIKE '%translation%'")?;
+        let rows = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, Option<String>>(1)?)))?;
+        let items: Vec<(String, Option<String>)> = rows.filter_map(|r| r.ok()).collect();
+        for (row_id, flags_opt) in items {
+            if let Some(flags) = flags_opt {
+                let cleaned = flags
+                    .replace("\"role\":\"translation\",", "")
+                    .replace(",\"role\":\"translation\"", "")
+                    .replace("\"role\":\"translation\"", "");
+                let _ = conn.execute(
+                    "UPDATE model_configs SET extra_flags_json = ?1 WHERE id = ?2",
+                    params![cleaned, row_id],
+                );
+            }
+        }
+        let flags = serde_json::json!({"role": "translation"}).to_string();
+        conn.execute(
+            "UPDATE model_configs SET extra_flags_json = ?1 WHERE id = ?2",
+            params![flags, id],
+        )?;
+        Ok(())
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub async fn add_model_config(
         &self,
@@ -131,6 +229,19 @@ impl Database {
         conn.execute(
             "UPDATE model_configs SET name = ?1, model_id = ?2, context_length = ?3 WHERE id = ?4",
             params![name, model_id, context_length, id],
+        )?;
+        Ok(())
+    }
+
+    pub async fn update_model_config_flags(
+        &self,
+        id: &str,
+        extra_flags_json: Option<&str>,
+    ) -> Result<()> {
+        let conn = self.conn.lock().await;
+        conn.execute(
+            "UPDATE model_configs SET extra_flags_json = ?1 WHERE id = ?2",
+            params![extra_flags_json, id],
         )?;
         Ok(())
     }

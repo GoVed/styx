@@ -150,7 +150,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Content Area */}
-      <main className="flex-1 min-h-0 relative overflow-hidden bg-styx-950">
+      <main className="flex-1 min-h-0 relative overflow-hidden bg-styx-950 flex flex-col">
         {activeTab === 'chat' && (
           <ChatView
             sessions={sessions}
@@ -194,6 +194,7 @@ export const App: React.FC = () => {
             onStartOnboarding={handleStartOnboarding}
             onOpenAudit={() => setAuditOpen(true)}
             onBackToChat={() => setActiveTab('chat')}
+            onPasswordChanged={(token) => authStatus && handleAuthenticated(token, authStatus)}
           />
         )}
 

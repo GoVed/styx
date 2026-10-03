@@ -30,3 +30,22 @@ export interface LocalGgufFile {
   is_mmproj: boolean;
   is_draft: boolean;
 }
+
+export interface HfQuantVariant {
+  quant: string;
+  filename: string;
+  size_bytes?: number;
+  size_gb: number;
+}
+
+export interface HfInspectResponse {
+  success: boolean;
+  repo?: string;
+  is_gguf?: boolean;
+  recommended_engine?: string;
+  recommended_quant?: string;
+  total_files?: number;
+  quants?: HfQuantVariant[];
+  error?: string;
+}
+

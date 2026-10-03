@@ -93,20 +93,20 @@ Message: "Build deployed successfully"`;
     expect(parsedSlack?.messageText).toBe('Build deployed successfully');
     expect(parsedSlack?.isGroup).toBe(true);
 
-    // 3. Bell legacy format (from mobile screenshot)
-    const bellFormat = `🔔 **Incoming WhatsApp Message from '120363320671864172' (ID: 120363320671864172@newsletter):**
-"Paper Rex is the first team headed to Playoffs!"
+    // 3. Bell legacy format
+    const bellFormat = `🔔 **Incoming WhatsApp Message from 'Tech News' (ID: 120363000000000002@newsletter):**
+"Release v2.0 is now live!"
 
 Raw Metadata:
 \`\`\`json
-{"from": "120363320671864172@newsletter"}
+{"from": "120363000000000002@newsletter"}
 \`\`\``;
     const parsedBell = parseToolEvent(bellFormat);
     expect(parsedBell).not.toBeNull();
     expect(parsedBell?.protocol).toBe('WhatsApp');
-    expect(parsedBell?.senderName).toBe('120363320671864172');
-    expect(parsedBell?.channel).toBe('120363320671864172@newsletter');
-    expect(parsedBell?.messageText).toBe('Paper Rex is the first team headed to Playoffs!');
+    expect(parsedBell?.senderName).toBe('Tech News');
+    expect(parsedBell?.channel).toBe('120363000000000002@newsletter');
+    expect(parsedBell?.messageText).toBe('Release v2.0 is now live!');
 
     // 4. Historical format
     const histFormat = `[INCOMING TOOL EVENT: whatsapp/new_message]

@@ -13,10 +13,20 @@ pub struct OpenAiClient {
     base_url: String,
     api_key: String,
     model: String,
+    reasoning_effort: Option<String>,
 }
 
 impl OpenAiClient {
     pub fn new(base_url: String, api_key: String, model: String) -> Self {
+        Self::new_with_reasoning(base_url, api_key, model, None)
+    }
+
+    pub fn new_with_reasoning(
+        base_url: String,
+        api_key: String,
+        model: String,
+        reasoning_effort: Option<String>,
+    ) -> Self {
         let mut clean_base = base_url.trim_end_matches('/').to_string();
 
         // If running inside Docker, adapt localhost / 127.0.0.1 to host.docker.internal
@@ -34,6 +44,7 @@ impl OpenAiClient {
             base_url: clean_base,
             api_key,
             model,
+            reasoning_effort,
         }
     }
 
@@ -125,10 +136,19 @@ impl OpenAiClient {
             "model": self.model,
             "messages": prepared_messages,
             "stream": true,
+            "temperature": 0.7,
+            "frequency_penalty": 0.2,
+            "presence_penalty": 0.2,
         });
 
         if let Some(mt) = max_tokens {
             body["max_tokens"] = json!(mt);
+        }
+
+        if let Some(ref re) = self.reasoning_effort {
+            if re != "off" {
+                body["reasoning_effort"] = json!(re);
+            }
         }
 
         if !tools.is_empty() {
@@ -170,8 +190,26 @@ impl OpenAiClient {
         if !resp.status().is_success() {
             let status = resp.status();
             let text = resp.text().await.unwrap_or_default();
-            // If the failure was due to function calling / tools unsupported on this engine, retry without tools
-            if body.get("tools").is_some() && (text.contains("tool choice") || text.contains("tool") || text.contains("function")) {
+
+            // 1. If failure was due to image input not supported on a text-only model (missing mmproj), perceive or strip images
+            if text.contains("image input is not supported") || text.contains("mmproj") {
+                let raw_msgs = body.get("messages").and_then(|m| m.as_array()).map(|a| a.as_slice()).unwrap_or(&[]);
+                let perceived_messages = super::perceiver::perceive_or_strip_images(raw_msgs, None).await;
+                let mut retry_body = body.clone();
+                retry_body["messages"] = json!(perceived_messages);
+                let mut retry_req = self.client.post(&chat_url).json(&retry_body);
+                if !self.api_key.is_empty() {
+                    retry_req = retry_req.bearer_auth(&self.api_key);
+                }
+                let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without images failed: {}", e))?;
+                if retry_resp.status().is_success() {
+                    resp = retry_resp;
+                } else {
+                    let r_status = retry_resp.status();
+                    let r_text = retry_resp.text().await.unwrap_or_default();
+                    bail!("OpenAI API error {}: {}", r_status, r_text);
+                }
+            } else if body.get("tools").is_some() && (text.contains("tool choice") || text.contains("tool") || text.contains("function")) {
                 let mut retry_body = body.clone();
                 if let Some(obj) = retry_body.as_object_mut() {
                     obj.remove("tools");
@@ -181,6 +219,23 @@ impl OpenAiClient {
                     retry_req = retry_req.bearer_auth(&self.api_key);
                 }
                 let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without tools failed: {}", e))?;
+                if retry_resp.status().is_success() {
+                    resp = retry_resp;
+                } else {
+                    let r_status = retry_resp.status();
+                    let r_text = retry_resp.text().await.unwrap_or_default();
+                    bail!("OpenAI API error {}: {}", r_status, r_text);
+                }
+            } else if body.get("reasoning_effort").is_some() && (text.contains("reasoning_effort") || text.contains("extra_forbidden") || text.contains("unrecognized")) {
+                let mut retry_body = body.clone();
+                if let Some(obj) = retry_body.as_object_mut() {
+                    obj.remove("reasoning_effort");
+                }
+                let mut retry_req = self.client.post(&chat_url).json(&retry_body);
+                if !self.api_key.is_empty() {
+                    retry_req = retry_req.bearer_auth(&self.api_key);
+                }
+                let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without reasoning_effort failed: {}", e))?;
                 if retry_resp.status().is_success() {
                     resp = retry_resp;
                 } else {
@@ -210,14 +265,8 @@ impl OpenAiClient {
                 }
 
                 if line == "data: [DONE]" {
-                    for (is_thought, text) in tag_parser.flush() {
-                        if !text.is_empty() {
-                            if is_thought {
-                                let _ = tx.send(super::StreamChunk::Thought(text)).await;
-                            } else {
-                                let _ = tx.send(super::StreamChunk::Token(text)).await;
-                            }
-                        }
+                    for chunk in tag_parser.flush() {
+                        let _ = tx.send(chunk).await;
                     }
                     let _ = tx.send(super::StreamChunk::Done).await;
                     return Ok(());
@@ -237,19 +286,13 @@ impl OpenAiClient {
                                         let _ = tx.send(super::StreamChunk::Thought(thought.to_string())).await;
                                     }
 
-                                // 2. Check content tokens (parsed for <think>...</think> / <thought> tags)
+                                // 2. Check content tokens (parsed for thoughts and native XML/JSON tool calls)
                                 if let Some(content) = delta
                                     .and_then(|d| d.get("content"))
                                     .and_then(|c| c.as_str())
                                     && !content.is_empty() {
-                                        for (is_thought, text) in tag_parser.process(content) {
-                                            if !text.is_empty() {
-                                                if is_thought {
-                                                    let _ = tx.send(super::StreamChunk::Thought(text)).await;
-                                                } else {
-                                                    let _ = tx.send(super::StreamChunk::Token(text)).await;
-                                                }
-                                            }
+                                        for chunk in tag_parser.process(content) {
+                                            let _ = tx.send(chunk).await;
                                         }
                                     }
 
@@ -287,14 +330,8 @@ impl OpenAiClient {
             }
         }
 
-        for (is_thought, text) in tag_parser.flush() {
-            if !text.is_empty() {
-                if is_thought {
-                    let _ = tx.send(super::StreamChunk::Thought(text)).await;
-                } else {
-                    let _ = tx.send(super::StreamChunk::Token(text)).await;
-                }
-            }
+        for chunk in tag_parser.flush() {
+            let _ = tx.send(chunk).await;
         }
         let _ = tx.send(super::StreamChunk::Done).await;
         Ok(())

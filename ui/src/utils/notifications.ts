@@ -72,15 +72,18 @@ export function sendBrowserNotification(
     body?: string;
     tag?: string;
     sessionId?: string;
+    urgency?: 'info' | 'action_required' | 'alert';
     onClick?: () => void;
   }
 ): boolean {
-  // Trigger physical device vibration if supported (Android / mobile browsers)
-  if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-    try {
-      navigator.vibrate([200, 100, 200, 100, 300]);
-    } catch {
-      // Ignore vibration errors if blocked by OS policy
+  // Trigger physical device vibration only for alert or action_required urgency
+  if (options?.urgency && options.urgency !== 'info') {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate([200, 100, 200, 100, 300]);
+      } catch {
+        // Ignore vibration errors if blocked by OS policy
+      }
     }
   }
 

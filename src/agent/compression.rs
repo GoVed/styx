@@ -1,4 +1,4 @@
-use crate::router::openai::ChatMessageParam;
+use crate::router::openai::{ChatMessageParam, ToolParam};
 use serde_json::Value;
 
 /// Conservative token estimator (chars / 3 or words * 4/3 + message boundary overhead)
@@ -10,6 +10,16 @@ pub fn estimate_tokens(text: &str) -> usize {
     let words = text.split_whitespace().count();
     let est = (chars / 3).max((words * 4) / 3) + 4;
     est.max(1)
+}
+
+pub fn estimate_tools_tokens(tools: &[ToolParam]) -> usize {
+    tools
+        .iter()
+        .map(|t| {
+            let p_str = t.parameters.to_string();
+            estimate_tokens(&t.name) + estimate_tokens(&t.description) + estimate_tokens(&p_str) + 16
+        })
+        .sum()
 }
 
 pub fn estimate_messages_tokens(messages: &[ChatMessageParam]) -> usize {
@@ -178,7 +188,9 @@ pub fn prepare_auto_compressed_messages(
     }
 
     // HARD INVARIANT: Guarantee prompt fits strictly within max_prompt_budget
-    while estimate_messages_tokens(&result) > max_prompt_budget {
+    let mut guard = 0;
+    while estimate_messages_tokens(&result) > max_prompt_budget && guard < 100 {
+        guard += 1;
         let current_tokens = estimate_messages_tokens(&result);
         if current_tokens <= max_prompt_budget {
             break;
@@ -216,7 +228,9 @@ pub fn prepare_auto_compressed_messages(
             let keep_len = msg_len.saturating_sub(cut_chars).max(80);
             result[candidate_idx].content =
                 result[candidate_idx].content.chars().take(keep_len).collect();
-            break;
+            if result[candidate_idx].content.len() <= 80 && result.len() > 3 && candidate_idx != 0 && candidate_idx != 1 && candidate_idx < result.len() - 1 {
+                result.remove(candidate_idx);
+            }
         }
     }
 

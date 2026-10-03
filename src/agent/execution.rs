@@ -1,10 +1,11 @@
 use anyhow::Result;
 use serde_json::{json, Value};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::sync::mpsc;
+use tracing::info;
 use uuid::Uuid;
 
-use crate::agent::compression::{estimate_messages_tokens, prepare_auto_compressed_messages};
+use crate::agent::compression::{estimate_messages_tokens, estimate_tools_tokens, prepare_auto_compressed_messages};
 use crate::agent::types::AgentEvent;
 use crate::agent::AgentRunner;
 use crate::db::ModelConfigRecord;
@@ -25,42 +26,48 @@ impl AgentRunner {
     ) -> Result<(String, String)> {
         let max_iterations = if is_mission_mode { 15 } else { 10 };
         let mut iteration = 0;
-        let mut accumulated_full_response = String::new();
-        let mut accumulated_full_thought = String::new();
+        let (mut accumulated_full_response, mut accumulated_full_thought) = (String::new(), String::new());
+        let (mut last_completed_text, mut last_completed_thought) = (String::new(), String::new());
 
-        let context_limit = if model_cfg.context_length > 0 {
-            model_cfg.context_length as usize
-        } else {
-            16384
-        };
+        let tools_overhead = estimate_tools_tokens(&available_tools);
+        let context_limit = if model_cfg.context_length > 0 { model_cfg.context_length as usize } else { 16384 };
         let target_generation_headroom = (context_limit / 4).clamp(1024, 8192);
-        let max_prompt_budget = context_limit.saturating_sub(target_generation_headroom);
+        let mut max_prompt_budget = context_limit
+            .saturating_sub(target_generation_headroom)
+            .saturating_sub(tools_overhead)
+            .max(1024);
 
         chat_messages = prepare_auto_compressed_messages(chat_messages, max_prompt_budget);
 
+        let reasoning_effort = self
+            .db
+            .get_setting("reasoning_effort")
+            .await
+            .ok()
+            .flatten()
+            .unwrap_or_else(|| "high".to_string());
+
+        let mut had_tool_rejection = false;
+
         while iteration < max_iterations {
             iteration += 1;
+            if iteration > 1 {
+                let _ = event_tx.send(AgentEvent::QueueStarted { turn_id: session_id.to_string() }).await;
+            }
 
             if estimate_messages_tokens(&chat_messages) > max_prompt_budget {
                 chat_messages = prepare_auto_compressed_messages(chat_messages, max_prompt_budget);
             }
 
-            let prompt_tokens = estimate_messages_tokens(&chat_messages);
+            let prompt_tokens = estimate_messages_tokens(&chat_messages) + tools_overhead;
             let remaining_kv = context_limit.saturating_sub(prompt_tokens + 32).max(512);
             let max_gen_tokens = Some(remaining_kv as u32);
 
-            let mut rx = self
-                .router
-                .dispatch_stream(
-                    &model_cfg.provider,
-                    model_cfg.base_url.as_deref(),
-                    model_cfg.api_key.as_deref(),
-                    &model_cfg.model_id,
-                    chat_messages.clone(),
-                    available_tools.clone(),
-                    max_gen_tokens,
-                )
-                .await;
+            let mut rx = self.router.dispatch_stream(
+                &model_cfg.provider, model_cfg.base_url.as_deref(), model_cfg.api_key.as_deref(),
+                &model_cfg.model_id, chat_messages.clone(), available_tools.clone(), max_gen_tokens,
+                Some(&reasoning_effort),
+            ).await;
 
             let mut current_turn_text = String::new();
             let mut current_turn_thought = String::new();
@@ -77,6 +84,9 @@ impl AgentRunner {
                         current_turn_thought.push_str(&th);
                         accumulated_full_thought.push_str(&th);
                         let _ = event_tx.send(AgentEvent::Thought { content: th }).await;
+                        if crate::agent::reasoning::arrest_repetition(&mut current_turn_thought, &mut accumulated_full_thought) {
+                            break;
+                        }
                     }
                     StreamChunk::Token(tok) => {
                         current_turn_text.push_str(&tok);
@@ -84,6 +94,9 @@ impl AgentRunner {
                         token_count_turn += 1;
                         self.telemetry.record_tokens(1);
                         let _ = event_tx.send(AgentEvent::Token { content: tok }).await;
+                        if crate::agent::reasoning::arrest_repetition(&mut current_turn_text, &mut accumulated_full_response) {
+                            break;
+                        }
                     }
                     StreamChunk::ToolCallDelta {
                         index,
@@ -106,7 +119,6 @@ impl AgentRunner {
                         break;
                     }
                     StreamChunk::Error(err) => {
-                        let _ = event_tx.send(AgentEvent::Error { message: err.clone() }).await;
                         turn_error = Some(err);
                         break;
                     }
@@ -114,13 +126,21 @@ impl AgentRunner {
             }
 
             if let Some(err) = turn_error {
+                if (err.contains("exceeds the available context size")
+                    || err.contains("exceed_context_size_error")
+                    || err.contains("context_length_exceeded"))
+                    && iteration < max_iterations
+                {
+                    tracing::warn!("Context size overflow from engine; applying emergency compression retry");
+                    max_prompt_budget = (max_prompt_budget / 2).max(512);
+                    chat_messages = prepare_auto_compressed_messages(chat_messages, max_prompt_budget);
+                    continue;
+                }
+
+                let _ = event_tx.send(AgentEvent::Error { message: err.clone() }).await;
                 let diagnostic = self.diagnose_inference_failure(model_cfg, &err).await;
                 if accumulated_full_response.trim().is_empty() {
-                    let _ = event_tx
-                        .send(AgentEvent::Token {
-                            content: diagnostic.clone(),
-                        })
-                        .await;
+                    let _ = event_tx.send(AgentEvent::Token { content: diagnostic.clone() }).await;
                     accumulated_full_response = diagnostic;
                 }
                 break;
@@ -134,6 +154,8 @@ impl AgentRunner {
 
             // If no tool calls were made, turn is complete
             if tool_calls_map.is_empty() {
+                last_completed_text = current_turn_text;
+                last_completed_thought = current_turn_thought;
                 break;
             }
 
@@ -150,62 +172,32 @@ impl AgentRunner {
 
             let tool_params: Vec<ToolCallParam> = sorted_calls
                 .iter()
-                .map(|(_idx, (call_id, name, args))| ToolCallParam {
-                    id: call_id.clone(),
-                    kind: "function".to_string(),
-                    function: ToolCallFunctionParam {
-                        name: name.clone(),
-                        arguments: args.clone(),
-                    },
+                .map(|(_, (cid, name, args))| ToolCallParam {
+                    id: cid.clone(), kind: "function".to_string(),
+                    function: ToolCallFunctionParam { name: name.clone(), arguments: args.clone() },
                 })
                 .collect();
 
             chat_messages.push(ChatMessageParam {
-                role: "assistant".to_string(),
-                content: current_turn_text.clone(),
-                name: None,
-                tool_call_id: None,
-                tool_calls: Some(tool_params),
-                images: None,
+                role: "assistant".to_string(), content: current_turn_text.clone(),
+                name: None, tool_call_id: None, tool_calls: Some(tool_params), images: None,
             });
 
             for (_idx, (call_id, tool_name, args_str)) in sorted_calls {
-                let parsed_args: Value =
-                    serde_json::from_str(&args_str).unwrap_or_else(|_| json!({}));
+                let parsed_args: Value = serde_json::from_str(&args_str).unwrap_or_else(|_| json!({}));
+                let _ = event_tx.send(AgentEvent::ToolCallStarted {
+                    id: call_id.clone(), tool_name: tool_name.clone(), arguments: parsed_args.clone(),
+                }).await;
 
-                let _ = event_tx
-                    .send(AgentEvent::ToolCallStarted {
-                        id: call_id.clone(),
-                        tool_name: tool_name.clone(),
-                        arguments: parsed_args.clone(),
-                    })
-                    .await;
-
-                // Check policy
                 let tool_def = self.mcp.get_tool(&tool_name).await;
-                let policy = tool_def
-                    .as_ref()
-                    .map(|t| t.policy)
-                    .unwrap_or(PolicyTier::RequireApproval);
-                let risk_level = tool_def
-                    .as_ref()
-                    .map(|t| t.risk_level.clone())
-                    .unwrap_or_else(|| "HIGH".to_string());
+                let policy = tool_def.as_ref().map(|t| t.policy).unwrap_or(PolicyTier::RequireApproval);
+                let risk_level = tool_def.as_ref().map(|t| t.risk_level.clone()).unwrap_or_else(|| "HIGH".to_string());
 
-                let (final_args, tool_permitted, rejection_reason) =
-                    if policy == PolicyTier::RequireApproval {
-                        self.handle_hitl_approval(
-                            session_id,
-                            &tool_name,
-                            &args_str,
-                            &parsed_args,
-                            &risk_level,
-                            event_tx,
-                        )
-                        .await
-                    } else {
-                        (parsed_args.clone(), true, None)
-                    };
+                let (final_args, tool_permitted, rejection_reason) = if policy == PolicyTier::RequireApproval {
+                    self.handle_hitl_approval(session_id, &tool_name, &args_str, &parsed_args, &risk_level, event_tx).await
+                } else {
+                    (parsed_args.clone(), true, None)
+                };
 
                 let tool_start = Instant::now();
                 let output = if tool_permitted {
@@ -229,6 +221,7 @@ impl AgentRunner {
                     }
                     res.content
                 } else {
+                    had_tool_rejection = true;
                     let duration = tool_start.elapsed().as_millis() as u64;
                     let reject_msg = format!(
                         "Tool execution rejected by human operator. Reason: {}",
@@ -244,27 +237,32 @@ impl AgentRunner {
                 };
 
                 chat_messages.push(ChatMessageParam {
-                    role: "tool".to_string(),
-                    content: output,
-                    name: Some(tool_name),
-                    tool_call_id: Some(call_id),
-                    tool_calls: None,
-                    images: None,
+                    role: "tool".to_string(), content: output,
+                    name: Some(tool_name), tool_call_id: Some(call_id), tool_calls: None, images: None,
                 });
+            }
+
+            if had_tool_rejection {
+                info!("Tool rejected/timed out in session {}; halting loop to prevent retry", session_id);
+                break;
             }
         }
 
-        // If tools executed but loop completed without final text response, force synthesis pass.
-        if accumulated_full_response.trim().is_empty() {
+        let mut synth_text = String::new();
+        if (last_completed_text.trim().is_empty() && accumulated_full_response.trim().is_empty()) || had_tool_rejection {
+            let synth_prompt = if had_tool_rejection {
+                "The requested tool execution was rejected by the operator or timed out. State clearly that the action was canceled, summarize what was stopped, and ask how the operator would like to proceed. Conclude with <options>.".to_string()
+            } else {
+                "All tool actions are finished. Provide your direct response to the operator summarizing what was done and conclude with <options>.".to_string()
+            };
             let mut final_messages = chat_messages.clone();
             final_messages.push(ChatMessageParam {
-                role: "system".to_string(),
-                content: "All tool actions are finished. Provide your direct response to the operator summarizing what was done and conclude with <options>.".to_string(),
+                role: "system".to_string(), content: synth_prompt,
                 name: None, tool_call_id: None, tool_calls: None, images: None,
             });
             let mut rx = self.router.dispatch_stream(
                 &model_cfg.provider, model_cfg.base_url.as_deref(), model_cfg.api_key.as_deref(),
-                &model_cfg.model_id, final_messages, vec![], Some(1024),
+                &model_cfg.model_id, final_messages, vec![], Some(1024), Some(&reasoning_effort),
             ).await;
             while let Some(chunk) = rx.recv().await {
                 match chunk {
@@ -273,15 +271,21 @@ impl AgentRunner {
                         let _ = event_tx.send(AgentEvent::Thought { content: th }).await;
                     }
                     StreamChunk::Token(tok) => {
+                        synth_text.push_str(&tok);
                         accumulated_full_response.push_str(&tok);
                         let _ = event_tx.send(AgentEvent::Token { content: tok }).await;
+                        if crate::agent::reasoning::arrest_repetition(&mut synth_text, &mut accumulated_full_response) {
+                            break;
+                        }
                     }
                     _ => {}
                 }
             }
         }
 
-        Ok((accumulated_full_response, accumulated_full_thought))
+        let final_resp = if had_tool_rejection && !synth_text.trim().is_empty() { synth_text } else if !last_completed_text.trim().is_empty() { last_completed_text } else if !synth_text.trim().is_empty() { synth_text } else { accumulated_full_response };
+        let final_th = if !last_completed_thought.trim().is_empty() { last_completed_thought } else { accumulated_full_thought };
+        Ok((final_resp, final_th))
     }
 
     async fn handle_hitl_approval(
@@ -295,11 +299,8 @@ impl AgentRunner {
     ) -> (Value, bool, Option<String>) {
         let ticket_id = Uuid::new_v4().to_string();
         let ticket = ApprovalTicket {
-            ticket_id: ticket_id.clone(),
-            session_id: session_id.to_string(),
-            tool_name: tool_name.to_string(),
-            arguments: parsed_args.clone(),
-            risk_level: risk_level.to_string(),
+            ticket_id: ticket_id.clone(), session_id: session_id.to_string(), tool_name: tool_name.to_string(),
+            arguments: parsed_args.clone(), risk_level: risk_level.to_string(),
             explanation: Some(format!("Agent requested state-mutating tool '{}'", tool_name)),
             created_at: chrono::Utc::now().to_rfc3339(),
         };
@@ -307,24 +308,34 @@ impl AgentRunner {
         let _ = self.db.create_approval_ticket(&ticket_id, session_id, tool_name, args_str, risk_level, ticket.explanation.as_deref()).await;
         let _ = event_tx.send(AgentEvent::ToolPendingApproval { ticket: ticket.clone() }).await;
 
-        match self.hitl.submit_for_approval(ticket).await.await {
-            Ok(ApprovalDecision::Approve) => {
+        let rx = self.hitl.submit_for_approval(ticket).await;
+        let decision = match tokio::time::timeout(Duration::from_secs(120), rx).await {
+            Ok(Ok(dec)) => dec,
+            Ok(Err(_)) => ApprovalDecision::Reject { reason: Some("Approval channel canceled".to_string()) },
+            Err(_) => {
+                let reason = "Approval request timed out after 120s with no operator response.".to_string();
+                let _ = self.hitl.resolve_approval(&ticket_id, ApprovalDecision::Reject { reason: Some(reason.clone()) }).await;
+                ApprovalDecision::Reject { reason: Some(reason) }
+            }
+        };
+
+        match decision {
+            ApprovalDecision::Approve => {
                 let _ = self.db.resolve_approval_ticket(&ticket_id, "approved", None).await;
                 let _ = event_tx.send(AgentEvent::ToolApproved { ticket_id }).await;
                 (parsed_args.clone(), true, None)
             }
-            Ok(ApprovalDecision::ModifyPayload { new_arguments }) => {
+            ApprovalDecision::ModifyPayload { new_arguments } => {
                 let mod_str = serde_json::to_string(&new_arguments).unwrap_or_default();
                 let _ = self.db.resolve_approval_ticket(&ticket_id, "modified", Some(&mod_str)).await;
                 let _ = event_tx.send(AgentEvent::ToolApproved { ticket_id }).await;
                 (new_arguments, true, None)
             }
-            Ok(ApprovalDecision::Reject { reason }) => {
-                let _ = self.db.resolve_approval_ticket(&ticket_id, "rejected", None).await;
+            ApprovalDecision::Reject { reason } => {
+                let _ = self.db.resolve_approval_ticket(&ticket_id, "rejected", reason.as_deref()).await;
                 let _ = event_tx.send(AgentEvent::ToolRejected { ticket_id, reason: reason.clone() }).await;
                 (parsed_args.clone(), false, reason)
             }
-            Err(_) => (parsed_args.clone(), false, Some("Approval channel canceled".to_string())),
         }
     }
 }

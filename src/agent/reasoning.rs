@@ -117,8 +117,8 @@ pub fn extract_thought_and_response(
     let mut final_response = raw_response.trim().to_string();
     let mut final_thought = raw_thought.trim().to_string();
 
-    // 1. Check for <think>...</think> or <thought>...</thought> tags in final_response
-    for tag in ["think", "thought"] {
+    // 1. Check for <think>...</think>, <thought>...</thought>, or <ifm|think> tags in final_response
+    for tag in ["think", "thought", "ifm|think"] {
         let open_tag = format!("<{}>", tag);
         let close_tag = format!("</{}>", tag);
         while let Some(start) = final_response.find(&open_tag) {
@@ -203,6 +203,10 @@ pub fn extract_thought_and_response(
         *s = t;
     }
 
+    if let Some(cutoff) = find_repetition_cutoff(&final_response) {
+        final_response.truncate(cutoff);
+    }
+
     let thought_opt = if !final_thought.is_empty() {
         Some(final_thought)
     } else {
@@ -210,4 +214,72 @@ pub fn extract_thought_and_response(
     };
 
     (final_response, thought_opt)
+}
+
+/// Detects runaway degenerative repetition loops (e.g. model repeating the same sentence or phrase 3+ times).
+/// Returns Some(cutoff_index) if repetition is detected, where cutoff_index is the end of the first occurrence.
+pub fn find_repetition_cutoff(text: &str) -> Option<usize> {
+    let n = text.len();
+    if n < 50 {
+        return None;
+    }
+
+    // 1. Line-based repetition check: scan non-empty trimmed lines
+    let non_empty_lines: Vec<(usize, &str)> = text
+        .match_indices('\n')
+        .chain(std::iter::once((text.len(), "")))
+        .scan(0usize, |start, (end, _)| {
+            let line = text.get(*start..end).unwrap_or("");
+            let res = (*start, line.trim());
+            *start = (end + 1).min(text.len());
+            Some(res)
+        })
+        .filter(|(_, line)| line.len() >= 10)
+        .collect();
+
+    if non_empty_lines.len() >= 3 {
+        let len = non_empty_lines.len();
+        let l3 = non_empty_lines[len - 1].1;
+        let l2 = non_empty_lines[len - 2].1;
+        let (l1_idx, l1) = non_empty_lines[len - 3];
+        if l1 == l2 && l2 == l3 {
+            return Some(l1_idx + l1.len());
+        }
+    }
+
+    // 2. Exact chunk pattern repetition check (length 15 to 250)
+    let max_pat_len = (n / 3).min(250);
+    for pat_len in 15..=max_pat_len {
+        let p3_start = n - pat_len;
+        let p2_start = n - 2 * pat_len;
+        let p1_start = n - 3 * pat_len;
+
+        if let (Some(p3), Some(p2), Some(p1)) = (
+            text.get(p3_start..n),
+            text.get(p2_start..p3_start),
+            text.get(p1_start..p2_start),
+        ) {
+            if p1.trim() == p2.trim() && p2.trim() == p3.trim() && p1.trim().len() >= 10 {
+                return Some(p1_start + p1.trim_end().len());
+            }
+        }
+    }
+
+    None
+}
+
+/// Truncates repeated patterns and halts streaming when a repetition loop is detected.
+pub fn arrest_repetition(current: &mut String, accumulated: &mut String) -> bool {
+    if current.len() >= 50 && (current.ends_with('\n') || current.ends_with('.') || current.ends_with('!')) {
+        if let Some(cutoff) = find_repetition_cutoff(current) {
+            let discarded = current.len().saturating_sub(cutoff);
+            current.truncate(cutoff);
+            if accumulated.len() >= discarded {
+                let new_len = accumulated.len() - discarded;
+                accumulated.truncate(new_len);
+            }
+            return true;
+        }
+    }
+    false
 }
