@@ -186,7 +186,7 @@ impl AgentRunner {
         system_context.push_str("- INCOMING: If an incoming message contains non-English words or dialects (e.g. Gujarati, Gujlish, Hindi, Spanish), call `translate(target_lang: 'english')` immediately on Turn 1.\n");
         system_context.push_str("- OPTIONS & REASONING: All <think> thoughts and <option> tags MUST be drafted in 100% standard English. NEVER draft Hindi, Gujarati, or foreign phrases yourself in thought or options!\n");
         system_context.push_str("- OUTGOING TRANSLATION & SENDING PROTOCOL:\n");
-        system_context.push_str("  1. When sending to a contact in their language/dialect, call `translate(text: \"<english draft>\", target_lang: \"<contact_lang>\")` first.\n");
+        system_context.push_str("  1. When sending to a contact in their language/dialect, call `translate` first. ALWAYS pass `context: { relationship, formality, recipient_gender, speaker_gender, age_group }` based on your memory of the contact (`people/<name>.md`) and operator profile (`core/user_profile.md`). Unlike English, foreign languages change grammar, pronouns, and verb conjugations based on respect tier (e.g. tu vs tame/aap/vous), recipient gender, and speaker gender!\n");
         system_context.push_str("  2. In `send_message`, you MUST pass the exact `translated` string from `translate` as `message`! NEVER send the English draft to the contact!\n");
         system_context.push_str("  3. In chat, confirm both English draft and translated text sent.\n");
         system_context.push_str("3. MESSAGING: When sending a message, invoke `send_message`.\n");
