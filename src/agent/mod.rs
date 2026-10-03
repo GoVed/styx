@@ -182,8 +182,14 @@ impl AgentRunner {
         system_context.push_str("4. If more details are required, autonomously execute `search_memory` or `read_memory` FIRST before answering or calling external tools.\n");
         system_context.push_str("\nTOOL EXECUTION PROTOCOL — NO SIMULATION IN TEXT:\n");
         system_context.push_str("1. NEVER SIMULATE TOOL CALLS: Never output mock tool call code blocks in text. When an action requires a tool, invoke the actual tool function.\n");
-        system_context.push_str("2. ALWAYS USE ENGLISH — LEAVE TRANSLATION TO THE TRANSLATOR TOOL:\n- INCOMING: If an incoming message contains non-English words, regional slang, or dialects (e.g. Gujarati, Gujlish, Hindi, Spanish), call the `translate` tool (`target_lang: 'english'`) immediately on Turn 1. Never guess in <think>.\n- OPTIONS: All <option> tags MUST be written in 100% standard English (e.g. `<option>Translate and send: \"Sure, come quickly! 😄\"</option>`). NEVER draft Hindi, Gujarati, or foreign phrases inside <option> tags!\n- OUTGOING: When sending in another language, execute `translate` first, then `send_message`. Never compose foreign dialects manually.\n");
-        system_context.push_str("3. MESSAGING: When instructed to send a message, invoke `send_message`.\n");
+        system_context.push_str("2. ALWAYS USE ENGLISH IN THOUGHT & OPTIONS — LEAVE TRANSLATION TO THE TRANSLATOR TOOL:\n");
+        system_context.push_str("- INCOMING: If an incoming message contains non-English words or dialects (e.g. Gujarati, Gujlish, Hindi, Spanish), call `translate(target_lang: 'english')` immediately on Turn 1.\n");
+        system_context.push_str("- OPTIONS & REASONING: All <think> thoughts and <option> tags MUST be drafted in 100% standard English. NEVER draft Hindi, Gujarati, or foreign phrases yourself in thought or options!\n");
+        system_context.push_str("- OUTGOING TRANSLATION & SENDING PROTOCOL:\n");
+        system_context.push_str("  1. When sending to a contact in their language/dialect, call `translate(text: \"<english draft>\", target_lang: \"<contact_lang>\")` first.\n");
+        system_context.push_str("  2. In `send_message`, you MUST pass the exact `translated` string from `translate` as `message`! NEVER send the English draft to the contact!\n");
+        system_context.push_str("  3. In chat, confirm both English draft and translated text sent.\n");
+        system_context.push_str("3. MESSAGING: When sending a message, invoke `send_message`.\n");
         system_context.push_str("\nINTERACTIVE OPTIONS REQUIREMENT:\nKeep prose concise (1-3 sentences). Formulate all options strictly in clean English. Conclude with 3-5 realistic choices using <options> tags, including 'Other':\n<options>\n<option>Option 1</option>\n<option>Option 2</option>\n<option>Option 3</option>\n<option other=\"true\">Other (specify custom details)...</option>\n</options>\n");
         system_context.push_str("\nUSER ONBOARDING & ENROLLMENT:\n");
         system_context.push_str("When conducting user onboarding or learning user profile directives, save user preferences to `core/user_profile.md` using `write_memory` and call the `complete_onboarding` tool to mark enrollment as completed.\n");
