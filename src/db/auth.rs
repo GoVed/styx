@@ -64,29 +64,14 @@ impl Database {
             return Ok(true);
         }
 
-        // Check env override first with constant-time equality
-        if let Ok(env_key) = std::env::var("STYX_ACCESS_KEY") {
-            let env_trimmed = env_key.trim();
-            if !env_trimmed.is_empty() {
-                let is_match: bool = if env_trimmed.len() == key_trimmed.len() {
-                    env_trimmed.as_bytes().ct_eq(key_trimmed.as_bytes()).into()
-                } else {
-                    false
-                };
-                if is_match {
-                    return Ok(true);
-                }
-            }
-        }
-
-        // Check database hash
+        // Check database hash (authoritative for configured user passwords)
         if let Some(stored_hash) = self.get_setting("auth_access_key_hash").await? {
             // Check if stored hash is Argon2 format ($argon2...)
             if stored_hash.starts_with("$argon2")
                 && let Ok(parsed_hash) = PasswordHash::new(&stored_hash) {
-                    return Ok(Argon2::default()
-                        .verify_password(key_trimmed.as_bytes(), &parsed_hash)
-                        .is_ok());
+                    if Argon2::default().verify_password(key_trimmed.as_bytes(), &parsed_hash).is_ok() {
+                        return Ok(true);
+                    }
                 }
 
             // Legacy SHA-256 fallback (raw 64 hex characters)
@@ -100,6 +85,23 @@ impl Database {
                     // Transparently upgrade legacy SHA-256 hash to Argon2id
                     let new_hash = Self::hash_access_key(key_trimmed);
                     let _ = self.set_setting("auth_access_key_hash", &new_hash).await;
+                    return Ok(true);
+                }
+            }
+
+            return Ok(false);
+        }
+
+        // Check env override as fallback when database has no stored hash
+        if let Ok(env_key) = std::env::var("STYX_ACCESS_KEY") {
+            let env_trimmed = env_key.trim();
+            if !env_trimmed.is_empty() {
+                let is_match: bool = if env_trimmed.len() == key_trimmed.len() {
+                    env_trimmed.as_bytes().ct_eq(key_trimmed.as_bytes()).into()
+                } else {
+                    false
+                };
+                if is_match {
                     return Ok(true);
                 }
             }

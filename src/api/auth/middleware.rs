@@ -62,6 +62,7 @@ pub async fn auth_middleware(
     if path == "/api/auth/status"
         || path == "/api/auth/setup"
         || path == "/api/auth/login"
+        || path == "/api/auth/password"
     {
         return next.run(req).await;
     }

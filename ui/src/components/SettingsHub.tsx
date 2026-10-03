@@ -7,19 +7,13 @@ import {
   Shield,
   Sparkles,
   Lock,
-  User,
+  KeyRound,
   ChevronRight,
   ArrowLeft,
-  HardDrive,
-  MemoryStick,
   Search,
-  CheckCircle,
-  AlertTriangle,
-  Sliders,
-  Terminal,
-  Zap,
 } from 'lucide-react';
 import { DeviceDiagnosticsView } from './settings/DeviceDiagnosticsView';
+import { ChangePasswordView } from './settings/ChangePasswordView';
 import {
   SystemTelemetry,
   AuthStatus,
@@ -41,6 +35,7 @@ interface SettingsHubProps {
   onStartOnboarding?: () => void;
   onOpenAudit?: () => void;
   onBackToChat?: () => void;
+  onPasswordChanged?: (newToken: string) => void;
 }
 
 export const SettingsHub: React.FC<SettingsHubProps> = ({
@@ -56,20 +51,18 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
   onStartOnboarding,
   onOpenAudit,
   onBackToChat,
+  onPasswordChanged,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [subView, setSubView] = useState<'main' | 'diagnostics'>('main');
+  const [subView, setSubView] = useState<'main' | 'diagnostics' | 'password'>('main');
 
   const handleNav = (dest: 'chat' | 'models' | 'memory' | 'tools' | 'diagnostics') => {
     if (dest === 'diagnostics') {
       setSubView('diagnostics');
       return;
     }
-    if (onNavigate) {
-      onNavigate(dest);
-    } else if (onNavigateSection) {
-      onNavigateSection(dest);
-    }
+    if (onNavigate) onNavigate(dest);
+    else if (onNavigateSection) onNavigateSection(dest);
   };
 
   const activeModel = telemetry?.active_model ?? 'Local vLLM';
@@ -132,6 +125,15 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
       action: () => (onOpenAudit ? onOpenAudit() : handleNav('chat')),
     },
     {
+      id: 'password',
+      title: 'Master Access Key & Password',
+      subtitle: 'Change your device unlock password and manage enclave access credentials',
+      icon: KeyRound,
+      color: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      badge: 'Security',
+      action: () => setSubView('password'),
+    },
+    {
       id: 'onboarding',
       title: 'Personal Setup & Preferences',
       subtitle: authStatus?.onboarded
@@ -159,7 +161,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
         <div className="flex items-center space-x-3">
           <button
             onClick={() => {
-              if (subView === 'diagnostics') {
+              if (subView !== 'main') {
                 setSubView('main');
               } else if (onBackToChat) {
                 onBackToChat();
@@ -174,10 +176,20 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
           </button>
           <div>
             <h1 className="text-base sm:text-lg font-bold tracking-tight text-white flex items-center gap-2">
-              <span>{subView === 'diagnostics' ? 'Device Health & Speed' : 'Assistant Settings'}</span>
+              <span>
+                {subView === 'diagnostics'
+                  ? 'Device Health & Speed'
+                  : subView === 'password'
+                  ? 'Master Password & Security'
+                  : 'Assistant Settings'}
+              </span>
             </h1>
             <p className="text-[11px] text-slate-400 font-mono">
-              {subView === 'diagnostics' ? 'Live device performance and responsiveness' : 'Manage your preferences, memory, and apps'}
+              {subView === 'diagnostics'
+                ? 'Live device performance and responsiveness'
+                : subView === 'password'
+                ? 'Update your device enclave unlock credentials'
+                : 'Manage your preferences, memory, and apps'}
             </p>
           </div>
         </div>
@@ -216,12 +228,22 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                 </div>
               </div>
 
-              <button
-                onClick={() => (onStartOnboarding ? onStartOnboarding() : handleNav('chat'))}
-                className="px-3 py-1.5 rounded-xl bg-styx-800 hover:bg-styx-700 text-slate-200 text-xs font-medium border border-styx-700 flex-shrink-0 transition-all active:scale-95 shadow-sm"
-              >
-                Edit Profile
-              </button>
+              <div className="flex items-center space-x-2 flex-shrink-0">
+                <button
+                  onClick={() => setSubView('password')}
+                  className="px-2.5 py-1.5 rounded-xl bg-styx-800 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 text-xs font-medium border border-styx-700/60 hover:border-amber-500/40 transition-all active:scale-95 shadow-sm flex items-center space-x-1.5"
+                  title="Change master password"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Change Password</span>
+                </button>
+                <button
+                  onClick={() => (onStartOnboarding ? onStartOnboarding() : handleNav('chat'))}
+                  className="px-3 py-1.5 rounded-xl bg-styx-800 hover:bg-styx-700 text-slate-200 text-xs font-medium border border-styx-700 transition-all active:scale-95 shadow-sm"
+                >
+                  Edit Profile
+                </button>
+              </div>
             </div>
 
             {/* Search Box */}
@@ -304,11 +326,16 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
               </button>
             </div>
           </>
-        ) : (
+        ) : subView === 'diagnostics' ? (
           <DeviceDiagnosticsView
             telemetry={telemetry}
             onBack={() => setSubView('main')}
             onOpenAudit={() => (onOpenAudit ? onOpenAudit() : handleNav('chat'))}
+          />
+        ) : (
+          <ChangePasswordView
+            onBack={() => setSubView('main')}
+            onPasswordChanged={onPasswordChanged}
           />
         )}
       </div>

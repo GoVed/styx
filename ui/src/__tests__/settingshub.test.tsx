@@ -82,6 +82,7 @@ describe('SettingsHub Android-style System Menu Tests', () => {
     expect(screen.getByText('Connected Apps & Assistants')).toBeInTheDocument();
     expect(screen.getByText('Device Health & Performance')).toBeInTheDocument();
     expect(screen.getByText('Privacy & Safety Approvals')).toBeInTheDocument();
+    expect(screen.getByText('Master Access Key & Password')).toBeInTheDocument();
     expect(screen.getByText('Personal Setup & Preferences')).toBeInTheDocument();
   });
 
@@ -168,5 +169,40 @@ describe('SettingsHub Android-style System Menu Tests', () => {
 
     expect(screen.getByText('Connected Apps & Assistants')).toBeInTheDocument();
     expect(screen.queryByText('Memory & What I Know About You')).not.toBeInTheDocument();
+  });
+
+  it('clicking Master Access Key & Password opens ChangePasswordView with form controls', () => {
+    const handlePasswordChanged = vi.fn();
+    render(
+      <SettingsHub
+        telemetry={mockTelemetry}
+        authStatus={mockAuthStatus}
+        modelConfigs={[]}
+        containers={[]}
+        mcpTools={[]}
+        pendingTicketsCount={0}
+        onNavigate={() => {}}
+        onLock={() => {}}
+        onStartOnboarding={() => {}}
+        onOpenAudit={() => {}}
+        onBackToChat={() => {}}
+        onPasswordChanged={handlePasswordChanged}
+      />
+    );
+
+    expect(screen.getByText('Master Access Key & Password')).toBeInTheDocument();
+    const passCard = screen.getByText('Master Access Key & Password').closest('div[class*="cursor-pointer"]');
+    fireEvent.click(passCard!);
+
+    expect(screen.getByText('Change Master Password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter current master password')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter new password (min. 8 characters)')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Re-enter new password')).toBeInTheDocument();
+    expect(screen.getByText('Save New Master Password')).toBeInTheDocument();
+
+    // Click back to main settings
+    const backBtn = screen.getByText('Back to Settings Menu');
+    fireEvent.click(backBtn);
+    expect(screen.getByText('Assistant Settings')).toBeInTheDocument();
   });
 });

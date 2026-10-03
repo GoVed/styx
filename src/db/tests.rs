@@ -134,9 +134,9 @@ mod tests {
         // 2a. Regular group chatter without mention -> Should NOT trigger
         let (trigger, pol, _) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "Good morning everyone! Check out this link.",
                 "",
@@ -151,9 +151,9 @@ mod tests {
         // 2b. Group chat with mention of Styx -> Should trigger
         let (trigger, pol, reason) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "Hey @Styx, can you summarize our meeting?",
                 "",
@@ -169,9 +169,9 @@ mod tests {
         // 2c. Group chat with mention of operator name ("Operator") -> Should trigger
         let (trigger, pol, _) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "Operator, what do you think about the architecture?",
                 "",
@@ -185,9 +185,9 @@ mod tests {
 
         // 3. Explicitly Muted Group
         db.set_channel_policy(
-            "120363028840427086@g.us",
+            "120363000000000001@g.us",
             "whatsapp",
-            Some("Computer Scientist"),
+            Some("Engineering Team"),
             true,
             "muted",
             None,
@@ -197,9 +197,9 @@ mod tests {
 
         let (trigger, pol, _) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "@Styx please help!",
                 "",
@@ -213,9 +213,9 @@ mod tests {
 
         // 4. Explicitly Set Group to Always Respond ('all')
         db.set_channel_policy(
-            "120363028840427086@g.us",
+            "120363000000000001@g.us",
             "whatsapp",
-            Some("Computer Scientist"),
+            Some("Engineering Team"),
             true,
             "all",
             None,
@@ -225,9 +225,9 @@ mod tests {
 
         let (trigger, pol, _) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "Just general chat",
                 "",
@@ -242,9 +242,9 @@ mod tests {
         // 5. Memory-level ignore override
         let (trigger, pol, _) = db
             .evaluate_channel_trigger(
-                "120363028840427086@g.us",
+                "120363000000000001@g.us",
                 "whatsapp",
-                Some("Computer Scientist"),
+                Some("Engineering Team"),
                 true,
                 "Hello",
                 "",
@@ -255,6 +255,32 @@ mod tests {
             .unwrap();
         assert!(!trigger, "Memory ignored channel must not trigger");
         assert_eq!(pol, "muted");
+
+        let _ = std::fs::remove_file(db_path);
+    }
+
+    #[tokio::test]
+    async fn test_change_password_and_hash_invalidation() {
+        let temp_dir = std::env::temp_dir();
+        let db_path = temp_dir.join(format!("test_styx_change_pass_{}.db", uuid::Uuid::new_v4()));
+        let db = Database::init(&db_path).expect("Failed to create test db");
+
+        // Initial password setup
+        let initial_pass = "old-secret-password-1";
+        let initial_hash = Database::hash_access_key(initial_pass);
+        db.set_setting("auth_access_key_hash", &initial_hash).await.unwrap();
+
+        assert!(db.verify_access_key(initial_pass).await.unwrap());
+        assert!(!db.verify_access_key("wrong-password").await.unwrap());
+
+        // Change password
+        let new_pass = "brand-new-master-key-2026";
+        let new_hash = Database::hash_access_key(new_pass);
+        db.set_setting("auth_access_key_hash", &new_hash).await.unwrap();
+
+        // New password must verify, old password must immediately fail
+        assert!(db.verify_access_key(new_pass).await.unwrap());
+        assert!(!db.verify_access_key(initial_pass).await.unwrap());
 
         let _ = std::fs::remove_file(db_path);
     }
