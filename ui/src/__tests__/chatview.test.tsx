@@ -304,4 +304,21 @@ OPERATING DIRECTIVES:
     expect(msgWrapper?.className).toContain('items-start');
     expect(msgWrapper?.className).not.toContain('items-end');
   });
+
+  it('extractOptionsAndContent sanitizes dialect prefixes and parenthesized translations', () => {
+    const raw = `Here are choices:
+<options>
+<option>Jokena Gujlish: "Jira banai de? Eh, AI banu..." (Create Jira ticket? Fix the bug right away!)</option>
+<option>Playful Gujlish: "Bug? Eh, AI banu tina fix karu!"</option>
+<option other="true">Custom reply...</option>
+</options>`;
+
+    const { options } = extractOptionsAndContent(raw);
+    expect(options).toHaveLength(3);
+    expect(options[0].label).toBe('Translate and send: "Create Jira ticket? Fix the bug right away!"');
+    expect(options[1].label).toBe('Translate and send: "Bug? Eh, AI banu tina fix karu!"');
+    expect(options[2].label).toBe('Custom reply...');
+    expect(options[2].isOther).toBe(true);
+  });
 });
+

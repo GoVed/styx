@@ -104,21 +104,8 @@ export const extractThoughtAndContent = (
     const lower = pTrim.toLowerCase();
     return (
       metaReasoningRegex.test(pTrim) ||
-      lower.includes('is asking ') ||
-      lower.includes('has chosen ') ||
-      lower.includes('has asked ') ||
-      lower.includes('wants me to ') ||
-      lower.includes('i should ') ||
-      lower.includes('i need to ') ||
-      lower.includes("i'll ") ||
-      lower.includes('i will ') ||
-      lower.includes('system instructions') ||
-      lower.includes('onboarding mode') ||
-      lower.includes('<options> block') ||
-      lower.includes('wrap my thinking') ||
-      pTrim.startsWith('- ') ||
-      pTrim.startsWith('* ') ||
-      /^\d+\.\s/.test(pTrim)
+      ['is asking ', 'has chosen ', 'has asked ', 'wants me to ', 'i should ', 'i need to ', "i'll ", 'i will ', 'system instructions', 'onboarding mode', '<options> block', 'wrap my thinking'].some(s => lower.includes(s)) ||
+      pTrim.startsWith('- ') || pTrim.startsWith('* ') || /^\d+\.\s/.test(pTrim)
     );
   };
 
@@ -191,7 +178,7 @@ export const extractOptionsAndContent = (
       if (optText.length > 0) {
         options.push({
           id: `opt-${idx++}`,
-          label: optText,
+          label: cleanOptionLabel(optText, isOther),
           isOther,
         });
       }
@@ -208,7 +195,7 @@ export const extractOptionsAndContent = (
             cleaned.toLowerCase().includes('other:');
           options.push({
             id: `opt-${idx++}`,
-            label: cleaned,
+            label: cleanOptionLabel(cleaned, isOther),
             isOther,
           });
         }
@@ -232,7 +219,7 @@ export const extractOptionsAndContent = (
         if (optText.length > 0) {
           options.push({
             id: `opt-${idx++}`,
-            label: optText,
+            label: cleanOptionLabel(optText, isOther),
             isOther,
           });
         }
@@ -255,6 +242,18 @@ export const extractOptionsAndContent = (
 
   return { content, options };
 };
+
+export function cleanOptionLabel(optText: string, isOther: boolean): string {
+  if (isOther) return optText;
+  const parenMatch = optText.match(/\(([^()]{5,})\)\s*$/);
+  if (parenMatch && /[a-zA-Z]{3,}/.test(parenMatch[1])) {
+    return `Translate and send: "${parenMatch[1].trim()}"`;
+  }
+  if (/^(?:Playful|Jokena|Casual|Joke|Meme|Friendly)?\s*(?:Gujlish|Hinglish|Dialect):\s*/i.test(optText)) {
+    return optText.replace(/^(?:Playful|Jokena|Casual|Joke|Meme|Friendly)?\s*(?:Gujlish|Hinglish|Dialect):\s*/i, 'Translate and send: ');
+  }
+  return optText;
+}
 
 function formatProtocol(p: string): string {
   const clean = p.split('/')[0].trim().toLowerCase();
