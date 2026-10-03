@@ -70,6 +70,13 @@ pub fn build_agent_system_prompt(
         system_context.push_str("\nMULTIMODAL VISION & MEDIA UNDERSTANDING:\nYou can visually understand attached images and media. Use the `inspect_image` tool to inspect any image or media URL before sending or replying.\n");
     }
 
+    system_context.push_str("\nFINDING & SENDING IMAGES / PHOTOS:\n");
+    system_context.push_str("You HAVE full access to `web_search`, `read_web_page`, `exec_container_command` (bash/curl/python in the container), and `send_image` / `send_gif`.\n");
+    system_context.push_str("NEVER recite generic AI refusal scripts like 'I cannot fetch or display images' or 'I cannot download photos'!\n");
+    system_context.push_str("When asked to find or send photos/images:\n");
+    system_context.push_str("1. Immediately invoke `web_search` (e.g. 'Mississauga autumn leaves site:unsplash.com' or 'Pexels/Wikimedia') to find direct image URLs.\n");
+    system_context.push_str("2. When sending to a WhatsApp chat, invoke `send_image` with `to` and `image: <url_or_path>` (and optional `caption`).\n");
+
     system_context.push_str("\nWORLD-LEARNING FRAMEWORK & AUTONOMOUS MEMORY BRAIN:\n");
     system_context.push_str("You have a persistent hierarchical markdown brain under /memory/:\n");
     system_context.push_str("- `core/user_profile.md`: Operator identity, routines, languages, and general preferences.\n");
@@ -129,12 +136,17 @@ pub fn enrich_user_turn_content(user_prompt: &str, raw_content: &str, is_last_tu
         || (user_prompt_clean.contains("emoji") && (user_prompt_clean.contains("send") || user_prompt_clean.contains("add")))
         || (user_prompt_clean.starts_with("like") && user_prompt_clean.contains("message"));
 
+    let is_image_request = (user_prompt_clean.contains("image") || user_prompt_clean.contains("photo") || user_prompt_clean.contains("pic"))
+        && (user_prompt_clean.contains("send") || user_prompt_clean.contains("find") || user_prompt_clean.contains("get") || user_prompt_clean.contains("search") || user_prompt_clean.contains("share"));
+
     if is_incoming_event && user_prompt.contains("Event: Reaction") {
         content.push_str("\n\n[DIRECTIVE: INCOMING REACTION EVENT:\nA contact or group member reacted to a message. Emoji reactions are acknowledgments and typically do not require an external reply unless follow-up is necessary. If you respond or react back, propose English options or invoke `send_reaction` if instructed.]");
     } else if is_incoming_event {
         content.push_str("\n\n[DIRECTIVE: INCOMING EVENT FROM EXTERNAL SENDER OR GROUP:\n1. CRITICAL: This is an INCOMING message event. Do NOT call `send_message`, `send_sticker`, or any outbound tool on this turn! The operator has NOT instructed you to send anything yet.\n2. External contacts do NOT see your chat. Address your operator directly.\n3. If this message is a media share (video, photo, document, sticker) with no text, acknowledge what was received in the group/chat and propose relevant options.\n4. If the message contains non-English words, regional slang, or dialects (e.g. Gujarati, Gujlish, Hindi, Spanish), execute the `translate` tool (`target_lang: \"english\"`) immediately to get the exact English translation. Do NOT guess foreign words in your head.\n5. Propose ALL reply options strictly in 100% standard English inside <option> tags. Format each reply option as: `<option>Translate and send: \"<English draft>\"</option>`. NEVER draft Hindi, Gujarati, or foreign phrases inside <option> tags.\n6. NEVER hallucinate prior conversation turns or randomly attempt to resend past links.]");
     } else if is_reaction_intent {
         content.push_str("\n\n[SYSTEM DIRECTIVE: The operator wants to send or remove an emoji reaction. Invoke the `send_reaction` tool. Specify `to` (the contact or chat) and `emoji` (the emoji or \"\" to remove). `message_id` is optional and defaults to the latest message in that chat.]");
+    } else if is_image_request {
+        content.push_str("\n\n[SYSTEM DIRECTIVE: The operator wants to find, get, or send photos/images. You HAVE access to `web_search`, `read_web_page`, `exec_container_command` (bash), and `send_image`. NEVER claim you cannot find, download, or send images! Execute `web_search` immediately (e.g. for free photos on Unsplash, Pexels, Wikimedia) to find high-quality image URLs, and call `send_image` or propose sending them in <options>.]");
     } else if is_translate_and_send {
         content.push_str("\n\n[DIRECTIVE: TRANSLATE AND SEND:\nThe operator confirmed sending this reply. First execute the `translate` tool (`target_lang: \"<contact_dialect>\"`, e.g. \"gujlish\" or \"spanish\") with the English message to get the authentic translation, then invoke `send_message` with the translated text. Do NOT draft foreign words manually.]");
     } else if is_send_confirmation {
