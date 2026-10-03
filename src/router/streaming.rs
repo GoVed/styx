@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use super::tags::{parse_ifm_block, parse_json_block};
+use super::tags::{parse_function_tag_block, parse_ifm_block, parse_json_block};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "type", rename_all = "snake_case")]
@@ -22,17 +22,14 @@ pub enum StreamChunk {
 enum ToolTagFormat {
     Ifm,
     Json,
+    FunctionTag,
 }
 
 const KNOWN_TAGS: &[&str] = &[
-    "<think>", "</think>",
-    "<thought>", "</thought>",
-    "<ifm|think>", "</ifm|think>",
-    "<ifm|tool_calls>", "</ifm|tool_calls>",
-    "<ifm|tool_call>", "</ifm|tool_call>",
-    "<function_calls>", "</function_calls>",
-    "<tool_calls>", "</tool_calls>",
-    "<tool_call>", "</tool_call>",
+    "<think>", "</think>", "<thought>", "</thought>", "<ifm|think>", "</ifm|think>",
+    "<ifm|tool_calls>", "</ifm|tool_calls>", "<ifm|tool_call>", "</ifm|tool_call>",
+    "<function_calls>", "</function_calls>", "<tool_calls>", "</tool_calls>",
+    "<tool_call>", "</tool_call>", "<function=", "</function>",
 ];
 
 /// Stateful parser to extract thoughts and native XML/JSON tool calls during token streaming
@@ -85,6 +82,13 @@ impl StreamTagParser {
                             (false, 0, 0)
                         }
                     }
+                    ToolTagFormat::FunctionTag => {
+                        if let Some(idx) = self.tool_buffer.find("</function>") {
+                            (true, idx, "</function>".len())
+                        } else {
+                            (false, 0, 0)
+                        }
+                    }
                 };
 
                 if closed {
@@ -97,6 +101,7 @@ impl StreamTagParser {
                     let calls = match format {
                         ToolTagFormat::Ifm => parse_ifm_block(&block),
                         ToolTagFormat::Json => parse_json_block(&block),
+                        ToolTagFormat::FunctionTag => parse_function_tag_block(&format!("{block}</function>")),
                     };
 
                     for (name, args) in calls {
@@ -123,16 +128,8 @@ impl StreamTagParser {
                         self.pending.drain(..open_idx);
                     }
 
-                    if self.pending.starts_with("</think>") {
-                        self.pending.drain(.."</think>".len());
-                        self.inside_think = false;
-                        continue;
-                    } else if self.pending.starts_with("</thought>") {
-                        self.pending.drain(.."</thought>".len());
-                        self.inside_think = false;
-                        continue;
-                    } else if self.pending.starts_with("</ifm|think>") {
-                        self.pending.drain(.."</ifm|think>".len());
+                    if let Some(tag) = ["</think>", "</thought>", "</ifm|think>"].iter().find(|t| self.pending.starts_with(**t)) {
+                        self.pending.drain(..tag.len());
                         self.inside_think = false;
                         continue;
                     } else if ["</think>", "</thought>", "</ifm|think>"].iter().any(|t| t.starts_with(&self.pending)) {
@@ -158,26 +155,9 @@ impl StreamTagParser {
                     self.pending.drain(..open_idx);
                 }
 
-                if self.pending.starts_with("<think>") {
-                    self.pending.drain(.."<think>".len());
+                if let Some(tag) = ["<think>", "<thought>", "<ifm|think>"].iter().find(|t| self.pending.starts_with(**t)) {
+                    self.pending.drain(..tag.len());
                     self.inside_think = true;
-                    continue;
-                } else if self.pending.starts_with("<thought>") {
-                    self.pending.drain(.."<thought>".len());
-                    self.inside_think = true;
-                    continue;
-                } else if self.pending.starts_with("<ifm|think>") {
-                    self.pending.drain(.."<ifm|think>".len());
-                    self.inside_think = true;
-                    continue;
-                } else if self.pending.starts_with("</think>") {
-                    self.pending.drain(.."</think>".len());
-                    continue;
-                } else if self.pending.starts_with("</thought>") {
-                    self.pending.drain(.."</thought>".len());
-                    continue;
-                } else if self.pending.starts_with("</ifm|think>") {
-                    self.pending.drain(.."</ifm|think>".len());
                     continue;
                 } else if self.pending.starts_with("<ifm|tool_calls>") {
                     self.pending.drain(.."<ifm|tool_calls>".len());
@@ -189,32 +169,17 @@ impl StreamTagParser {
                     self.inside_tool_call = Some(ToolTagFormat::Ifm);
                     self.tool_buffer.push_str("<ifm|tool_call>");
                     continue;
-                } else if self.pending.starts_with("<function_calls>") {
-                    self.pending.drain(.."<function_calls>".len());
+                } else if let Some(tag) = ["<function_calls>", "<tool_calls>", "<tool_call>"].iter().find(|t| self.pending.starts_with(**t)) {
+                    self.pending.drain(..tag.len());
                     self.inside_tool_call = Some(ToolTagFormat::Json);
                     continue;
-                } else if self.pending.starts_with("<tool_calls>") {
-                    self.pending.drain(.."<tool_calls>".len());
-                    self.inside_tool_call = Some(ToolTagFormat::Json);
+                } else if self.pending.starts_with("<function=") {
+                    self.pending.drain(.."<function=".len());
+                    self.inside_tool_call = Some(ToolTagFormat::FunctionTag);
+                    self.tool_buffer.push_str("<function=");
                     continue;
-                } else if self.pending.starts_with("<tool_call>") {
-                    self.pending.drain(.."<tool_call>".len());
-                    self.inside_tool_call = Some(ToolTagFormat::Json);
-                    continue;
-                } else if self.pending.starts_with("</ifm|tool_calls>") {
-                    self.pending.drain(.."</ifm|tool_calls>".len());
-                    continue;
-                } else if self.pending.starts_with("</ifm|tool_call>") {
-                    self.pending.drain(.."</ifm|tool_call>".len());
-                    continue;
-                } else if self.pending.starts_with("</function_calls>") {
-                    self.pending.drain(.."</function_calls>".len());
-                    continue;
-                } else if self.pending.starts_with("</tool_calls>") {
-                    self.pending.drain(.."</tool_calls>".len());
-                    continue;
-                } else if self.pending.starts_with("</tool_call>") {
-                    self.pending.drain(.."</tool_call>".len());
+                } else if let Some(tag) = ["</think>", "</thought>", "</ifm|think>", "</ifm|tool_calls>", "</ifm|tool_call>", "</function_calls>", "</tool_calls>", "</tool_call>", "</function>"].iter().find(|t| self.pending.starts_with(**t)) {
+                    self.pending.drain(..tag.len());
                     continue;
                 } else if KNOWN_TAGS.iter().any(|t| t.starts_with(&self.pending)) {
                     break;
@@ -244,6 +209,8 @@ impl StreamTagParser {
 
             let calls = if full.contains("<ifm|") {
                 parse_ifm_block(&full)
+            } else if full.contains("<function=") {
+                parse_function_tag_block(&full)
             } else {
                 parse_json_block(&full)
             };
@@ -301,6 +268,21 @@ mod tests {
             let parsed: serde_json::Value = serde_json::from_str(arguments_delta).unwrap();
             assert_eq!(parsed["text"], "hi");
             assert_eq!(parsed["target_lang"], "gujlish");
+        } else {
+            panic!("Expected ToolCallDelta, got {:?}", chunks[0]);
+        }
+    }
+
+    #[test]
+    fn test_stream_tag_parser_hermes_function_call() {
+        let mut parser = StreamTagParser::new();
+        let chunks = parser.process("<function=send_message>\n<parameter=to>\nHirrag Family (919904970631-1503553071@g.us)\n</parameter>\n<parameter=message>\nhttps://www.facebook.com/share/r/1CwHSrXHaU/\n</parameter>\n</function>");
+        assert_eq!(chunks.len(), 1);
+        if let StreamChunk::ToolCallDelta { name, arguments_delta, .. } = &chunks[0] {
+            assert_eq!(name.as_deref(), Some("send_message"));
+            let parsed: serde_json::Value = serde_json::from_str(arguments_delta).unwrap();
+            assert_eq!(parsed["to"], "Hirrag Family (919904970631-1503553071@g.us)");
+            assert_eq!(parsed["message"], "https://www.facebook.com/share/r/1CwHSrXHaU/");
         } else {
             panic!("Expected ToolCallDelta, got {:?}", chunks[0]);
         }

@@ -289,7 +289,13 @@ pub async fn handle_inbound_tool_event(
         }
     });
 
-    let incoming_images = extract_field(&payload.payload, &["media_url", "image_url"]).map(|u| vec![u.to_string()]);
+    let incoming_images = extract_field(&payload.payload, &["media_url", "image_url"])
+        .filter(|u| {
+            let lower = u.to_lowercase();
+            !lower.ends_with(".mp4") && !lower.ends_with(".mov") && !lower.ends_with(".webm")
+                && !lower.ends_with(".pdf") && !lower.ends_with(".mp3") && !lower.ends_with(".ogg")
+        })
+        .map(|u| vec![u.to_string()]);
 
     let (turn_id, position, is_immediate) = state
         .turn_queue

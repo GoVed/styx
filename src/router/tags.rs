@@ -114,3 +114,45 @@ fn extract_tool_from_json(val: &Value) -> Option<(String, String)> {
 
     Some((name.to_string(), args_str))
 }
+
+/// Extracts tool name and JSON arguments from Hermes / Qwen <function=name><parameter=key>value</parameter></function> blocks
+pub fn parse_function_tag_block(block: &str) -> Vec<(String, String)> {
+    let mut results = Vec::new();
+    let mut cur = block;
+
+    while let Some(f_start) = cur.find("<function=") {
+        let after_start = &cur[f_start + "<function=".len()..];
+        let Some(name_end) = after_start.find('>') else { break };
+        let name = after_start[..name_end].trim().to_string();
+        let body_start = &after_start[name_end + 1..];
+        let Some(f_end) = body_start.find("</function>") else { break };
+        let body = &body_start[..f_end];
+
+        let mut args_map = serde_json::Map::new();
+        let mut param_cur = body;
+        while let Some(p_start) = param_cur.find("<parameter=") {
+            let after_p = &param_cur[p_start + "<parameter=".len()..];
+            let Some(k_end) = after_p.find('>') else { break };
+            let key = after_p[..k_end].trim().to_string();
+            let val_start = &after_p[k_end + 1..];
+            let Some(p_end) = val_start.find("</parameter>") else { break };
+            let val_str = val_start[..p_end].trim();
+
+            let val = if let Ok(parsed) = serde_json::from_str::<Value>(val_str) {
+                parsed
+            } else {
+                Value::String(val_str.to_string())
+            };
+
+            args_map.insert(key, val);
+            param_cur = &val_start[p_end + "</parameter>".len()..];
+        }
+
+        if !name.is_empty() {
+            results.push((name, Value::Object(args_map).to_string()));
+        }
+        cur = &body_start[f_end + "</function>".len()..];
+    }
+
+    results
+}
