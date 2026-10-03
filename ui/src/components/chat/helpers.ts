@@ -300,6 +300,7 @@ export function parseToolEvent(content: string): ParsedToolEvent | null {
   if (channelMatch) channel = channelMatch[1].trim();
 
   const msgContentMatch =
+    content.match(/(?:•\s*Action:|\bAction:)\s*([^\n]+)/i) ||
     content.match(/(?:•\s*Message Content:|\bMessage Content:|\bMessage:)\s*"([^"]+)"/i) ||
     content.match(/(?:•\s*Message Content:|\bMessage Content:|\bMessage:)\s*([^\n]+)/i) ||
     content.match(/\n"([^"]+)"\n/);

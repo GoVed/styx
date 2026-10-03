@@ -124,8 +124,17 @@ pub fn enrich_user_turn_content(user_prompt: &str, raw_content: &str, is_last_tu
         || user_prompt_clean.contains("message ")
         || user_prompt_clean.contains("tell ");
 
-    if is_incoming_event {
+    let is_reaction_intent = user_prompt_clean.contains("react")
+        || user_prompt_clean.contains("reaction")
+        || (user_prompt_clean.contains("emoji") && (user_prompt_clean.contains("send") || user_prompt_clean.contains("add")))
+        || (user_prompt_clean.starts_with("like") && user_prompt_clean.contains("message"));
+
+    if is_incoming_event && user_prompt.contains("Event: Reaction") {
+        content.push_str("\n\n[DIRECTIVE: INCOMING REACTION EVENT:\nA contact or group member reacted to a message. Emoji reactions are acknowledgments and typically do not require an external reply unless follow-up is necessary. If you respond or react back, propose English options or invoke `send_reaction` if instructed.]");
+    } else if is_incoming_event {
         content.push_str("\n\n[DIRECTIVE: INCOMING MESSAGE IN ANOTHER LANGUAGE / DIALECT:\n1. If this message contains non-English words, regional slang, or dialects (e.g. Gujarati, Gujlish, Hindi, Spanish), execute the `translate` tool (`target_lang: \"english\"`) immediately on Turn 1 to get the exact English translation. Do NOT guess foreign words in your head.\n2. Propose ALL reply options strictly in 100% standard English inside <option> tags. Format each reply option as: `<option>Translate and send: \"<English draft>\"</option>`. NEVER draft Hindi, Gujarati, or foreign phrases inside <option> tags. The operator only reviews and selects English options.\n3. Never compose foreign text manually.]");
+    } else if is_reaction_intent {
+        content.push_str("\n\n[SYSTEM DIRECTIVE: The operator wants to send or remove an emoji reaction. Invoke the `send_reaction` tool. Specify `to` (the contact or chat) and `emoji` (the emoji or \"\" to remove). `message_id` is optional and defaults to the latest message in that chat.]");
     } else if is_translate_and_send {
         content.push_str("\n\n[DIRECTIVE: TRANSLATE AND SEND:\nThe operator confirmed sending this reply. First execute the `translate` tool (`target_lang: \"<contact_dialect>\"`, e.g. \"gujlish\" or \"spanish\") with the English message to get the authentic translation, then invoke `send_message` with the translated text. Do NOT draft foreign words manually.]");
     } else if is_send_confirmation {

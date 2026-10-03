@@ -226,50 +226,48 @@ pub async fn handle_inbound_tool_event(
         })
         .unwrap_or_else(|| chrono::Utc::now().format("%Y-%m-%d %H:%M:%S UTC").to_string());
 
-    let mentions_info = if let Some(m_val) = payload.payload.get("mentions") {
-        if let Some(arr) = m_val.as_array() {
-            if !arr.is_empty() {
-                let mut is_self_tagged = payload.payload.get("is_self_tagged").and_then(|v| v.as_bool()).unwrap_or(false);
-                let mention_names: Vec<String> = arr.iter().filter_map(|m| {
-                    if let Some(obj) = m.as_object() {
-                        if obj.get("is_me").and_then(|v| v.as_bool()).unwrap_or(false) {
-                            is_self_tagged = true;
-                        }
-                        if let Some(d_tag) = obj.get("display_tag").and_then(|v| v.as_str()) {
-                            Some(d_tag.to_string())
-                        } else if let Some(name) = obj.get("name").and_then(|v| v.as_str()) {
-                            Some(format!("@{name}"))
-                        } else {
-                            None
-                        }
-                    } else if let Some(s) = m.as_str() {
-                        Some(if s.starts_with('@') { s.to_string() } else { format!("@{s}") })
-                    } else {
-                        None
-                    }
-                }).collect();
-
-                if !mention_names.is_empty() {
-                    let tag_notice = if is_self_tagged { " [YOU WERE TAGGED]" } else { "" };
-                    format!("\nMentions: {}{}", mention_names.join(", "), tag_notice)
-                } else {
-                    String::new()
-                }
+    let mentions_info = payload.payload.get("mentions").and_then(|v| v.as_array()).map(|arr| {
+        let mut is_self = payload.payload.get("is_self_tagged").and_then(|v| v.as_bool()).unwrap_or(false);
+        let names: Vec<String> = arr.iter().filter_map(|m| {
+            if let Some(obj) = m.as_object() {
+                if obj.get("is_me").and_then(|v| v.as_bool()).unwrap_or(false) { is_self = true; }
+                obj.get("display_tag").and_then(|v| v.as_str()).map(|s| s.to_string())
+                    .or_else(|| obj.get("name").and_then(|v| v.as_str()).map(|s| format!("@{s}")))
             } else {
-                String::new()
+                m.as_str().map(|s| if s.starts_with('@') { s.to_string() } else { format!("@{s}") })
             }
-        } else {
-            String::new()
-        }
-    } else {
-        String::new()
-    };
+        }).collect();
+        if names.is_empty() { String::new() } else { format!("\nMentions: {}{}", names.join(", "), if is_self { " [YOU WERE TAGGED]" } else { "" }) }
+    }).unwrap_or_default();
 
     let turn_prompt = match payload.event_type.as_str() {
         "new_message" | "message_received" => format!(
             "[INCOMING TOOL EVENT: {}]\nSender: {}\nChannel: {}{}\nReceived: {}{}\nMessage: \"{}\"",
             payload.protocol.to_uppercase(), sender_display, channel_desc, reply_info, received_time, mentions_info, text
         ),
+        "reaction" => {
+            let emoji = payload.payload.get("reaction").and_then(|v| v.as_str()).unwrap_or("");
+            let target_text = payload.payload.get("target_message_text").and_then(|v| v.as_str());
+            let target_author = payload.payload.get("target_sender_name").and_then(|v| v.as_str());
+            let is_removed = payload.payload.get("is_removed").and_then(|v| v.as_bool()).unwrap_or(false);
+            let action_desc = if is_removed {
+                match (target_text, target_author) {
+                    (Some(t), Some(a)) => format!("Removed reaction from \"{t}\" (by {a})"),
+                    (Some(t), None) => format!("Removed reaction from \"{t}\""),
+                    _ => "Removed reaction".to_string(),
+                }
+            } else {
+                match (target_text, target_author) {
+                    (Some(t), Some(a)) => format!("Reacted {emoji} to \"{t}\" (by {a})"),
+                    (Some(t), None) => format!("Reacted {emoji} to \"{t}\""),
+                    _ => format!("Reacted {emoji}"),
+                }
+            };
+            format!(
+                "[INCOMING TOOL EVENT: {}]\nSender: {}\nChannel: {}\nReceived: {}\nEvent: Reaction\nAction: {}\nReaction: {}\nIs Removed: {}",
+                payload.protocol.to_uppercase(), sender_display, channel_desc, received_time, action_desc, emoji, is_removed
+            )
+        }
         _ => {
             let pretty = serde_json::to_string_pretty(&payload.payload).unwrap_or_else(|_| "{}".to_string());
             format!("[INCOMING TOOL EVENT: {}]\nEvent: {}\nSource: {}\nDetails: {}", payload.protocol.to_uppercase(), payload.event_type, sender_display, pretty)
@@ -299,12 +297,21 @@ pub async fn handle_inbound_tool_event(
         .await;
 
     // Send proactive WebSocket notification to notify operator in UI and trigger session refresh
+    let notif_text = if payload.event_type == "reaction" {
+        let emoji = payload.payload.get("reaction").and_then(|v| v.as_str()).unwrap_or("");
+        if emoji.is_empty() { format!("{sender_display} removed a reaction") } else { format!("{sender_display} reacted {emoji}") }
+    } else if text.is_empty() {
+        format!("Incoming {} event", payload.event_type)
+    } else {
+        text.to_string()
+    };
+
     let notif_msg = json!({
         "topic": "notification",
         "payload": {
             "id": format!("inbound-{}", turn_id),
             "title": format!("{} from {}", payload.protocol.to_uppercase(), sender_display),
-            "message": if text.is_empty() { format!("Incoming {} event", payload.event_type) } else { text.to_string() },
+            "message": notif_text,
             "urgency": "info",
             "sessionId": target_session_id,
             "timestamp": chrono::Utc::now().to_rfc3339()
