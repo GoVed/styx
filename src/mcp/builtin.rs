@@ -24,7 +24,7 @@ pub fn get_builtin_tools() -> Vec<McpTool> {
         },
         McpTool {
             name: "search_memory".to_string(),
-            description: "Full-text search across all markdown memory notes, user dictionaries, contact profiles, group files, modular skills, and daily scratchpads using Tantivy BM25".to_string(),
+            description: "Fast hybrid semantic vector and full-text search across all markdown memory notes, user dictionaries, contact profiles, group files, modular skills, projects, and images using neural embeddings and Tantivy BM25".to_string(),
             input_schema: json!({
                 "type": "object",
                 "properties": {
@@ -118,17 +118,25 @@ pub fn get_builtin_tools() -> Vec<McpTool> {
         },
         McpTool {
             name: "inspect_image".to_string(),
-            description: "Visually inspect and analyze an image from an online HTTP URL or local file path. Use this to examine photos, graphics, charts, or diagrams to understand visual content before responding.".to_string(),
+            description: "Visually inspect and analyze an image from an online HTTP URL, data URI, or local file path. Operator can select any vision model (e.g. moondream, qwen2-vl-2b) or custom vision endpoint.".to_string(),
             input_schema: json!({
                 "type": "object",
                 "properties": {
                     "url": {
                         "type": "string",
-                        "description": "HTTP(S) URL or local file path of the image to inspect"
+                        "description": "HTTP(S) URL, base64 data URI, or local file path of the image to inspect"
                     },
                     "question": {
                         "type": "string",
-                        "description": "Optional specific question or prompt about the image (e.g. 'What is written on the whiteboard?'). Defaults to a comprehensive visual description."
+                        "description": "Optional specific question or prompt about the image. Defaults to a comprehensive visual description."
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Optional vision model name (e.g. 'moondream', 'qwen2-vl-2b-local'). Defaults to active vision provider."
+                    },
+                    "endpoint": {
+                        "type": "string",
+                        "description": "Optional custom vision API base URL (e.g. 'http://localhost:11434/v1')."
                     }
                 },
                 "required": ["url"]

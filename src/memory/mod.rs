@@ -1,5 +1,9 @@
+pub mod active;
+pub mod embeddings;
+pub mod images;
 pub mod merge;
 pub mod search;
+pub mod vector;
 
 use anyhow::{bail, Context, Result};
 use search::{MemorySearchIndex, SearchResult};
@@ -9,8 +13,8 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MemoryFileNode {
-    pub path: String,       // relative path e.g. "skills/custom_task.md"
-    pub category: String,   // "core", "skills", "scratchpad"
+    pub path: String,       // relative path e.g. "skills/custom_task.md" or "media/pic.png"
+    pub category: String,   // "core", "skills", "scratchpad", "media", etc.
     pub filename: String,   // "custom_task.md"
     pub title: String,      // "# Skillset: Custom Task" or filename
     pub size_bytes: u64,
@@ -42,7 +46,9 @@ impl MemoryManager {
     }
 
     pub fn ensure_directories(&self) -> Result<()> {
-        let defaults = ["core", "skills", "scratchpad", "dictionary", "people", "groups"];
+        let defaults = [
+            "core", "skills", "scratchpad", "dictionary", "people", "groups", "projects", "media",
+        ];
         for d in defaults {
             std::fs::create_dir_all(self.base_dir.join(d))?;
         }
@@ -100,7 +106,6 @@ impl MemoryManager {
             .map(|l| l.trim_start_matches('#').trim().to_string())
             .unwrap_or_else(|| filename.to_string());
 
-        // Re-index in Tantivy
         let _ = self
             .search_index
             .index_file(&safe_rel, category, &title, &final_content)
@@ -143,25 +148,30 @@ impl MemoryManager {
         self.search_index.search(query, limit)
     }
 
-    /// Load all core guidelines and active scratchpads as system context
+    pub fn fetch_active_context(
+        &self,
+        prompt: &str,
+        images: Option<&[String]>,
+    ) -> active::ActiveMemoryContext {
+        active::fetch_active_context(self, prompt, images, 5)
+    }
+
+    /// Load core guidelines and active scratchpads as system context
     pub fn build_system_context(&self) -> String {
         let mut context = String::new();
 
-        // 1. Read core files
         for core_file in ["core/system_instructions.md", "core/user_profile.md"] {
             if let Ok(content) = self.read_file(core_file) {
                 context.push_str(&format!("\n\n=== MEMORY: {} ===\n{}\n", core_file, content.trim()));
             }
         }
 
-        // 2. Read active scratchpads
         for scratch in ["scratchpad/daily_log.md", "scratchpad/active_projects.md"] {
             if let Ok(content) = self.read_file(scratch) {
                 context.push_str(&format!("\n\n=== SCRATCHPAD: {} ===\n{}\n", scratch, content.trim()));
             }
         }
 
-        // 3. Read active user dictionary files dynamically
         let dict_dir = self.base_dir.join("dictionary");
         if let Ok(entries) = std::fs::read_dir(&dict_dir) {
             for entry in entries.flatten() {
@@ -182,7 +192,7 @@ impl MemoryManager {
     pub fn get_entity_context(&self, entity_name: &str) -> Option<String> {
         let clean = entity_name.trim().to_lowercase().replace([' ', '@', '.', ':', '+', '-'], "_");
         let raw_clean = entity_name.trim().to_lowercase();
-        for cat in ["people", "groups", "dictionary"] {
+        for cat in ["people", "groups", "projects", "dictionary", "skills"] {
             for candidate_name in [&clean, &raw_clean] {
                 let candidate = format!("{}/{}.md", cat, candidate_name);
                 if let Ok(content) = self.read_file(&candidate) {
@@ -193,8 +203,7 @@ impl MemoryManager {
         None
     }
 
-    /// Check whether a communication channel or group (e.g. "15551234567-1600000000@g.us")
-    /// is explicitly marked to be ignored or muted in user_profile.md or system_instructions.md
+    /// Check whether a channel is explicitly ignored or muted
     pub fn is_channel_ignored(&self, channel_id: &str) -> bool {
         let clean_cid = channel_id.trim().to_lowercase();
         if clean_cid.is_empty() {
@@ -246,8 +255,15 @@ fn scan_dir_recursive(base: &Path, current: &Path, list: &mut Vec<MemoryFileNode
                 }
             if path.is_dir() {
                 scan_dir_recursive(base, &path, list);
-            } else if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("md")
+            } else if path.is_file()
                 && let Ok(rel) = path.strip_prefix(base) {
+                    let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
+                    let is_md = ext == "md";
+                    let is_img = images::is_image_extension(ext);
+                    if !is_md && !is_img {
+                        continue;
+                    }
+
                     let rel_str = rel.to_string_lossy().replace('\\', "/");
                     let parts: Vec<&str> = rel_str.split('/').collect();
                     let category = if parts.len() > 1 { parts[0].to_string() } else { "uncategorized".to_string() };
@@ -262,14 +278,18 @@ fn scan_dir_recursive(base: &Path, current: &Path, list: &mut Vec<MemoryFileNode
                         })
                         .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
 
-                    let title = if let Ok(content) = std::fs::read_to_string(&path) {
-                        content
-                            .lines()
-                            .find(|l| l.starts_with('#'))
-                            .map(|l| l.trim_start_matches('#').trim().to_string())
-                            .unwrap_or_else(|| filename.clone())
+                    let title = if is_md {
+                        if let Ok(content) = std::fs::read_to_string(&path) {
+                            content
+                                .lines()
+                                .find(|l| l.starts_with('#'))
+                                .map(|l| l.trim_start_matches('#').trim().to_string())
+                                .unwrap_or_else(|| filename.clone())
+                        } else {
+                            filename.clone()
+                        }
                     } else {
-                        filename.clone()
+                        format!("Image: {}", filename)
                     };
 
                     list.push(MemoryFileNode {
@@ -287,5 +307,3 @@ fn scan_dir_recursive(base: &Path, current: &Path, list: &mut Vec<MemoryFileNode
 
 #[cfg(test)]
 mod tests;
-
-
