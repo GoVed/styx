@@ -12,7 +12,7 @@ import platform
 import time
 
 SERVER_INFO = {
-    "name": "styx-reference-daemon",
+    "name": "syndae-reference-daemon",
     "version": "1.0.0"
 }
 

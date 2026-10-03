@@ -18,7 +18,7 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
   onSelectTestingTool,
 }) => {
   return (
-    <div className="bg-styx-900 border border-styx-800 rounded-lg p-3 font-mono space-y-3">
+    <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-3 font-mono space-y-3">
       <div className="flex items-center justify-between">
         <div className="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
           <Shield className="w-3.5 h-3.5 text-amber-400" />
@@ -43,7 +43,7 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
       <div className="overflow-x-auto">
         <table className="w-full text-left text-[11px]">
           <thead>
-            <tr className="border-b border-styx-800 text-slate-400">
+            <tr className="border-b border-syndae-800 text-slate-400">
               <th className="py-2 px-2">TOOL NAME</th>
               <th className="py-2 px-2">DESCRIPTION</th>
               <th className="py-2 px-2">POLICY TIER</th>
@@ -51,9 +51,9 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
               <th className="py-2 px-2 text-right">TEST</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-styx-800/60">
+          <tbody className="divide-y divide-syndae-800/60">
             {tools.map(t => (
-              <tr key={t.name} className="hover:bg-styx-850">
+              <tr key={t.name} className="hover:bg-syndae-850">
                 <td className="py-2 px-2 font-bold text-slate-200">
                   <code>{t.name}</code>
                 </td>
@@ -61,7 +61,7 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
                   {t.description}
                 </td>
                 <td className="py-2 px-2">
-                  <div className="flex items-center bg-styx-950 p-0.5 rounded border border-styx-800 w-fit">
+                  <div className="flex items-center bg-syndae-950 p-0.5 rounded border border-syndae-800 w-fit">
                     <button
                       type="button"
                       onClick={() => onUpdatePolicy(t.name, 'AUTONOMOUS', t.risk_level)}
@@ -114,7 +114,7 @@ export const PolicyMatrix: React.FC<PolicyMatrixProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectTestingTool(t)}
-                    className="px-2 py-1 rounded bg-styx-800 hover:bg-styx-700 text-cyan-300 border border-styx-700 text-[10px] flex items-center space-x-1 ml-auto"
+                    className="px-2 py-1 rounded bg-syndae-800 hover:bg-syndae-700 text-cyan-300 border border-syndae-700 text-[10px] flex items-center space-x-1 ml-auto"
                   >
                     <Play className="w-3 h-3" />
                     <span>Inspect & Call</span>

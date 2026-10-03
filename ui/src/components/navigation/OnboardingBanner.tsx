@@ -15,7 +15,7 @@ export const OnboardingBanner: React.FC<OnboardingBannerProps> = ({
       <div className="flex items-center gap-2">
         <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
         <span>
-          <strong className="text-emerald-300">Welcome to Styx!</strong> Take 30 seconds to set up your preferences so your assistant adapts to you.
+          <strong className="text-emerald-300">Welcome to Syndae!</strong> Take 30 seconds to set up your preferences so your assistant adapts to you.
         </span>
       </div>
       <div className="flex items-center space-x-2">

@@ -34,13 +34,13 @@ async fn main() -> Result<()> {
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| "styx=info,tower_http=info".into()),
+                .unwrap_or_else(|_| "syndae=info,tower_http=info".into()),
         )
         .with(tracing_subscriber::fmt::layer())
         .init();
 
     let config = AppConfig::from_env();
-    info!("Starting Styx Personal AI OS Runtime");
+    info!("Starting Syndae Personal AI OS Runtime");
     info!("Host: {}:{}", config.host, config.port);
     info!("Memory directory: {:?}", config.memory_dir);
     info!("Database path: {:?}", config.db_path);
@@ -225,12 +225,12 @@ async fn main() -> Result<()> {
     println!(
         r#"
 ========================================================================
-   ███████╗████████╗██╗   ██╗██╗  ██╗
-   ██╔════╝╚══██╔══╝╚██╗ ██╔╝╚██╗██╔╝
-   ███████╗   ██║    ╚████╔╝  ╚███╔╝ 
-   ╚════██║   ██║     ╚██╔╝   ██╔██╗ 
-   ███████║   ██║      ██║   ██╔╝ ██╗
-   ╚══════╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝
+   ███████╗██╗   ██╗███╗   ██╗██████╗   █████╗ ███████╗
+   ██╔════╝╚██╗ ██╔╝████╗  ██║██╔══██╗ ██╔══██╗██╔════╝
+   ███████╗ ╚████╔╝ ██╔██╗ ██║██║  ██║ ███████║█████╗  
+   ╚════██║  ╚██╔╝  ██║╚██╗██║██║  ██║ ██╔══██║██╔══╝  
+   ███████║   ██║   ██║ ╚████║██████╔╝ ██║  ██║███████╗
+   ╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═════╝  ╚═╝  ╚═╝╚══════╝
    AGENT HARNESS, MODEL MANAGER & MISSION CONTROL DASHBOARD
 ========================================================================
    ▶ Mission Control UI:    http://{}:{}

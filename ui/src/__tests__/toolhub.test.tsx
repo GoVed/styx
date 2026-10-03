@@ -61,7 +61,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
                 display_name: 'WhatsApp Connector',
                 version: '1.0.0',
                 description: 'Isolated Bi-Directional WhatsApp Connect Micro-Daemon',
-                path: '/tools/styx-whatsapp',
+                path: '/tools/syndae-whatsapp',
                 is_installed: true,
                 has_docker: true,
               },
@@ -79,11 +79,11 @@ describe('ToolHub Component - Drag & Drop Support', () => {
               name: 'whatsapp',
               display_name: 'WhatsApp Connector',
               version: '1.0.0',
-              description: 'Isolated Bi-Directional WhatsApp Connect Micro-Daemon & MCP Tool for Styx Agent OS',
-              path: '/tools/styx-whatsapp',
+              description: 'Isolated Bi-Directional WhatsApp Connect Micro-Daemon & MCP Tool for Syndae Agent OS',
+              path: '/tools/syndae-whatsapp',
               has_docker: true,
               has_compose: true,
-              container_name: 'styx-whatsapp-connector',
+              container_name: 'syndae-whatsapp-connector',
               container_exists: true,
               container_running: true,
               container_status: 'Up 10 minutes',
@@ -169,7 +169,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
     );
 
     const input = screen.getByPlaceholderText('/path/to/tool');
-    fireEvent.change(input, { target: { value: '/tools/styx-whatsapp' } });
+    fireEvent.change(input, { target: { value: '/tools/syndae-whatsapp' } });
 
     const inspectBtn = screen.getByRole('button', { name: /Inspect/i });
     fireEvent.click(inspectBtn);
@@ -180,7 +180,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({
-            path: '/tools/styx-whatsapp',
+            path: '/tools/syndae-whatsapp',
           }),
         })
       );
@@ -189,7 +189,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
     // Verify inspected tool card appears with details
     await waitFor(() => {
       expect(screen.getByText(/v1.0.0/i)).toBeDefined();
-      expect(screen.getByText(/styx-whatsapp-connector/i)).toBeDefined();
+      expect(screen.getByText(/syndae-whatsapp-connector/i)).toBeDefined();
       expect(screen.getByText(/Deploy & Connect MCP Daemon|Re-Deploy & Sync Tool/i)).toBeDefined();
     });
   });
@@ -215,7 +215,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
     fireEvent.drop(dropzone, {
       dataTransfer: {
         getData: (format: string) =>
-          format === 'text/plain' ? '/tools/styx-whatsapp/' : '',
+          format === 'text/plain' ? '/tools/syndae-whatsapp/' : '',
         items: [],
       },
     });
@@ -242,7 +242,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
 
     // Trigger inspection first
     const input = screen.getByPlaceholderText('/path/to/tool');
-    fireEvent.change(input, { target: { value: '/tools/styx-whatsapp' } });
+    fireEvent.change(input, { target: { value: '/tools/syndae-whatsapp' } });
     const inspectBtn = screen.getByRole('button', { name: /Inspect/i });
     fireEvent.click(inspectBtn);
 
@@ -257,7 +257,7 @@ describe('ToolHub Component - Drag & Drop Support', () => {
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({
-            path: '/tools/styx-whatsapp',
+            path: '/tools/syndae-whatsapp',
             name: 'whatsapp',
             transport_type: 'http',
             url: 'http://host.docker.internal:8765/mcp',

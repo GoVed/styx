@@ -58,7 +58,7 @@ impl McpRegistry {
                 "sampling": {}
             },
             "clientInfo": {
-                "name": "styx-harness",
+                "name": "syndae-harness",
                 "version": "0.1.0"
             }
         });

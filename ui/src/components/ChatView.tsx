@@ -114,7 +114,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
   );
 
   return (
-    <div className="relative flex h-full w-full overflow-hidden bg-styx-950 font-sans">
+    <div className="relative flex h-full w-full overflow-hidden bg-syndae-950 font-sans">
       {/* Session Drawer / Sidebar */}
       <SessionSidebar
         sessions={sessions}
@@ -131,14 +131,14 @@ export const ChatView: React.FC<ChatViewProps> = ({
       />
 
       {/* Central Chat Stream */}
-      <main className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-styx-950">
+      <main className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-syndae-950">
         {/* Chat Header / Mode Bar with Safe Area Top Support */}
-        <div className="p-2 sm:p-2.5 px-3 sm:px-4 pt-[max(0.6rem,env(safe-area-inset-top))] md:pt-2.5 border-b border-styx-800 bg-styx-900 flex items-center justify-between font-mono text-xs flex-shrink-0 z-20">
+        <div className="p-2 sm:p-2.5 px-3 sm:px-4 pt-[max(0.6rem,env(safe-area-inset-top))] md:pt-2.5 border-b border-syndae-800 bg-syndae-900 flex items-center justify-between font-mono text-xs flex-shrink-0 z-20">
           <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
             <button
               type="button"
               onClick={() => setMobileSidebarOpen(true)}
-              className="md:hidden p-1.5 rounded-lg bg-styx-850 hover:bg-styx-800 text-slate-300 border border-styx-700/80 flex-shrink-0 transition-colors"
+              className="md:hidden p-1.5 rounded-lg bg-syndae-850 hover:bg-syndae-800 text-slate-300 border border-syndae-700/80 flex-shrink-0 transition-colors"
               title="Open workspaces drawer"
             >
               <Menu className="w-4 h-4" />
@@ -149,13 +149,13 @@ export const ChatView: React.FC<ChatViewProps> = ({
             </span>
 
             {/* Mode Switcher */}
-            <div className="flex bg-styx-950 p-0.5 rounded border border-styx-800">
+            <div className="flex bg-syndae-950 p-0.5 rounded border border-syndae-800">
               <button
                 type="button"
                 onClick={() => setMode('chat')}
                 className={`px-2 sm:px-2.5 py-1 rounded text-[11px] transition-colors flex items-center space-x-1 ${
                   mode === 'chat'
-                    ? 'bg-styx-800 text-emerald-300 font-semibold shadow'
+                    ? 'bg-syndae-800 text-emerald-300 font-semibold shadow'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
                 title="Conversational Chat Mode"
@@ -192,7 +192,7 @@ export const ChatView: React.FC<ChatViewProps> = ({
               <button
                 type="button"
                 onClick={onNavigateToSettings}
-                className="md:hidden p-1.5 rounded-lg bg-styx-850 hover:bg-styx-800 text-slate-300 hover:text-emerald-400 border border-styx-700/80 transition-colors"
+                className="md:hidden p-1.5 rounded-lg bg-syndae-850 hover:bg-syndae-800 text-slate-300 hover:text-emerald-400 border border-syndae-700/80 transition-colors"
                 title="Open Settings"
               >
                 <Settings className="w-4 h-4" />
@@ -205,10 +205,10 @@ export const ChatView: React.FC<ChatViewProps> = ({
         <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 min-w-0">
           {messages.length === 0 && !isStreaming && (
             <div className="flex flex-col items-center justify-center h-full text-center max-w-md mx-auto space-y-3">
-              <div className="p-3 rounded-full bg-styx-900 border border-styx-700/60 text-emerald-400">
+              <div className="p-3 rounded-full bg-syndae-900 border border-syndae-700/60 text-emerald-400">
                 <BrainCircuit className="w-8 h-8" />
               </div>
-              <h3 className="font-mono text-sm font-bold text-slate-200">STYX AGENT READY</h3>
+              <h3 className="font-mono text-sm font-bold text-slate-200">SYNDAE AGENT READY</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 Connect directly to your local containerized models (vLLM, llama.cpp, Ollama) or external APIs.
                 Autonomous reads &amp; searches operate with zero overhead. Mutating tool actions halt automatically for human approval.

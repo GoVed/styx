@@ -20,7 +20,7 @@ impl DockerOrchestrator {
             engines::EngineKind::Ollama => 11434,
         };
 
-        let bind_ip = std::env::var("STYX_DOCKER_HOST_IP").unwrap_or_else(|_| "0.0.0.0".to_string());
+        let bind_ip = std::env::var("SYNDAE_DOCKER_HOST_IP").unwrap_or_else(|_| "0.0.0.0".to_string());
         let port_key = format!("{}/tcp", target_port);
         let mut port_bindings = HashMap::new();
         port_bindings.insert(
@@ -105,11 +105,11 @@ impl DockerOrchestrator {
         let cmd_args = req.build_cmd_args();
 
         let mut labels = HashMap::new();
-        labels.insert("styx.managed".to_string(), "true".to_string());
-        labels.insert("styx.engine".to_string(), req.engine.to_string());
-        labels.insert("styx.model".to_string(), req.hf_repo.clone());
+        labels.insert("syndae.managed".to_string(), "true".to_string());
+        labels.insert("syndae.engine".to_string(), req.engine.to_string());
+        labels.insert("syndae.model".to_string(), req.hf_repo.clone());
 
-        let container_name = format!("styx-{}", req.name.trim().replace(' ', "-").to_lowercase());
+        let container_name = format!("syndae-{}", req.name.trim().replace(' ', "-").to_lowercase());
 
         let config = Config {
             image: Some(image.to_string()),
@@ -139,7 +139,7 @@ impl DockerOrchestrator {
         if let Ok(containers) = self.list_containers(true).await {
             let port_needle = format!(":{}", host_port);
             for c in containers {
-                if (c.is_styx_managed || c.names.iter().any(|n| n.starts_with("/styx-")))
+                if (c.is_syndae_managed || c.names.iter().any(|n| n.starts_with("/syndae-")))
                     && c.ports.iter().any(|p| p.contains(&port_needle)) {
                         let _ = self.docker.remove_container(&c.id, Some(RemoveContainerOptions { force: true, ..Default::default() })).await;
                     }

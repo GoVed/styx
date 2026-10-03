@@ -6,7 +6,7 @@ export const useManualServerModal = (onRefresh: () => void) => {
   const [transportType, setTransportType] = useState<'stdio' | 'unix_socket' | 'http_sse'>('stdio');
   const [command, setCommand] = useState('python3');
   const [argsStr, setArgsStr] = useState('["./examples/reference_mcp_daemon.py"]');
-  const [socketPath, setSocketPath] = useState('/tmp/styx-mcp.sock');
+  const [socketPath, setSocketPath] = useState('/tmp/syndae-mcp.sock');
   const [url, setUrl] = useState('http://localhost:8080/mcp');
 
   const handleAddServer = async () => {

@@ -38,7 +38,7 @@ export const LockScreen: React.FC<LockScreenProps> = ({
           </div>
 
           <h1 className="mt-2 text-xl font-bold tracking-tight text-zinc-100 uppercase">
-            Styx Personal AI
+            Syndae Personal AI
           </h1>
 
           <p className="mt-1 text-xs text-zinc-400">
@@ -84,7 +84,7 @@ export const LockScreen: React.FC<LockScreenProps> = ({
               <span>Unlocking your assistant...</span>
             ) : (
               <>
-                <span>Unlock Styx OS</span>
+                <span>Unlock Syndae OS</span>
                 <ArrowRight className="h-4 w-4" />
               </>
             )}

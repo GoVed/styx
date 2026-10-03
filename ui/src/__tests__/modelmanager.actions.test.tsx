@@ -38,12 +38,12 @@ describe('ModelManager Actions Tests', () => {
     const mockContainers = [
       {
         id: 'c1234567890ab',
-        names: ['/styx-qwen-3-5-9b-vllm'],
+        names: ['/syndae-qwen-3-5-9b-vllm'],
         image: 'vllm/vllm-openai-rocm:latest',
         status: 'Up 10 minutes',
         state: 'running',
         ports: ['8000:8000 (TCP)'],
-        is_styx_managed: true,
+        is_syndae_managed: true,
         created: 1790450000,
       },
     ];
@@ -73,7 +73,7 @@ describe('ModelManager Actions Tests', () => {
       />
     );
 
-    expect(screen.getByText('/styx-qwen-3-5-9b-vllm')).toBeInTheDocument();
+    expect(screen.getByText('/syndae-qwen-3-5-9b-vllm')).toBeInTheDocument();
     const setActiveBtn = screen.getByRole('button', { name: /Set Active/i });
     expect(setActiveBtn).toBeInTheDocument();
 

@@ -34,7 +34,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       className={`relative rounded-xl border-2 border-dashed transition-all p-5 font-mono ${
         isDragging
           ? 'border-emerald-400 bg-emerald-950/30 scale-[1.01] shadow-2xl shadow-emerald-500/10'
-          : 'border-styx-700 bg-styx-900/60 hover:border-styx-600'
+          : 'border-syndae-700 bg-syndae-900/60 hover:border-syndae-600'
       }`}
     >
       {/* Hidden Directory/File input for file picker */}
@@ -67,7 +67,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="px-3 py-1.5 rounded-lg bg-styx-800 hover:bg-styx-700 text-slate-200 border border-styx-600 text-xs font-semibold flex items-center space-x-1.5 transition-colors"
+            className="px-3 py-1.5 rounded-lg bg-syndae-800 hover:bg-syndae-700 text-slate-200 border border-syndae-600 text-xs font-semibold flex items-center space-x-1.5 transition-colors"
           >
             <FolderDown className="w-3.5 h-3.5 text-cyan-400" />
             <span>Browse Tool Folder</span>
@@ -76,7 +76,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
       </div>
 
       {/* Manual Path Inspection */}
-      <div className="mt-4 pt-3 border-t border-styx-800/80 flex flex-wrap items-center gap-2">
+      <div className="mt-4 pt-3 border-t border-syndae-800/80 flex flex-wrap items-center gap-2">
         <span className="text-[11px] text-slate-500 font-bold uppercase">
           Inspect Tool Directory:
         </span>
@@ -88,7 +88,7 @@ export const DragDropZone: React.FC<DragDropZoneProps> = ({
             value={inputPath}
             onChange={e => onChangeInputPath(e.target.value)}
             placeholder="/path/to/tool"
-            className="bg-styx-950 border border-styx-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500 w-full md:w-64"
+            className="bg-syndae-950 border border-syndae-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 font-mono focus:outline-none focus:border-emerald-500 w-full md:w-64"
           />
           <button
             type="button"

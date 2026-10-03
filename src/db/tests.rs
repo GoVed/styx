@@ -5,7 +5,7 @@ mod tests {
     #[tokio::test]
     async fn test_find_session_for_tool_and_consolidation() {
         let temp_dir = std::env::temp_dir();
-        let db_path = temp_dir.join(format!("test_styx_sessions_{}.db", uuid::Uuid::new_v4()));
+        let db_path = temp_dir.join(format!("test_syndae_sessions_{}.db", uuid::Uuid::new_v4()));
         let db = Database::init(&db_path).expect("Failed to create test db");
 
         // 1. Create older session for WhatsApp contact Alice
@@ -72,7 +72,7 @@ mod tests {
     #[tokio::test]
     async fn test_access_key_argon2_and_legacy_upgrade() {
         let temp_dir = std::env::temp_dir();
-        let db_path = temp_dir.join(format!("test_styx_auth_{}.db", uuid::Uuid::new_v4()));
+        let db_path = temp_dir.join(format!("test_syndae_auth_{}.db", uuid::Uuid::new_v4()));
         let db = Database::init(&db_path).expect("Failed to create test db");
 
         // 1. Initialized check should be false
@@ -110,7 +110,7 @@ mod tests {
     #[tokio::test]
     async fn test_channel_trigger_policies_and_evaluation() {
         let temp_dir = std::env::temp_dir();
-        let db_path = temp_dir.join(format!("test_styx_channels_{}.db", uuid::Uuid::new_v4()));
+        let db_path = temp_dir.join(format!("test_syndae_channels_{}.db", uuid::Uuid::new_v4()));
         let db = Database::init(&db_path).expect("Failed to create test db");
 
         // 1. Direct chat defaults to Always Respond ('all')
@@ -148,21 +148,21 @@ mod tests {
         assert!(!trigger, "Group chat without mention should NOT trigger");
         assert_eq!(pol, "mentions");
 
-        // 2b. Group chat with mention of Styx -> Should trigger
+        // 2b. Group chat with mention of Syndae -> Should trigger
         let (trigger, pol, reason) = db
             .evaluate_channel_trigger(
                 "120363000000000001@g.us",
                 "whatsapp",
                 Some("Engineering Team"),
                 true,
-                "Hey @Styx, can you summarize our meeting?",
+                "Hey @Syndae, can you summarize our meeting?",
                 "",
                 "Operator",
                 false,
             )
             .await
             .unwrap();
-        assert!(trigger, "Group chat with mention of Styx SHOULD trigger");
+        assert!(trigger, "Group chat with mention of Syndae SHOULD trigger");
         assert_eq!(pol, "mentions");
         assert!(reason.contains("Mention"));
 
@@ -201,7 +201,7 @@ mod tests {
                 "whatsapp",
                 Some("Engineering Team"),
                 true,
-                "@Styx please help!",
+                "@Syndae please help!",
                 "",
                 "Operator",
                 false,
@@ -262,7 +262,7 @@ mod tests {
     #[tokio::test]
     async fn test_change_password_and_hash_invalidation() {
         let temp_dir = std::env::temp_dir();
-        let db_path = temp_dir.join(format!("test_styx_change_pass_{}.db", uuid::Uuid::new_v4()));
+        let db_path = temp_dir.join(format!("test_syndae_change_pass_{}.db", uuid::Uuid::new_v4()));
         let db = Database::init(&db_path).expect("Failed to create test db");
 
         // Initial password setup

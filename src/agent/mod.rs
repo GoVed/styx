@@ -13,8 +13,10 @@ use crate::router::MultiModelRouter;
 use crate::telemetry::TelemetryCollector;
 
 pub mod compression;
+pub mod contact;
 pub mod diagnosis;
 pub mod execution;
+pub mod hitl_handler;
 pub mod prompt;
 pub mod queue;
 pub mod reasoning;
@@ -176,6 +178,9 @@ impl AgentRunner {
         });
 
         let hist_len = history.len();
+        let hist_texts: Vec<String> = history.iter().map(|m| m.content.clone()).collect();
+        let resolved_contact = contact::resolve_contact_from_history(&hist_texts, &base_context);
+
         for (idx, msg) in history.iter().enumerate() {
             if msg.content.trim().is_empty()
                 && msg.tool_calls.as_deref().unwrap_or("").trim().is_empty()
@@ -192,7 +197,7 @@ impl AgentRunner {
             let images_param = msg.images.as_deref().and_then(|imgs| serde_json::from_str(imgs).ok());
 
             let is_last_turn = idx + 1 == hist_len && msg.role == "user";
-            let content = prompt::enrich_user_turn_content(user_prompt, &msg.content, is_last_turn);
+            let content = prompt::enrich_user_turn_content(user_prompt, &msg.content, is_last_turn, Some(&resolved_contact));
 
             chat_messages.push(ChatMessageParam {
                 role: llm_role.to_string(),
@@ -225,6 +230,7 @@ impl AgentRunner {
             .execute_turn_loop(
                 session_id,
                 &model_cfg,
+                user_prompt,
                 chat_messages,
                 available_tools,
                 is_mission_mode,

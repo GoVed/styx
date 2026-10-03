@@ -27,7 +27,7 @@ pub fn split_leading_reasoning(content: &str) -> (Option<String>, String) {
         "[Thought]",
         "[Context]",
         "The daily log ",
-        "As Styx, I should ",
+        "As Syndae, I should ",
         "As an AI ",
         "However, I ",
         "I don't have access to real-time",

@@ -131,11 +131,11 @@ export const useToolHub = (servers: McpServerRecord[], onRefresh: () => void) =>
 
     let resolvedPath = inputPath;
     if (detectedDirName) {
-      resolvedPath = `styx_tools/${detectedDirName}`;
+      resolvedPath = `syndae_tools/${detectedDirName}`;
       setInputPath(resolvedPath);
     } else if (foundPackageJson?.name) {
       const toolDir = foundPackageJson.name.replace(/^@?[^/]+\//, '');
-      resolvedPath = `styx_tools/${toolDir}`;
+      resolvedPath = `syndae_tools/${toolDir}`;
       setInputPath(resolvedPath);
     }
 
@@ -165,7 +165,7 @@ export const useToolHub = (servers: McpServerRecord[], onRefresh: () => void) =>
 
     let targetPath = inputPath;
     if (dirName) {
-      targetPath = `styx_tools/${dirName}`;
+      targetPath = `syndae_tools/${dirName}`;
       setInputPath(targetPath);
     }
 

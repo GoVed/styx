@@ -6,7 +6,7 @@ export const useChannelPolicies = () => {
   const [defaults, setDefaults] = useState<ChannelDefaultsRecord>({
     default_group_policy: 'mentions',
     default_direct_policy: 'all',
-    mention_keywords: 'styx,assistant,ai,bot',
+    mention_keywords: 'syndae,assistant,ai,bot',
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);

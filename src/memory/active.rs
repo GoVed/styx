@@ -150,6 +150,6 @@ fn find_exact_entity(memory: &MemoryManager, candidate: &str) -> Option<(String,
 fn is_common_phrase(s: &str) -> bool {
     matches!(
         s,
-        "can you" | "check if" | "anyone used" | "what is" | "tell me" | "how to" | "if anyone" | "there is" | "used styx" | "is the"
+        "can you" | "check if" | "anyone used" | "what is" | "tell me" | "how to" | "if anyone" | "there is" | "used syndae" | "is the"
     )
 }

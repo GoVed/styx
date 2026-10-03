@@ -28,7 +28,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
   };
 
   return (
-    <div className="p-2.5 rounded bg-styx-950 border border-styx-800 space-y-2">
+    <div className="p-2.5 rounded bg-syndae-950 border border-syndae-800 space-y-2">
       <div className="flex items-center justify-between text-[11px] text-slate-300">
         <div className="flex items-center space-x-1.5 font-bold">
           <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
@@ -41,7 +41,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-[11px]">
         {/* Group Chats Default */}
-        <div className="p-2 rounded bg-styx-900 border border-styx-800/80 space-y-1">
+        <div className="p-2 rounded bg-syndae-900 border border-syndae-800/80 space-y-1">
           <div className="text-slate-400 text-[10px] flex items-center space-x-1">
             <Users className="w-3 h-3 text-cyan-400" />
             <span>Group Chats Default:</span>
@@ -59,7 +59,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
                       : p === 'all'
                       ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
                       : 'bg-rose-950 text-rose-300 border border-rose-700'
-                    : 'text-slate-500 hover:text-slate-300 bg-styx-950 border border-transparent'
+                    : 'text-slate-500 hover:text-slate-300 bg-syndae-950 border border-transparent'
                 }`}
               >
                 {p === 'mentions' ? 'Mentions Only' : p === 'all' ? 'Always' : 'Muted'}
@@ -69,7 +69,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
         </div>
 
         {/* Direct Chats Default */}
-        <div className="p-2 rounded bg-styx-900 border border-styx-800/80 space-y-1">
+        <div className="p-2 rounded bg-syndae-900 border border-syndae-800/80 space-y-1">
           <div className="text-slate-400 text-[10px] flex items-center space-x-1">
             <User className="w-3 h-3 text-emerald-400" />
             <span>Direct Chats Default:</span>
@@ -87,7 +87,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
                       : p === 'mentions'
                       ? 'bg-amber-950 text-amber-300 border border-amber-700'
                       : 'bg-rose-950 text-rose-300 border border-rose-700'
-                    : 'text-slate-500 hover:text-slate-300 bg-styx-950 border border-transparent'
+                    : 'text-slate-500 hover:text-slate-300 bg-syndae-950 border border-transparent'
                 }`}
               >
                 {p === 'all' ? 'Always' : p === 'mentions' ? 'Mentions Only' : 'Muted'}
@@ -97,7 +97,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
         </div>
 
         {/* Mention Keywords */}
-        <div className="p-2 rounded bg-styx-900 border border-styx-800/80 space-y-1">
+        <div className="p-2 rounded bg-syndae-900 border border-syndae-800/80 space-y-1">
           <div className="text-slate-400 text-[10px] flex items-center justify-between">
             <div className="flex items-center space-x-1">
               <AtSign className="w-3 h-3 text-amber-400" />
@@ -118,8 +118,8 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
               onKeyDown={e => {
                 if (e.key === 'Enter') handleSaveKeywords();
               }}
-              placeholder="styx, assistant, ai, bot"
-              className="flex-1 bg-styx-950 border border-styx-800 rounded px-2 py-0.5 text-[10px] text-slate-200 focus:outline-none focus:border-amber-600"
+              placeholder="syndae, assistant, ai, bot"
+              className="flex-1 bg-syndae-950 border border-syndae-800 rounded px-2 py-0.5 text-[10px] text-slate-200 focus:outline-none focus:border-amber-600"
             />
             <button
               type="button"
@@ -128,7 +128,7 @@ export const GlobalChannelDefaultsCard: React.FC<GlobalChannelDefaultsCardProps>
               className={`px-2 py-0.5 rounded text-[10px] font-bold transition-colors ${
                 isKeywordsDirty
                   ? 'bg-amber-700 hover:bg-amber-600 text-slate-900'
-                  : 'bg-styx-800 text-slate-500 cursor-not-allowed'
+                  : 'bg-syndae-800 text-slate-500 cursor-not-allowed'
               }`}
             >
               Save

@@ -32,7 +32,7 @@ export const OptionsPills: React.FC<OptionsPillsProps> = ({
   if (options.length === 0) return null;
 
   return (
-    <div className="w-full max-w-3xl mt-2 rounded-lg bg-styx-950/80 border border-emerald-500/30 p-2.5 space-y-2 shadow-sm">
+    <div className="w-full max-w-3xl mt-2 rounded-lg bg-syndae-950/80 border border-emerald-500/30 p-2.5 space-y-2 shadow-sm">
       <div className="flex items-center justify-between text-[11px] font-mono">
         <span className="flex items-center space-x-1.5 font-semibold text-emerald-400">
           <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
@@ -66,7 +66,7 @@ export const OptionsPills: React.FC<OptionsPillsProps> = ({
                 disabled={hasUserReplied || isStreaming}
                 className={`px-3 py-1.5 rounded-md text-xs font-mono transition-all flex items-center space-x-1.5 shadow-sm ${
                   hasUserReplied
-                    ? 'bg-styx-900/50 text-slate-500 border border-styx-800 cursor-default'
+                    ? 'bg-syndae-900/50 text-slate-500 border border-syndae-800 cursor-default'
                     : activeOtherMsgId === messageId
                     ? 'bg-purple-900/80 text-purple-200 border border-purple-400 ring-1 ring-purple-400'
                     : 'bg-purple-950/40 hover:bg-purple-900/60 text-purple-300 border border-purple-500/40 hover:border-purple-400 cursor-pointer active:scale-95'
@@ -85,8 +85,8 @@ export const OptionsPills: React.FC<OptionsPillsProps> = ({
                 isSelectedByFollowup
                   ? 'bg-emerald-950 text-emerald-300 border border-emerald-500/70 ring-1 ring-emerald-500/50'
                   : hasUserReplied
-                  ? 'bg-styx-900/50 text-slate-500 border border-styx-800'
-                  : 'bg-styx-850 hover:bg-emerald-950/60 text-slate-200 hover:text-emerald-200 border border-styx-700/80 hover:border-emerald-500/60'
+                  ? 'bg-syndae-900/50 text-slate-500 border border-syndae-800'
+                  : 'bg-syndae-850 hover:bg-emerald-950/60 text-slate-200 hover:text-emerald-200 border border-syndae-700/80 hover:border-emerald-500/60'
               }`}
             >
               <button
@@ -121,7 +121,7 @@ export const OptionsPills: React.FC<OptionsPillsProps> = ({
             }}
             placeholder="Type custom response or details..."
             autoFocus
-            className="flex-1 bg-styx-900 border border-purple-800/80 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500"
+            className="flex-1 bg-syndae-900 border border-purple-800/80 rounded px-2.5 py-1 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500"
           />
           <button
             type="button"

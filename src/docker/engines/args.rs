@@ -32,7 +32,7 @@ impl DeployModelRequest {
             },
             EngineKind::LlamaCpp => match vendor {
                 GpuVendor::Amd if self.hf_repo.to_lowercase().contains("k2-horizon") => {
-                    "styx-llama-k2:server-rocm".to_string()
+                    "syndae-llama-k2:server-rocm".to_string()
                 }
                 GpuVendor::Amd => "ghcr.io/ggml-org/llama.cpp:server-rocm".to_string(),
                 _ => "ghcr.io/ggerganov/llama.cpp:server".to_string(),
@@ -320,7 +320,7 @@ impl DeployModelRequest {
         let cmd_args = formatted_cmd_args.join(" ");
         let cmd_str = if cmd_args.is_empty() { String::new() } else { format!(" \\\n  {}", cmd_args) };
         let image = self.image_name();
-        let mut parts = vec![format!("docker run -d --name styx-{}", self.name)];
+        let mut parts = vec![format!("docker run -d --name syndae-{}", self.name)];
         if !gpu_flag.is_empty() {
             parts.push(format!("  {}", gpu_flag));
         }

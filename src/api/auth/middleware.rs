@@ -10,7 +10,7 @@ use tracing::warn;
 
 use crate::state::AppState;
 
-/// Helper to extract bearer token or X-Styx-Access-Key or query ?token=
+/// Helper to extract bearer token or X-Syndae-Access-Key or query ?token=
 pub async fn verify_token_from_parts(state: &AppState, headers: &HeaderMap, uri: &Uri) -> bool {
     // If auth is not initialized, do NOT allow access to protected endpoints!
     if !state.db.is_auth_initialized().await.unwrap_or(false) {
@@ -30,8 +30,8 @@ pub async fn verify_token_from_parts(state: &AppState, headers: &HeaderMap, uri:
         }
     }
 
-    // 2. Check X-Styx-Access-Key: <key>
-    if let Some(key_hdr) = headers.get("X-Styx-Access-Key").and_then(|h| h.to_str().ok())
+    // 2. Check X-Syndae-Access-Key: <key>
+    if let Some(key_hdr) = headers.get("X-Syndae-Access-Key").and_then(|h| h.to_str().ok())
         && state.db.verify_access_key(key_hdr).await.unwrap_or(false) {
             return true;
         }

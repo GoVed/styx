@@ -45,8 +45,8 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
   const [showTechnicalLogs, setShowTechnicalLogs] = useState(false);
 
   return (
-    <div className="bg-styx-900 border border-styx-800 rounded-lg p-4 font-mono space-y-4">
-      <div className="flex items-center justify-between border-b border-styx-800 pb-2">
+    <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-4 font-mono space-y-4">
+      <div className="flex items-center justify-between border-b border-syndae-800 pb-2">
         <div className="text-xs font-bold text-slate-200 flex items-center space-x-2">
           <Activity
             className={`w-4 h-4 ${
@@ -88,7 +88,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
       </div>
 
       {/* 4-Stage Stepper Tracker */}
-      <div className="p-3 bg-styx-950 rounded border border-styx-800 space-y-2.5">
+      <div className="p-3 bg-syndae-950 rounded border border-syndae-800 space-y-2.5">
         <div className="grid grid-cols-4 gap-1 text-center relative">
           {[
             { idx: 1, label: 'Download / Cache', icon: Download },
@@ -111,7 +111,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
                       ? 'bg-rose-950 border border-rose-500 text-rose-400'
                       : isCurrent
                       ? 'bg-cyan-950 border-2 border-cyan-400 text-cyan-200 animate-pulse shadow-sm shadow-cyan-900/60'
-                      : 'bg-styx-900 border border-styx-800 text-slate-500'
+                      : 'bg-syndae-900 border border-syndae-800 text-slate-500'
                   }`}
                 >
                   {isComplete ? (
@@ -141,7 +141,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
         </div>
 
         {/* Progress Bar */}
-        <div className="w-full bg-styx-900 h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-syndae-900 h-2 rounded-full overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${
               progressInfo.stage === 'error'
@@ -204,7 +204,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
             <button
               type="button"
               onClick={onReturnToDashboard}
-              className="px-4 py-2.5 rounded-lg bg-styx-800 hover:bg-styx-750 text-slate-200 border border-styx-700 font-semibold text-xs"
+              className="px-4 py-2.5 rounded-lg bg-syndae-800 hover:bg-syndae-750 text-slate-200 border border-syndae-700 font-semibold text-xs"
             >
               View Active Model Dashboard
             </button>
@@ -244,7 +244,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
       )}
 
       {/* Collapsible Technical Console Logs */}
-      <div className="pt-2 border-t border-styx-800">
+      <div className="pt-2 border-t border-syndae-800">
         <button
           type="button"
           onClick={() => setShowTechnicalLogs(!showTechnicalLogs)}
@@ -273,7 +273,7 @@ export const DeploymentStepper: React.FC<DeploymentStepperProps> = ({
                 </button>
               )}
             </div>
-            <div className="h-64 bg-styx-950 p-3 rounded border border-styx-800 text-[10px] text-slate-300 overflow-y-auto space-y-0.5 font-mono">
+            <div className="h-64 bg-syndae-950 p-3 rounded border border-syndae-800 text-[10px] text-slate-300 overflow-y-auto space-y-0.5 font-mono">
               {containerLogs.length === 0 ? (
                 <div className="text-slate-600 italic">No console logs received yet...</div>
               ) : (

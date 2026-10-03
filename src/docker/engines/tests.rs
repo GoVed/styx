@@ -44,7 +44,7 @@ mod tests {
         assert!(args.contains(&"--enforce-eager".to_string()));
 
         let preview = req.generate_docker_cli_preview();
-        assert!(preview.contains("docker run -d --name styx-test-qwen"));
+        assert!(preview.contains("docker run -d --name syndae-test-qwen"));
         assert!(preview.contains("--device=/dev/kfd --device=/dev/dri --group-add=video --security-opt seccomp=unconfined --ipc=host"));
         assert!(preview.contains("vllm/vllm-openai-rocm:latest"));
         assert!(preview.contains("QuantTrio/Qwen3.5-9B-AWQ"));
@@ -302,7 +302,7 @@ mod tests {
         let args_repo = req_repo.build_cmd_args();
         let hf_idx_repo = args_repo.iter().position(|a| a == "-hf").unwrap();
         assert_eq!(args_repo[hf_idx_repo + 1], "IFM/K2-Horizon-7B-GGUF:Q5_K_M");
-        assert_eq!(req_url.image_name(), "styx-llama-k2:server-rocm");
-        assert_eq!(req_repo.image_name(), "styx-llama-k2:server-rocm");
+        assert_eq!(req_url.image_name(), "syndae-llama-k2:server-rocm");
+        assert_eq!(req_repo.image_name(), "syndae-llama-k2:server-rocm");
     }
 }

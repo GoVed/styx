@@ -71,6 +71,7 @@ impl MultiModelRouter {
         tools: Vec<ToolParam>,
         max_tokens: Option<u32>,
         reasoning_effort: Option<&str>,
+        tool_choice: Option<&str>,
     ) -> mpsc::Receiver<StreamChunk> {
         let (tx, rx) = mpsc::channel(100);
 
@@ -79,21 +80,22 @@ impl MultiModelRouter {
         let api_key_str = api_key.unwrap_or_default().to_string();
         let model_str = model.to_string();
         let reasoning_str = reasoning_effort.map(|s| s.to_string());
+        let tool_choice_str = tool_choice.map(|s| s.to_string());
 
         tokio::spawn(async move {
             let res = match provider_str.as_str() {
                 "anthropic" => {
                     let client = AnthropicClient::new_with_reasoning(api_key_str, model_str, reasoning_str);
-                    client.stream_chat(messages, tools, tx.clone(), max_tokens).await
+                    client.stream_chat(messages, tools, tx.clone(), max_tokens, tool_choice_str).await
                 }
                 "gemini" => {
                     let client = GeminiClient::new(api_key_str, model_str);
-                    client.stream_chat(messages, tools, tx.clone(), max_tokens).await
+                    client.stream_chat(messages, tools, tx.clone(), max_tokens, tool_choice_str).await
                 }
                 _ => {
                     let base = base_url_str.unwrap_or_else(|| "http://localhost:8000/v1".to_string());
                     let client = OpenAiClient::new_with_reasoning(base, api_key_str, model_str, reasoning_str);
-                    client.stream_chat(messages, tools, tx.clone(), max_tokens).await
+                    client.stream_chat(messages, tools, tx.clone(), max_tokens, tool_choice_str).await
                 }
             };
 

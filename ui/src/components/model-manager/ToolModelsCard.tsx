@@ -46,7 +46,7 @@ export const ToolModelsCard: React.FC<ToolModelsCardProps> = ({ onRefresh }) => 
   return (
     <div className="w-full space-y-6">
       {/* Banner */}
-      <div className="bg-styx-900 border border-styx-700/80 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="bg-syndae-900 border border-syndae-700/80 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded-md">
             <Sparkles className="w-5 h-5 text-emerald-400" />
@@ -63,7 +63,7 @@ export const ToolModelsCard: React.FC<ToolModelsCardProps> = ({ onRefresh }) => 
         <button
           onClick={fetchRoles}
           disabled={loading}
-          className="px-3 py-1.5 rounded bg-styx-800 hover:bg-styx-700 border border-styx-700 text-xs font-mono text-slate-300 flex items-center space-x-1.5 self-start sm:self-auto"
+          className="px-3 py-1.5 rounded bg-syndae-800 hover:bg-syndae-700 border border-syndae-700 text-xs font-mono text-slate-300 flex items-center space-x-1.5 self-start sm:self-auto"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
           <span>Refresh Status</span>

@@ -1,7 +1,7 @@
-# STYX ARCHITECTURAL RULES & CORE LAWS
+# SYNDAE ARCHITECTURAL RULES & CORE LAWS
 
-## Law 1: Styx Core is a Pure Harness
-The Styx repository (`Styx/`) is strictly a general-purpose AI Operating System and execution harness.
+## Law 1: Syndae Core is a Pure Harness
+The Syndae repository (`Syndae/`) is strictly a general-purpose AI Operating System and execution harness.
 - It contains ONLY:
   - Agent runtime, turn queue, reasoning / thinking loop.
   - Model management and local engine orchestration (vLLM, llama.cpp, Ollama).
@@ -17,15 +17,15 @@ The Styx repository (`Styx/`) is strictly a general-purpose AI Operating System 
 
 ## Law 2: Tools Live Exclusively in External Packages
 - Tools are independent micro-daemons residing in external tool packages or standalone repositories.
-- Tools communicate with Styx strictly via:
+- Tools communicate with Syndae strictly via:
   1. Standard MCP protocol (`tools/list`, `tools/call`).
   2. Generic HTTP inbound webhook (`POST /api/tools/trigger`).
-- Styx core remains 100% agnostic to what any external tool does. Styx only processes standardized parameters: `protocol`, `channel_id`, `source_id`, `event_type`, `payload`.
+- Syndae core remains 100% agnostic to what any external tool does. Syndae only processes standardized parameters: `protocol`, `channel_id`, `source_id`, `event_type`, `payload`.
 
 ## Law 3: Universal World-Learning Framework
 - Every user has a completely distinct life, culture, language, family, and social circle.
-- Styx is built for millions of users worldwide and makes zero assumptions about who the user is.
-- Styx dynamically learns about each user's world and records it into `/memory/`:
+- Syndae is built for millions of users worldwide and makes zero assumptions about who the user is.
+- Syndae dynamically learns about each user's world and records it into `/memory/`:
   - `core/user_profile.md`: The user's identity, routines, languages, and general preferences.
   - `people/<contact_name>.md`: The user's relationship with that specific person, communication style, language, and shared history.
   - `groups/<group_name>.md`: The purpose behind the group, its dynamics, tone, and participants.

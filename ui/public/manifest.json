@@ -1,6 +1,6 @@
 {
-  "name": "Styx Mission Control",
-  "short_name": "Styx",
+  "name": "Syndae Mission Control",
+  "short_name": "Syndae",
   "description": "Agent Harness, Model Manager & Mission Control",
   "start_url": "/",
   "display": "standalone",

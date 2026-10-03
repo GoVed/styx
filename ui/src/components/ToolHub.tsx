@@ -72,10 +72,10 @@ export const ToolHub: React.FC<ToolHubProps> = ({
   } = useToolHub(servers, onRefresh);
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-styx-950 font-sans text-xs">
+    <div className="flex h-full w-full overflow-hidden bg-syndae-950 font-sans text-xs">
       <div className="flex-1 flex flex-col h-full min-h-0 overflow-y-auto p-4 space-y-4 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-styx-800 pb-3 gap-3 font-mono">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-syndae-800 pb-3 gap-3 font-mono">
           <div className="flex items-center space-x-3">
             <div className="p-2 rounded-lg bg-emerald-950/80 border border-emerald-800 text-emerald-400 flex-shrink-0">
               <Layers className="w-5 h-5" />
@@ -96,7 +96,7 @@ export const ToolHub: React.FC<ToolHubProps> = ({
             <button
               type="button"
               onClick={() => setShowAddModal(true)}
-              className="px-3 py-1.5 rounded bg-styx-800 hover:bg-styx-700 text-slate-200 border border-styx-700 font-bold flex items-center space-x-1.5 shadow text-xs active:scale-95 transition-all"
+              className="px-3 py-1.5 rounded bg-syndae-800 hover:bg-syndae-700 text-slate-200 border border-syndae-700 font-bold flex items-center space-x-1.5 shadow text-xs active:scale-95 transition-all"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Manual Setup</span>

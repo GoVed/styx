@@ -82,9 +82,9 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
   };
 
   return (
-    <div className="bg-styx-900 border border-styx-800 rounded-lg p-5 flex flex-col justify-between space-y-4">
+    <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-5 flex flex-col justify-between space-y-4">
       <div className="space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-styx-800">
+        <div className="flex items-center justify-between pb-3 border-b border-syndae-800">
           <div className="flex items-center space-x-2">
             <Eye className="w-4 h-4 text-cyan-400" />
             <h4 className="text-sm font-bold text-slate-100 font-mono">VISION MODEL (inspect_image)</h4>
@@ -105,7 +105,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
                 setVisionBaseUrl('http://localhost:11434/v1');
               }}
               className={`px-2.5 py-1.5 text-left rounded border text-xs font-mono ${
-                visionModelId === 'moondream' ? 'bg-cyan-950/60 border-cyan-600 text-cyan-200' : 'bg-styx-950 border-styx-800 text-slate-400 hover:border-styx-700'
+                visionModelId === 'moondream' ? 'bg-cyan-950/60 border-cyan-600 text-cyan-200' : 'bg-syndae-950 border-syndae-800 text-slate-400 hover:border-syndae-700'
               }`}
             >
               <div className="font-bold">Moondream 2 1.8B</div>
@@ -119,7 +119,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
                 setVisionBaseUrl('http://localhost:8080/v1');
               }}
               className={`px-2.5 py-1.5 text-left rounded border text-xs font-mono ${
-                visionModelId === 'qwen2-vl-2b-local' ? 'bg-cyan-950/60 border-cyan-600 text-cyan-200' : 'bg-styx-950 border-styx-800 text-slate-400 hover:border-styx-700'
+                visionModelId === 'qwen2-vl-2b-local' ? 'bg-cyan-950/60 border-cyan-600 text-cyan-200' : 'bg-syndae-950 border-syndae-800 text-slate-400 hover:border-syndae-700'
               }`}
             >
               <div className="font-bold">Qwen2-VL 2B</div>
@@ -135,7 +135,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
               <select
                 value={visionProvider}
                 onChange={(e) => setVisionProvider(e.target.value)}
-                className="w-full bg-styx-950 border border-styx-700 rounded px-2.5 py-1.5 text-slate-200"
+                className="w-full bg-syndae-950 border border-syndae-700 rounded px-2.5 py-1.5 text-slate-200"
               >
                 <option value="docker_ollama">Ollama (Local/ROCm)</option>
                 <option value="docker_llamacpp">llama.cpp (Local GGUF)</option>
@@ -150,7 +150,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
                 value={visionModelId}
                 onChange={(e) => setVisionModelId(e.target.value)}
                 placeholder="e.g. moondream"
-                className="w-full bg-styx-950 border border-styx-700 rounded px-2.5 py-1.5 text-slate-200"
+                className="w-full bg-syndae-950 border border-syndae-700 rounded px-2.5 py-1.5 text-slate-200"
               />
             </div>
           </div>
@@ -161,7 +161,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
               value={visionBaseUrl}
               onChange={(e) => setVisionBaseUrl(e.target.value)}
               placeholder="http://localhost:11434/v1"
-              className="w-full bg-styx-950 border border-styx-700 rounded px-2.5 py-1.5 text-slate-200 font-mono text-[11px]"
+              className="w-full bg-syndae-950 border border-syndae-700 rounded px-2.5 py-1.5 text-slate-200 font-mono text-[11px]"
             />
           </div>
           <div className="flex items-center justify-between pt-1">
@@ -178,7 +178,7 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
           </div>
         </div>
 
-        <div className="pt-3 border-t border-styx-800 space-y-2">
+        <div className="pt-3 border-t border-syndae-800 space-y-2">
           <label className="text-[10px] font-mono text-slate-400 flex items-center space-x-1">
             <ImageIcon className="w-3 h-3 text-cyan-400" />
             <span>TEST VISION INSPECTION</span>
@@ -189,20 +189,20 @@ export const VisionModelSection: React.FC<VisionModelSectionProps> = ({
               value={testImageUrl}
               onChange={(e) => setTestImageUrl(e.target.value)}
               placeholder="Paste Image URL or data:image/..."
-              className="flex-1 bg-styx-950 border border-styx-800 rounded px-2.5 py-1 text-xs text-slate-200 font-mono"
+              className="flex-1 bg-syndae-950 border border-syndae-800 rounded px-2.5 py-1 text-xs text-slate-200 font-mono"
             />
             <button
               type="button"
               onClick={handleTestVision}
               disabled={testingVision || !testImageUrl.trim()}
-              className="px-3 py-1 bg-styx-800 hover:bg-styx-700 border border-styx-700 text-cyan-300 rounded text-xs font-mono font-bold flex items-center space-x-1"
+              className="px-3 py-1 bg-syndae-800 hover:bg-syndae-700 border border-syndae-700 text-cyan-300 rounded text-xs font-mono font-bold flex items-center space-x-1"
             >
               {testingVision ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
               <span>Inspect</span>
             </button>
           </div>
           {visionResult && (
-            <div className="p-2.5 rounded bg-styx-950 border border-styx-800 text-xs font-mono">
+            <div className="p-2.5 rounded bg-syndae-950 border border-syndae-800 text-xs font-mono">
               {visionResult.error ? (
                 <div className="text-rose-400">{visionResult.error}</div>
               ) : (

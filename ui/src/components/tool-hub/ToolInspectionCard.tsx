@@ -16,8 +16,8 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
   onInstall,
 }) => {
   return (
-    <div className="bg-styx-900 border-2 border-emerald-600/90 rounded-xl p-4 font-mono space-y-4 shadow-2xl animate-in fade-in slide-in-from-top-2">
-      <div className="flex items-start justify-between border-b border-styx-800 pb-3">
+    <div className="bg-syndae-900 border-2 border-emerald-600/90 rounded-xl p-4 font-mono space-y-4 shadow-2xl animate-in fade-in slide-in-from-top-2">
+      <div className="flex items-start justify-between border-b border-syndae-800 pb-3">
         <div className="flex items-center space-x-3">
           <div className="p-2.5 rounded-lg bg-emerald-950 border border-emerald-700 text-emerald-400 shadow">
             <MessageSquare className="w-6 h-6" />
@@ -51,7 +51,7 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
 
       {/* Metadata Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-        <div className="p-2.5 rounded-lg bg-styx-950 border border-styx-800 space-y-1">
+        <div className="p-2.5 rounded-lg bg-syndae-950 border border-syndae-800 space-y-1">
           <span className="text-[10px] uppercase text-slate-500 font-bold">Location & Repo</span>
           <div className="text-slate-200 font-mono truncate text-[11px]">{inspectedTool.path}</div>
           <div className="text-[10px] text-emerald-400 flex items-center space-x-1">
@@ -60,7 +60,7 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
           </div>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-styx-950 border border-styx-800 space-y-1">
+        <div className="p-2.5 rounded-lg bg-syndae-950 border border-syndae-800 space-y-1">
           <span className="text-[10px] uppercase text-slate-500 font-bold">Container Micro-Daemon</span>
           <div className="text-slate-200 font-mono text-[11px] truncate">
             {inspectedTool.container_name}
@@ -77,7 +77,7 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
           </div>
         </div>
 
-        <div className="p-2.5 rounded-lg bg-styx-950 border border-styx-800 space-y-1">
+        <div className="p-2.5 rounded-lg bg-syndae-950 border border-syndae-800 space-y-1">
           <span className="text-[10px] uppercase text-slate-500 font-bold">Tool Instructions & Skills</span>
           <div className="text-slate-200 font-mono text-[11px] truncate">
             {inspectedTool.instructions ? 'Provided by Tool Package' : 'Standard MCP Protocol'}
@@ -98,7 +98,7 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
           {inspectedTool.tools?.map(t => (
             <div
               key={t.name}
-              className="p-2 rounded-lg bg-styx-950 border border-styx-800 flex items-start justify-between space-x-2"
+              className="p-2 rounded-lg bg-syndae-950 border border-syndae-800 flex items-start justify-between space-x-2"
             >
               <div>
                 <code className="text-emerald-400 font-bold text-[11px]">{t.name}</code>
@@ -122,18 +122,18 @@ export const ToolInspectionCard: React.FC<ToolInspectionCardProps> = ({
 
       {/* Instructions Preview if supplied by tool */}
       {inspectedTool.instructions && (
-        <details className="text-xs bg-styx-950/70 border border-styx-800 rounded-lg p-2.5">
+        <details className="text-xs bg-syndae-950/70 border border-syndae-800 rounded-lg p-2.5">
           <summary className="cursor-pointer text-slate-300 font-semibold hover:text-emerald-400 select-none flex items-center space-x-1.5">
-            <span>📖 View Tool Instructions & Styx Integration Guide</span>
+            <span>📖 View Tool Instructions & Syndae Integration Guide</span>
           </summary>
-          <div className="mt-2 pt-2 text-slate-400 font-mono text-[11px] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed border-t border-styx-800/80 bg-styx-950 p-2 rounded">
+          <div className="mt-2 pt-2 text-slate-400 font-mono text-[11px] whitespace-pre-wrap max-h-48 overflow-y-auto leading-relaxed border-t border-syndae-800/80 bg-syndae-950 p-2 rounded">
             {inspectedTool.instructions}
           </div>
         </details>
       )}
 
       {/* Deploy Action Bar */}
-      <div className="pt-2 border-t border-styx-800 flex items-center justify-between">
+      <div className="pt-2 border-t border-syndae-800 flex items-center justify-between">
         <div className="text-[11px] text-slate-400 flex items-center space-x-1.5">
           <Shield className="w-3.5 h-3.5 text-amber-400" />
           <span>Deterministic HITL gates will safeguard mutating actions (e.g. sending real messages).</span>

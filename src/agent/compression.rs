@@ -151,7 +151,7 @@ pub fn prepare_auto_compressed_messages(
         for msg in &older_messages {
             let role_label = match msg.role.as_str() {
                 "user" => "User",
-                "assistant" => "Styx",
+                "assistant" => "Syndae",
                 "tool" => msg.name.as_deref().unwrap_or("Tool Output"),
                 r => r,
             };
@@ -219,7 +219,7 @@ pub fn prepare_auto_compressed_messages(
             let keep_len = msg_len.saturating_sub(cut_chars);
             let truncated: String = result[candidate_idx].content.chars().take(keep_len).collect();
             result[candidate_idx].content = format!(
-                "{}\n\n[... Truncated by Styx Context Compressor to fit model window ...]",
+                "{}\n\n[... Truncated by Syndae Context Compressor to fit model window ...]",
                 truncated
             );
         } else if result.len() > 3 && candidate_idx != 0 && candidate_idx != 1 && candidate_idx < result.len() - 1 {

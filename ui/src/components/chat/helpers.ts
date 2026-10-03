@@ -11,7 +11,7 @@ marked.use({
     link({ href, title, text }: { href: string; title?: string | null; text: string }) {
       if (href && href.startsWith('file://')) {
         const cleanPath = href.replace(/^file:\/\//, '');
-        return `<code class="px-1.5 py-0.5 rounded text-[11px] font-mono bg-styx-900 text-emerald-400 border border-styx-700 select-all inline-block" title="Local file: ${cleanPath}">${text || cleanPath}</code>`;
+        return `<code class="px-1.5 py-0.5 rounded text-[11px] font-mono bg-syndae-900 text-emerald-400 border border-syndae-700 select-all inline-block" title="Local file: ${cleanPath}">${text || cleanPath}</code>`;
       }
       const titleAttr = title ? ` title="${title}"` : '';
       return `<a href="${href}" target="_blank" rel="noopener noreferrer"${titleAttr} class="text-emerald-400 hover:underline">${text}</a>`;
@@ -97,7 +97,7 @@ export const extractThoughtAndContent = (
 
   // 3. Extract leading untagged meta-reasoning paragraphs
   const metaReasoningRegex =
-    /^(?:\[(?:Memory Check|Reasoning|Plan|Thought|Internal|Context)\]|Okay[,.]|Alright[,.]|Looking at|The user|Since (?:I|there)|I should|I shouldn't|I need to|I'll|I will|Let me|Based on|From (?:my |the )?(?:memory|scratchpad)|Thinking Process|Reasoning Process|The daily log|As (?:Styx|an AI)|However, I (?:don't|do not)|I don't have access|The memory only contains|Given (?:the |this )?|Considering (?:the |this )?|In this (?:conversation|context)|To respond to the user)/i;
+    /^(?:\[(?:Memory Check|Reasoning|Plan|Thought|Internal|Context)\]|Okay[,.]|Alright[,.]|Looking at|The user|Since (?:I|there)|I should|I shouldn't|I need to|I'll|I will|Let me|Based on|From (?:my |the )?(?:memory|scratchpad)|Thinking Process|Reasoning Process|The daily log|As (?:Syndae|an AI)|However, I (?:don't|do not)|I don't have access|The memory only contains|Given (?:the |this )?|Considering (?:the |this )?|In this (?:conversation|context)|To respond to the user)/i;
 
   const isMetaPara = (p: string): boolean => {
     const pTrim = p.trim();

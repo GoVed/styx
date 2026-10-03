@@ -122,7 +122,7 @@ impl<'a> AgentToolExecutor<'a> {
                     tool_name: name.to_string(),
                     success: true,
                     content: format!(
-                        "User enrollment and onboarding marked as completed in Styx. Summary: {}",
+                        "User enrollment and onboarding marked as completed in Syndae. Summary: {}",
                         summary
                     ),
                     is_error: false,

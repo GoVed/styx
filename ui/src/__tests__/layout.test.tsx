@@ -101,7 +101,7 @@ describe('Layout Structure & Overflow Prevention Tests', () => {
     const nav = screen.getByRole('navigation');
     expect(nav).toBeInTheDocument();
     expect(nav.className).toContain('flex-shrink-0');
-    expect(nav.className).toContain('bg-styx-900');
+    expect(nav.className).toContain('bg-syndae-900');
     expect(nav.className).toContain('border-b');
   });
 
@@ -147,7 +147,7 @@ describe('Layout Structure & Overflow Prevention Tests', () => {
     expect(header).toBeInTheDocument();
     expect(header?.className).toContain('flex-shrink-0');
     expect(header?.className).not.toContain('sticky');
-    expect(header?.className).toContain('bg-styx-900');
+    expect(header?.className).toContain('bg-syndae-900');
 
     // Inner flex container should not wrap
     const innerFlex = header?.firstElementChild as HTMLElement;

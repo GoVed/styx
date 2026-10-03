@@ -10,7 +10,7 @@ export interface WebSocketHandlers {
   onAuthEvent: () => void;
 }
 
-export const useStyxWebSocket = (handlers: WebSocketHandlers) => {
+export const useSyndaeWebSocket = (handlers: WebSocketHandlers) => {
   const wsRef = useRef<WebSocket | null>(null);
   const handlersRef = useRef<WebSocketHandlers>(handlers);
   handlersRef.current = handlers;
@@ -18,7 +18,7 @@ export const useStyxWebSocket = (handlers: WebSocketHandlers) => {
   const connectWebSocket = useCallback(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
-    const token = localStorage.getItem('styx_access_key') || '';
+    const token = localStorage.getItem('syndae_access_key') || '';
     const wsUrl = `${protocol}//${host}/ws${token ? `?token=${encodeURIComponent(token)}` : ''}`;
 
     const ws = new WebSocket(wsUrl);
@@ -42,7 +42,7 @@ export const useStyxWebSocket = (handlers: WebSocketHandlers) => {
           if (data.event?.type === 'notification') {
             handlersRef.current.onNotification?.({
               id: `notif-${Date.now()}`,
-              title: data.event.title || 'Styx Notification',
+              title: data.event.title || 'Syndae Notification',
               message: data.event.message || '',
               urgency: data.event.urgency || 'action_required',
               sessionId: data.session_id,
@@ -60,7 +60,7 @@ export const useStyxWebSocket = (handlers: WebSocketHandlers) => {
     };
 
     ws.onclose = () => {
-      if (localStorage.getItem('styx_access_key')) {
+      if (localStorage.getItem('syndae_access_key')) {
         setTimeout(connectWebSocket, 2000);
       }
     };

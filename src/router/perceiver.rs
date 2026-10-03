@@ -1,8 +1,8 @@
 use serde_json::{json, Value};
 
 pub async fn resolve_vision_endpoint(db: &crate::db::Database) -> (String, String, String) {
-    if let Ok(endpoint) = std::env::var("STYX_VISION_ENDPOINT") {
-        let model = std::env::var("STYX_VISION_MODEL").unwrap_or_else(|_| "moondream".to_string());
+    if let Ok(endpoint) = std::env::var("SYNDAE_VISION_ENDPOINT") {
+        let model = std::env::var("SYNDAE_VISION_MODEL").unwrap_or_else(|_| "moondream".to_string());
         return (endpoint, String::new(), model);
     }
     if let Ok(Some(cfg)) = db.get_active_vision_model_config().await {
@@ -41,10 +41,10 @@ pub async fn perceive_or_strip_images(
     let endpoint = if let Some(ep) = vision_endpoint {
         ep
     } else {
-        let base = std::env::var("STYX_VISION_ENDPOINT")
+        let base = std::env::var("SYNDAE_VISION_ENDPOINT")
             .unwrap_or_else(|_| "http://localhost:11434/v1".to_string());
-        let key = std::env::var("STYX_VISION_KEY").unwrap_or_default();
-        let model = std::env::var("STYX_VISION_MODEL")
+        let key = std::env::var("SYNDAE_VISION_KEY").unwrap_or_default();
+        let model = std::env::var("SYNDAE_VISION_MODEL")
             .unwrap_or_else(|_| "moondream".to_string());
         default_endpoint = (base, key, model);
         (&default_endpoint.0[..], &default_endpoint.1[..], &default_endpoint.2[..])

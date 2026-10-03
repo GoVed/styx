@@ -98,7 +98,7 @@ export function sendBrowserNotification(
         if (reg && typeof reg.showNotification === 'function') {
           return reg.showNotification(title, {
             body: options?.body,
-            tag: options?.tag || 'styx-alert',
+            tag: options?.tag || 'syndae-alert',
             icon: '/icon-192.png',
             badge: '/icon-192.png',
             vibrate: [200, 100, 200, 100, 300],
@@ -119,7 +119,7 @@ export function sendBrowserNotification(
   try {
     const notif = new Notification(title, {
       body: options?.body,
-      tag: options?.tag || 'styx-alert',
+      tag: options?.tag || 'syndae-alert',
       icon: '/icon-192.png',
     });
 

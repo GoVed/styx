@@ -39,9 +39,9 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
   });
 
   return (
-    <div className="fixed inset-y-0 right-0 w-full sm:w-[500px] bg-styx-900 border-l border-styx-700 shadow-2xl z-50 flex flex-col font-mono text-xs">
+    <div className="fixed inset-y-0 right-0 w-full sm:w-[500px] bg-syndae-900 border-l border-syndae-700 shadow-2xl z-50 flex flex-col font-mono text-xs">
       {/* Header */}
-      <div className="p-3 border-b border-styx-800 flex items-center justify-between bg-styx-950">
+      <div className="p-3 border-b border-syndae-800 flex items-center justify-between bg-syndae-950">
         <div className="flex items-center space-x-2">
           <Terminal className="w-4 h-4 text-cyan-400" />
           <span className="font-bold text-slate-100">AUDIT TRAIL & EXECUTION LOG</span>
@@ -60,13 +60,13 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
       </div>
 
       {/* Filter Bar */}
-      <div className="p-2 border-b border-styx-800 bg-styx-900/60 flex items-center space-x-2 text-[11px]">
+      <div className="p-2 border-b border-syndae-800 bg-syndae-900/60 flex items-center space-x-2 text-[11px]">
         <Filter className="w-3.5 h-3.5 text-slate-500" />
         <span className="text-slate-400">Tool:</span>
         <select
           value={filterTool}
           onChange={e => setFilterTool(e.target.value)}
-          className="bg-styx-950 border border-styx-700 rounded px-2 py-0.5 text-slate-200 text-xs"
+          className="bg-syndae-950 border border-syndae-700 rounded px-2 py-0.5 text-slate-200 text-xs"
         >
           <option value="all">All Tools ({auditEvents.length})</option>
           {toolNames.map(t => (
@@ -90,10 +90,10 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
               <div
                 key={evt.id}
                 onClick={() => setSelectedEvent(evt)}
-                className={`p-2.5 rounded bg-styx-950 border cursor-pointer transition-colors ${
+                className={`p-2.5 rounded bg-syndae-950 border cursor-pointer transition-colors ${
                   selectedEvent?.id === evt.id
-                    ? 'border-cyan-500 bg-styx-850'
-                    : 'border-styx-800 hover:border-styx-700'
+                    ? 'border-cyan-500 bg-syndae-850'
+                    : 'border-syndae-800 hover:border-syndae-700'
                 }`}
               >
                 <div className="flex items-center justify-between mb-1">
@@ -131,7 +131,7 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
                 </div>
 
                 {evt.payload_json && (
-                  <pre className="mt-1.5 p-1.5 rounded bg-styx-900 border border-styx-800 text-[10px] text-slate-400 truncate">
+                  <pre className="mt-1.5 p-1.5 rounded bg-syndae-900 border border-syndae-800 text-[10px] text-slate-400 truncate">
                     {evt.payload_json}
                   </pre>
                 )}
@@ -143,7 +143,7 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
 
       {/* Selected Event Detail Modal / Drawer Footer */}
       {selectedEvent && (
-        <div className="p-3 border-t border-styx-800 bg-styx-950 space-y-2">
+        <div className="p-3 border-t border-syndae-800 bg-syndae-950 space-y-2">
           <div className="text-xs font-bold text-cyan-300 flex items-center justify-between">
             <span>Payload Inspector: {selectedEvent.tool_name}</span>
             <button
@@ -153,7 +153,7 @@ export const AuditDrawer: React.FC<AuditDrawerProps> = ({
               Clear
             </button>
           </div>
-          <pre className="bg-styx-900 p-2 rounded border border-styx-800 text-[10px] text-slate-300 overflow-x-auto max-h-40">
+          <pre className="bg-syndae-900 p-2 rounded border border-syndae-800 text-[10px] text-slate-300 overflow-x-auto max-h-40">
             {selectedEvent.payload_json}
           </pre>
         </div>

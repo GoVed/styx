@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        styx: {
+        syndae: {
           950: '#06080d',
           900: '#0c1018',
           850: '#111722',

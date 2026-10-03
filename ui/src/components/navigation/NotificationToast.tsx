@@ -27,10 +27,10 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
   const isAction = notification.urgency === 'action_required';
 
   const borderClass = isAlert
-    ? 'border-rose-500/60 bg-gradient-to-r from-rose-950/90 via-styx-900/95 to-styx-900/95 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
+    ? 'border-rose-500/60 bg-gradient-to-r from-rose-950/90 via-syndae-900/95 to-syndae-900/95 shadow-[0_0_20px_rgba(244,63,94,0.3)]'
     : isAction
-    ? 'border-amber-500/60 bg-gradient-to-r from-amber-950/90 via-styx-900/95 to-styx-900/95 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
-    : 'border-emerald-500/60 bg-gradient-to-r from-emerald-950/90 via-styx-900/95 to-styx-900/95 shadow-[0_0_20px_rgba(16,185,129,0.25)]';
+    ? 'border-amber-500/60 bg-gradient-to-r from-amber-950/90 via-syndae-900/95 to-syndae-900/95 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
+    : 'border-emerald-500/60 bg-gradient-to-r from-emerald-950/90 via-syndae-900/95 to-syndae-900/95 shadow-[0_0_20px_rgba(16,185,129,0.25)]';
 
   const badgeClass = isAlert
     ? 'bg-rose-950 text-rose-300 border-rose-800'
@@ -50,7 +50,7 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
       >
         <div className="flex items-start justify-between gap-2.5">
           <div className="flex items-start gap-2.5 min-w-0 flex-1">
-            <div className="p-1.5 rounded-lg bg-styx-950/80 border border-slate-700/60 shrink-0 mt-0.5">
+            <div className="p-1.5 rounded-lg bg-syndae-950/80 border border-slate-700/60 shrink-0 mt-0.5">
               <IconComponent className="w-4 h-4 text-emerald-400" />
             </div>
 
@@ -89,7 +89,7 @@ export const NotificationToast: React.FC<NotificationToastProps> = ({
           <button
             type="button"
             onClick={onDismiss}
-            className="p-1 rounded hover:bg-styx-800/80 text-slate-400 hover:text-slate-200 transition-colors shrink-0"
+            className="p-1 rounded hover:bg-syndae-800/80 text-slate-400 hover:text-slate-200 transition-colors shrink-0"
             title="Dismiss notification"
           >
             <X className="w-4 h-4" />

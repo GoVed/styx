@@ -14,7 +14,7 @@ pub struct SemanticEmbedder {
 
 impl SemanticEmbedder {
     pub fn new() -> Self {
-        let remote_url = std::env::var("STYX_EMBEDDING_URL")
+        let remote_url = std::env::var("SYNDAE_EMBEDDING_URL")
             .ok()
             .map(|s| s.trim().to_string())
             .filter(|s| !s.is_empty());

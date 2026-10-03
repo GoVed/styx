@@ -25,7 +25,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
   const gpu = telemetry?.gpu;
 
   return (
-    <header className="bg-styx-900 border-b border-styx-700/80 px-4 py-2 text-xs font-mono select-none flex-shrink-0 shadow-md z-40">
+    <header className="bg-syndae-900 border-b border-syndae-700/80 px-4 py-2 text-xs font-mono select-none flex-shrink-0 shadow-md z-40">
       <div className="flex items-center justify-between gap-3 overflow-x-auto min-w-0">
         {/* Brand / Status */}
         <div className="flex items-center space-x-3 flex-shrink-0">
@@ -34,7 +34,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="font-bold tracking-wider text-slate-100 text-sm">STYX</span>
+            <span className="font-bold tracking-wider text-slate-100 text-sm">SYNDAE</span>
             <span className="px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[10px] font-semibold border border-emerald-800/80">
               RUNTIME ARMED
             </span>
@@ -43,7 +43,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
           <div className="flex items-center space-x-1.5 text-slate-300 min-w-0">
             <span className="text-slate-500 flex-shrink-0">MODEL:</span>
             <span
-              className="px-2 py-0.5 rounded bg-styx-800 text-cyan-300 font-semibold border border-cyan-900/50 truncate max-w-[160px] sm:max-w-[220px] md:max-w-[300px]"
+              className="px-2 py-0.5 rounded bg-syndae-800 text-cyan-300 font-semibold border border-cyan-900/50 truncate max-w-[160px] sm:max-w-[220px] md:max-w-[300px]"
               title={activeModel}
             >
               {activeModel}
@@ -54,13 +54,13 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
         {/* System Vitals Strip */}
         <div className="flex items-center space-x-3 flex-shrink-0">
           {/* Host CPU */}
-          <div className="flex items-center space-x-1.5 bg-styx-950 px-2.5 py-1 rounded border border-styx-700/60 flex-shrink-0">
+          <div className="flex items-center space-x-1.5 bg-syndae-950 px-2.5 py-1 rounded border border-syndae-700/60 flex-shrink-0">
             <Cpu className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
             <span className="text-slate-400">CPU</span>
             <span className={`font-semibold ${cpu > 80 ? 'text-rose-400' : 'text-slate-200'}`}>
               {cpu.toFixed(1)}%
             </span>
-            <div className="w-12 h-1.5 bg-styx-800 rounded-full overflow-hidden ml-1">
+            <div className="w-12 h-1.5 bg-syndae-800 rounded-full overflow-hidden ml-1">
               <div
                 className={`h-full ${cpu > 80 ? 'bg-rose-500' : 'bg-emerald-500'}`}
                 style={{ width: `${Math.min(100, Math.max(2, cpu))}%` }}
@@ -69,14 +69,14 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
           </div>
 
           {/* Host RAM */}
-          <div className="flex items-center space-x-1.5 bg-styx-950 px-2.5 py-1 rounded border border-styx-700/60 flex-shrink-0">
+          <div className="flex items-center space-x-1.5 bg-syndae-950 px-2.5 py-1 rounded border border-syndae-700/60 flex-shrink-0">
             <MemoryStick className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
             <span className="text-slate-400">RAM</span>
             <span className="font-semibold text-slate-200">
               {telemetry ? `${(telemetry.memory_used_mb / 1024).toFixed(1)}G` : '0G'}
             </span>
             <span className="text-slate-500">({memPct.toFixed(0)}%)</span>
-            <div className="w-12 h-1.5 bg-styx-800 rounded-full overflow-hidden ml-1">
+            <div className="w-12 h-1.5 bg-syndae-800 rounded-full overflow-hidden ml-1">
               <div
                 className="h-full bg-cyan-500"
                 style={{ width: `${Math.min(100, Math.max(2, memPct))}%` }}
@@ -85,7 +85,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
           </div>
 
           {/* Disk */}
-          <div className="hidden lg:flex items-center space-x-1.5 bg-styx-950 px-2.5 py-1 rounded border border-styx-700/60 flex-shrink-0">
+          <div className="hidden lg:flex items-center space-x-1.5 bg-syndae-950 px-2.5 py-1 rounded border border-syndae-700/60 flex-shrink-0">
             <HardDrive className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
             <span className="text-slate-400">DISK</span>
             <span className="font-semibold text-slate-200">{telemetry?.disk_used_gb ?? 0}GB</span>
@@ -95,7 +95,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
           {/* GPU / VRAM */}
           {gpu && (
             <div
-              className="flex items-center space-x-1.5 bg-styx-950 px-2.5 py-1 rounded border border-styx-700/60 flex-shrink-0"
+              className="flex items-center space-x-1.5 bg-syndae-950 px-2.5 py-1 rounded border border-syndae-700/60 flex-shrink-0"
               title={`${gpu.name} (${gpu.vendor === 'amd' ? 'AMD ROCm' : 'NVIDIA CUDA'})`}
             >
               <Activity className={`w-3.5 h-3.5 flex-shrink-0 ${gpu.vendor === 'amd' ? 'text-rose-400' : 'text-emerald-400'}`} />
@@ -114,7 +114,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
           )}
 
           {/* Tok/s */}
-          <div className="flex items-center space-x-1.5 bg-styx-950 px-2.5 py-1 rounded border border-styx-700/60 flex-shrink-0">
+          <div className="flex items-center space-x-1.5 bg-syndae-950 px-2.5 py-1 rounded border border-syndae-700/60 flex-shrink-0">
             <Sparkles className="w-3.5 h-3.5 text-yellow-400 flex-shrink-0" />
             <span className="text-slate-400">SPEED</span>
             <span className="font-semibold text-amber-300">
@@ -124,7 +124,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
 
           {/* GPU Queue / Parallel Slots */}
           <div
-            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded border flex-shrink-0 ${(telemetry?.queued_turns ?? 0) > 0 ? 'bg-amber-950/70 border-amber-700/80 text-amber-300 animate-pulse' : 'bg-styx-950 border-styx-700/60 text-slate-300'}`}
+            className={`flex items-center space-x-1.5 px-2.5 py-1 rounded border flex-shrink-0 ${(telemetry?.queued_turns ?? 0) > 0 ? 'bg-amber-950/70 border-amber-700/80 text-amber-300 animate-pulse' : 'bg-syndae-950 border-syndae-700/60 text-slate-300'}`}
             title={`GPU Inference Concurrency: ${telemetry?.active_turns ?? 0} active, ${telemetry?.queued_turns ?? 0} queued (Max parallel: ${telemetry?.max_concurrent_turns ?? 1})`}
           >
             <Layers className={`w-3.5 h-3.5 flex-shrink-0 ${(telemetry?.queued_turns ?? 0) > 0 ? 'text-amber-400' : 'text-cyan-400'}`} />
@@ -166,7 +166,7 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
               </span>
             </button>
           ) : (
-            <div className="flex items-center space-x-1 px-2 py-1 rounded bg-styx-800 text-slate-400 border border-styx-700/50 text-[11px]">
+            <div className="flex items-center space-x-1 px-2 py-1 rounded bg-syndae-800 text-slate-400 border border-syndae-700/50 text-[11px]">
               <ShieldAlert className="w-3.5 h-3.5 text-emerald-500" />
               <span>GATES: 0</span>
             </div>
@@ -177,8 +177,8 @@ export const TelemetryStrip: React.FC<TelemetryStripProps> = ({
             onClick={onToggleAudit}
             className={`flex items-center space-x-1 px-2.5 py-1 rounded border text-[11px] transition-colors ${
               auditOpen
-                ? 'bg-styx-700 text-white border-styx-500'
-                : 'bg-styx-800 text-slate-300 border-styx-700 hover:bg-styx-700'
+                ? 'bg-syndae-700 text-white border-syndae-500'
+                : 'bg-syndae-800 text-slate-300 border-syndae-700 hover:bg-syndae-700'
             }`}
           >
             <Terminal className="w-3.5 h-3.5 text-cyan-400" />

@@ -20,7 +20,7 @@ describe('ChatView Layout & HITL Deterministic Gate Tests', () => {
     ticket_id: 'ticket-999',
     session_id: 'test-session-1',
     tool_name: 'write_memory',
-    arguments: { path: 'scratchpad/daily_log.md', content: 'Styx is deployed.' },
+    arguments: { path: 'scratchpad/daily_log.md', content: 'Syndae is deployed.' },
     risk_level: 'MUTATING',
     status: 'pending',
     created_at: new Date().toISOString(),
@@ -121,7 +121,7 @@ describe('ChatView Layout & HITL Deterministic Gate Tests', () => {
     const inputBar = textarea.closest('main')?.querySelector('.flex-shrink-0:last-child');
     expect(inputBar).toBeInTheDocument();
     expect(inputBar?.className).toContain('flex-shrink-0');
-    expect(inputBar?.className).toContain('bg-styx-900');
+    expect(inputBar?.className).toContain('bg-syndae-900');
   });
 
   it('Renders inline HITL approval banner with Approve & Continue, Reject, and Edit Arguments buttons', async () => {

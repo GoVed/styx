@@ -28,14 +28,14 @@ pub async fn inspect_tool(
         vec![
             trimmed.to_string(),
             format!("/tools/{}", base_name),
-            format!("../styx_tools/{}", base_name),
-            format!("{}/Projects/styx_tools/{}", host_home, base_name),
-            format!("/app/styx_tools/{}", base_name),
+            format!("../syndae_tools/{}", base_name),
+            format!("{}/Projects/syndae_tools/{}", host_home, base_name),
+            format!("/app/syndae_tools/{}", base_name),
         ]
     } else {
         vec![
             "/tools".to_string(),
-            format!("{}/Projects/styx_tools", host_home),
+            format!("{}/Projects/syndae_tools", host_home),
         ]
     };
 
@@ -50,7 +50,7 @@ pub async fn inspect_tool(
 
     let mut tool_name = "tool".to_string();
     let mut display_name = "Local Tool".to_string();
-    let mut description = "Local Micro-Daemon & MCP Tool for Styx Agent OS".to_string();
+    let mut description = "Local Micro-Daemon & MCP Tool for Syndae Agent OS".to_string();
     let mut version = "1.0.0".to_string();
     let mut has_docker = false;
     let mut has_compose = false;
@@ -67,7 +67,7 @@ pub async fn inspect_tool(
             .to_string();
         tool_name = dir_basename.clone();
         display_name = dir_basename.clone();
-        container_name = format!("styx-{}-connector", dir_basename);
+        container_name = format!("syndae-{}-connector", dir_basename);
 
         // 1. Check manifest.json
         let manifest_path = dir.join("manifest.json");
@@ -106,9 +106,9 @@ pub async fn inspect_tool(
                 && let Ok(c) = std::fs::read_to_string(&pkg_path)
                     && let Ok(v) = serde_json::from_str::<Value>(&c) {
                         if let Some(n) = v.get("name").and_then(|x| x.as_str()) {
-                            tool_name = n.replace("@styx-tools/", "").to_string();
+                            tool_name = n.replace("@syndae-tools/", "").to_string();
                             display_name = tool_name.clone();
-                            container_name = format!("styx-{}-connector", tool_name);
+                            container_name = format!("syndae-{}-connector", tool_name);
                         }
                         if let Some(d) = v.get("description").and_then(|x| x.as_str()) {
                             description = d.to_string();
@@ -131,9 +131,9 @@ pub async fn inspect_tool(
         }
     } else if let Some(ref manifest) = payload.manifest {
         if let Some(n) = manifest.get("name").and_then(|x| x.as_str()) {
-            tool_name = n.replace("@styx-tools/", "").to_string();
+            tool_name = n.replace("@syndae-tools/", "").to_string();
             display_name = tool_name.clone();
-            container_name = format!("styx-{}-connector", tool_name);
+            container_name = format!("syndae-{}-connector", tool_name);
         }
         if let Some(dn) = manifest.get("display_name").and_then(|x| x.as_str()) {
             display_name = dn.to_string();
@@ -159,7 +159,7 @@ pub async fn inspect_tool(
     }
 
     if container_name.is_empty() {
-        container_name = format!("styx-{}-connector", tool_name);
+        container_name = format!("syndae-{}-connector", tool_name);
     }
 
     // Check Docker status
@@ -211,7 +211,7 @@ pub async fn inspect_tool(
             }
     }
 
-    // Check if already registered in Styx DB
+    // Check if already registered in Syndae DB
     let is_registered = state
         .db
         .list_mcp_servers()

@@ -20,7 +20,7 @@ pub struct ContainerSummaryInfo {
     pub status: String,
     pub state: String,
     pub ports: Vec<String>,
-    pub is_styx_managed: bool,
+    pub is_syndae_managed: bool,
     pub created: i64,
     pub model_id: Option<String>,
 }
@@ -59,7 +59,7 @@ impl DockerOrchestrator {
             let state = c.state.unwrap_or_default();
             let created = c.created.unwrap_or_default();
 
-            let is_styx_managed = names.iter().any(|n| n.contains("styx"))
+            let is_syndae_managed = names.iter().any(|n| n.contains("syndae"))
                 || image.contains("vllm")
                 || image.contains("llama.cpp")
                 || image.contains("ollama");
@@ -105,7 +105,7 @@ impl DockerOrchestrator {
                 status,
                 state,
                 ports: ports_str,
-                is_styx_managed,
+                is_syndae_managed,
                 created,
                 model_id: detected_model,
             });

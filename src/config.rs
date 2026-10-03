@@ -18,29 +18,29 @@ pub struct AppConfig {
 
 impl AppConfig {
     pub fn from_env() -> Self {
-        let host = std::env::var("STYX_HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
-        let port = std::env::var("STYX_PORT")
+        let host = std::env::var("SYNDAE_HOST").unwrap_or_else(|_| "127.0.0.1".to_string());
+        let port = std::env::var("SYNDAE_PORT")
             .ok()
             .and_then(|p| p.parse().ok())
             .unwrap_or(3000);
-        let memory_dir = std::env::var("STYX_MEMORY_DIR")
+        let memory_dir = std::env::var("SYNDAE_MEMORY_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("./memory"));
-        let data_dir = std::env::var("STYX_DATA_DIR")
+        let data_dir = std::env::var("SYNDAE_DATA_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("./data"));
-        let db_path = data_dir.join("styx.db");
+        let db_path = data_dir.join("syndae.db");
         let tantivy_dir = data_dir.join("tantivy_index");
         let docker_socket = std::env::var("DOCKER_SOCKET")
             .unwrap_or_else(|_| "/var/run/docker.sock".to_string());
-        let static_dir = std::env::var("STYX_STATIC_DIR")
+        let static_dir = std::env::var("SYNDAE_STATIC_DIR")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("./ui/dist"));
-        let max_concurrent_turns = std::env::var("STYX_MAX_CONCURRENT_TURNS")
+        let max_concurrent_turns = std::env::var("SYNDAE_MAX_CONCURRENT_TURNS")
             .ok()
             .and_then(|m| m.parse().ok())
             .unwrap_or(1);
-        let allowed_origins = std::env::var("STYX_ALLOWED_ORIGINS")
+        let allowed_origins = std::env::var("SYNDAE_ALLOWED_ORIGINS")
             .ok()
             .map(|s| {
                 s.split(',')
@@ -49,7 +49,7 @@ impl AppConfig {
                     .collect()
             })
             .unwrap_or_default();
-        let docker_host_ip = std::env::var("STYX_DOCKER_HOST_IP")
+        let docker_host_ip = std::env::var("SYNDAE_DOCKER_HOST_IP")
             .unwrap_or_else(|_| "127.0.0.1".to_string());
 
         Self {

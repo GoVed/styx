@@ -50,10 +50,10 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
   });
 
   return (
-    <div className="flex-1 h-full w-full min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 pb-16 bg-styx-950 text-slate-100 flex flex-col items-center">
+    <div className="flex-1 h-full w-full min-h-0 overflow-y-auto overflow-x-hidden p-4 sm:p-6 pb-16 bg-syndae-950 text-slate-100 flex flex-col items-center">
       <div className="w-full max-w-6xl space-y-4">
         {/* Navigation Bar & Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-styx-800 gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-syndae-800 gap-3">
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-xl font-bold tracking-tight text-slate-100 font-mono">
@@ -75,12 +75,12 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center bg-styx-900 p-0.5 rounded border border-styx-700">
+          <div className="flex items-center bg-syndae-900 p-0.5 rounded border border-syndae-700">
             <button
               onClick={() => m.setActiveSubTab('docker')}
               className={`px-3 py-1.5 rounded flex items-center space-x-1.5 ${
                 m.activeSubTab === 'docker'
-                  ? 'bg-styx-800 text-emerald-400 font-bold'
+                  ? 'bg-syndae-800 text-emerald-400 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -91,7 +91,7 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
               onClick={() => m.setActiveSubTab('external')}
               className={`px-3 py-1.5 rounded flex items-center space-x-1.5 ${
                 m.activeSubTab === 'external'
-                  ? 'bg-styx-800 text-cyan-400 font-bold'
+                  ? 'bg-syndae-800 text-cyan-400 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -102,7 +102,7 @@ export const ModelManager: React.FC<ModelManagerProps> = ({
               onClick={() => m.setActiveSubTab('tools')}
               className={`px-3 py-1.5 rounded flex items-center space-x-1.5 ${
                 m.activeSubTab === 'tools'
-                  ? 'bg-styx-800 text-amber-400 font-bold'
+                  ? 'bg-syndae-800 text-amber-400 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >

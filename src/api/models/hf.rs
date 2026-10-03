@@ -118,7 +118,7 @@ pub async fn inspect_hf_repo(
 
     let res = match client
         .get(&url)
-        .header("User-Agent", "Styx-Agent-OS/1.0 (Local-Model-Inspector)")
+        .header("User-Agent", "Syndae-Agent-OS/1.0 (Local-Model-Inspector)")
         .send()
         .await
     {

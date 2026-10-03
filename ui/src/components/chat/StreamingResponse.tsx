@@ -29,12 +29,12 @@ export const StreamingResponse: React.FC<StreamingResponseProps> = ({
     <div className="flex flex-col items-start space-y-2">
       <div className="flex items-center space-x-1.5 text-[11px] font-mono text-emerald-400">
         <Bot className="w-3 h-3" />
-        <span>STYX AGENT (STREAMING)</span>
+        <span>SYNDAE AGENT (STREAMING)</span>
       </div>
 
       {/* Collapsible Live Thought Bubble */}
       {activeThought && (
-        <div className="w-full max-w-3xl rounded-lg bg-styx-900/60 border border-purple-900/30 text-xs font-mono p-2 shadow-sm transition-all">
+        <div className="w-full max-w-3xl rounded-lg bg-syndae-900/60 border border-purple-900/30 text-xs font-mono p-2 shadow-sm transition-all">
           <button
             type="button"
             onClick={() => setThoughtExpanded(!thoughtExpanded)}
@@ -63,11 +63,11 @@ export const StreamingResponse: React.FC<StreamingResponseProps> = ({
         return (
           <div
             key={exec.id}
-            className="w-full max-w-3xl rounded border border-styx-700 bg-styx-900 text-xs font-mono overflow-hidden shadow"
+            className="w-full max-w-3xl rounded border border-syndae-700 bg-syndae-900 text-xs font-mono overflow-hidden shadow"
           >
             <div
               onClick={() => toggleToolExpand(exec.id)}
-              className="p-2 px-3 bg-styx-850 flex items-center justify-between cursor-pointer border-b border-styx-800"
+              className="p-2 px-3 bg-syndae-850 flex items-center justify-between cursor-pointer border-b border-syndae-800"
             >
               <div className="flex items-center space-x-2">
                 <Terminal className="w-3.5 h-3.5 text-cyan-400" />
@@ -97,17 +97,17 @@ export const StreamingResponse: React.FC<StreamingResponseProps> = ({
             </div>
 
             {isExpanded && (
-              <div className="p-3 space-y-2 bg-styx-950/80">
+              <div className="p-3 space-y-2 bg-syndae-950/80">
                 <div>
                   <div className="text-[10px] uppercase text-slate-500 font-semibold mb-0.5">Parameters:</div>
-                  <pre className="bg-styx-900 p-2 rounded text-slate-300 text-[11px] overflow-x-auto border border-styx-800">
+                  <pre className="bg-syndae-900 p-2 rounded text-slate-300 text-[11px] overflow-x-auto border border-syndae-800">
                     {JSON.stringify(exec.arguments, null, 2)}
                   </pre>
                 </div>
                 {exec.output && (
                   <div>
                     <div className="text-[10px] uppercase text-slate-500 font-semibold mb-0.5">Output:</div>
-                    <pre className="bg-styx-900 p-2 rounded text-emerald-300 text-[11px] overflow-x-auto max-h-40 border border-styx-800">
+                    <pre className="bg-syndae-900 p-2 rounded text-emerald-300 text-[11px] overflow-x-auto max-h-40 border border-syndae-800">
                       {exec.output}
                     </pre>
                   </div>
@@ -120,7 +120,7 @@ export const StreamingResponse: React.FC<StreamingResponseProps> = ({
 
       {/* Streaming Content */}
       {activeStreamingText && (
-        <div className="max-w-3xl rounded-lg p-3 bg-styx-900 text-slate-200 border border-styx-800 text-xs leading-relaxed shadow-sm">
+        <div className="max-w-3xl rounded-lg p-3 bg-syndae-900 text-slate-200 border border-syndae-800 text-xs leading-relaxed shadow-sm">
           <div
             className="prose max-w-none break-words"
             dangerouslySetInnerHTML={{ __html: renderMarkdown(activeStreamingText) }}

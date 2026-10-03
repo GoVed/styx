@@ -37,7 +37,7 @@ pub fn build_router(state: AppState) -> Router {
             .allow_headers([
                 header::CONTENT_TYPE,
                 header::AUTHORIZATION,
-                HeaderName::from_static("x-styx-access-key"),
+                HeaderName::from_static("x-syndae-access-key"),
             ])
     } else {
         let default_origins = [
@@ -58,7 +58,7 @@ pub fn build_router(state: AppState) -> Router {
             .allow_headers([
                 header::CONTENT_TYPE,
                 header::AUTHORIZATION,
-                HeaderName::from_static("x-styx-access-key"),
+                HeaderName::from_static("x-syndae-access-key"),
             ])
     };
 
@@ -101,7 +101,7 @@ async fn fallback_ui_handler() -> Html<&'static str> {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Styx Mission Control</title>
+    <title>Syndae Mission Control</title>
     <style>
         body { background: #09090b; color: #f4f4f5; font-family: monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .box { border: 1px solid #27272a; padding: 2rem; border-radius: 8px; max-width: 600px; text-align: center; }
@@ -112,7 +112,7 @@ async fn fallback_ui_handler() -> Html<&'static str> {
 </head>
 <body>
     <div class="box">
-        <h1>STYX PERSONAL AI OS // HARNESS ACTIVE</h1>
+        <h1>SYNDAE PERSONAL AI OS // HARNESS ACTIVE</h1>
         <p>Backend daemon is fully operational and listening on REST and WebSocket endpoints.</p>
         <p>To compile and mount the Mission Control UI, run:</p>
         <p><code>cd ui && npm install && npm run build</code></p>

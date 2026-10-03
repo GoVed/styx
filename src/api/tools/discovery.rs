@@ -22,16 +22,16 @@ pub async fn discover_local_tools(State(state): State<AppState>) -> impl IntoRes
     let mut discovered = Vec::new();
     let mut candidates = vec![
         "/tools".to_string(),
-        "../styx_tools".to_string(),
-        "./styx_tools".to_string(),
-        "/app/styx_tools".to_string(),
+        "../syndae_tools".to_string(),
+        "./syndae_tools".to_string(),
+        "/app/syndae_tools".to_string(),
     ];
-    if let Ok(dir) = std::env::var("STYX_TOOLS_DIR") {
+    if let Ok(dir) = std::env::var("SYNDAE_TOOLS_DIR") {
         candidates.insert(0, dir);
     }
     if let Ok(home) = std::env::var("HOST_HOME").or_else(|_| std::env::var("HOME")) {
-        candidates.push(format!("{}/Projects/styx_tools", home));
-        candidates.push(format!("{}/styx_tools", home));
+        candidates.push(format!("{}/Projects/syndae_tools", home));
+        candidates.push(format!("{}/syndae_tools", home));
     }
 
     let installed_servers = state.db.list_mcp_servers().await.unwrap_or_default();
@@ -62,7 +62,7 @@ pub async fn discover_local_tools(State(state): State<AppState>) -> impl IntoRes
                         {
                             let mut name = dir_name.clone();
                             let mut display_name = dir_name.clone();
-                            let mut desc = format!("Local Styx Tool Module ({})", dir_name);
+                            let mut desc = format!("Local Syndae Tool Module ({})", dir_name);
                             let mut version = "1.0.0".to_string();
                             let mut has_docker = compose_path.exists();
 
@@ -92,7 +92,7 @@ pub async fn discover_local_tools(State(state): State<AppState>) -> impl IntoRes
                             } else if let Ok(content) = std::fs::read_to_string(&pkg_json_path)
                                 && let Ok(val) = serde_json::from_str::<Value>(&content) {
                                     if let Some(n) = val.get("name").and_then(|v| v.as_str()) {
-                                        name = n.replace("@styx-tools/", "").to_string();
+                                        name = n.replace("@syndae-tools/", "").to_string();
                                         display_name = name.clone();
                                     }
                                     if let Some(d) = val.get("description").and_then(|v| v.as_str())
@@ -139,7 +139,7 @@ pub async fn install_tool(
     let auto_start = payload.auto_start_container.unwrap_or(true);
 
     let container_name = format!(
-        "styx-{}-connector",
+        "syndae-{}-connector",
         tool_name.replace('@', "").replace('/', "-")
     );
 
@@ -242,7 +242,7 @@ pub async fn install_tool(
         .await
     {
         Ok(tools) => {
-            // Automatically ingest & install tool's shareable instructions into Styx memory
+            // Automatically ingest & install tool's shareable instructions into Syndae memory
             let mut instructions_installed = false;
             let mut instructions_file = None;
             let mut instructions_content: Option<String> = None;

@@ -18,7 +18,7 @@ fn test_prepare_auto_compressed_messages_below_budget() {
     let msgs = vec![
         ChatMessageParam {
             role: "system".to_string(),
-            content: "You are Styx.".to_string(),
+            content: "You are Syndae.".to_string(),
             name: None,
             tool_call_id: None,
             tool_calls: None,
@@ -35,7 +35,7 @@ fn test_prepare_auto_compressed_messages_below_budget() {
     ];
     let res = prepare_auto_compressed_messages(msgs.clone(), 1000);
     assert_eq!(res.len(), 2);
-    assert_eq!(res[0].content, "You are Styx.");
+    assert_eq!(res[0].content, "You are Syndae.");
     assert_eq!(res[1].content, "Hi");
 }
 
@@ -43,7 +43,7 @@ fn test_prepare_auto_compressed_messages_below_budget() {
 fn test_prepare_auto_compressed_messages_compresses_older_turns() {
     let mut msgs = vec![ChatMessageParam {
         role: "system".to_string(),
-        content: "You are Styx.".to_string(),
+        content: "You are Syndae.".to_string(),
         name: None,
         tool_call_id: None,
         tool_calls: None,
@@ -94,7 +94,7 @@ fn test_prepare_auto_compressed_messages_strictly_enforces_budget_on_giant_tool_
     let msgs = vec![
         ChatMessageParam {
             role: "system".to_string(),
-            content: "You are Styx.".to_string(),
+            content: "You are Syndae.".to_string(),
             name: None,
             tool_call_id: None,
             tool_calls: None,

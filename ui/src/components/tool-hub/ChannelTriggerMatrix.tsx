@@ -35,9 +35,9 @@ export const ChannelTriggerMatrix: React.FC = () => {
   const directCount = channels.filter(c => !c.is_group).length;
 
   return (
-    <div className="bg-styx-900 border border-styx-800 rounded-lg p-3 font-mono space-y-3">
+    <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-3 font-mono space-y-3">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-styx-800/80 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-2 border-b border-syndae-800/80 gap-2">
         <div className="flex items-center space-x-2">
           <div className="p-1.5 rounded bg-cyan-950/80 border border-cyan-800 text-cyan-400">
             <Radio className="w-4 h-4" />
@@ -47,7 +47,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
               <span className="text-xs font-bold text-slate-100">
                 INBOUND TRIGGER RULES & CHANNELS
               </span>
-              <span className="px-1.5 py-0.2 rounded bg-styx-800 text-slate-300 text-[10px]">
+              <span className="px-1.5 py-0.2 rounded bg-syndae-800 text-slate-300 text-[10px]">
                 {channels.length} Total
               </span>
             </div>
@@ -61,7 +61,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
             type="button"
             onClick={refreshAll}
             disabled={loading}
-            className="px-2 py-1 rounded bg-styx-800 hover:bg-styx-700 text-slate-300 border border-styx-700 text-[10px] flex items-center space-x-1 transition-colors"
+            className="px-2 py-1 rounded bg-syndae-800 hover:bg-syndae-700 text-slate-300 border border-syndae-700 text-[10px] flex items-center space-x-1 transition-colors"
             title="Refresh channels and defaults"
           >
             <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin text-cyan-400' : ''}`} />
@@ -107,17 +107,17 @@ export const ChannelTriggerMatrix: React.FC = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search group name, JID..."
-              className="w-full pl-8 pr-2 py-1 rounded bg-styx-950 border border-styx-800 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-600"
+              className="w-full pl-8 pr-2 py-1 rounded bg-syndae-950 border border-syndae-800 text-[11px] text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-600"
             />
           </div>
 
-          <div className="flex items-center bg-styx-950 p-0.5 rounded border border-styx-800">
+          <div className="flex items-center bg-syndae-950 p-0.5 rounded border border-syndae-800">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
               className={`px-2 py-0.5 rounded text-[10px] ${
                 typeFilter === 'all'
-                  ? 'bg-styx-800 text-slate-100 font-bold'
+                  ? 'bg-syndae-800 text-slate-100 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -128,7 +128,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
               onClick={() => setTypeFilter('groups')}
               className={`px-2 py-0.5 rounded text-[10px] flex items-center space-x-1 ${
                 typeFilter === 'groups'
-                  ? 'bg-styx-800 text-slate-100 font-bold'
+                  ? 'bg-syndae-800 text-slate-100 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -140,7 +140,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
               onClick={() => setTypeFilter('direct')}
               className={`px-2 py-0.5 rounded text-[10px] flex items-center space-x-1 ${
                 typeFilter === 'direct'
-                  ? 'bg-styx-800 text-slate-100 font-bold'
+                  ? 'bg-syndae-800 text-slate-100 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -181,14 +181,14 @@ export const ChannelTriggerMatrix: React.FC = () => {
       <div className="overflow-x-auto">
         <table className="w-full text-left text-[11px]">
           <thead>
-            <tr className="border-b border-styx-800 text-slate-400">
+            <tr className="border-b border-syndae-800 text-slate-400">
               <th className="py-2 px-2">CHANNEL / GROUP</th>
               <th className="py-2 px-2">TYPE</th>
               <th className="py-2 px-2">PROTOCOL</th>
               <th className="py-2 px-2">TRIGGER POLICY</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-styx-800/60">
+          <tbody className="divide-y divide-syndae-800/60">
             {filteredChannels.length === 0 ? (
               <tr>
                 <td colSpan={4} className="py-8 text-center text-slate-500">
@@ -209,7 +209,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
               </tr>
             ) : (
               filteredChannels.map(c => (
-                <tr key={c.channel_id} className="hover:bg-styx-850 transition-colors">
+                <tr key={c.channel_id} className="hover:bg-syndae-850 transition-colors">
                   {/* Channel Name & ID */}
                   <td className="py-2 px-2 max-w-xs">
                     <div className="flex items-center space-x-2">
@@ -248,14 +248,14 @@ export const ChannelTriggerMatrix: React.FC = () => {
 
                   {/* Protocol */}
                   <td className="py-2 px-2 whitespace-nowrap">
-                    <span className="px-1.5 py-0.5 rounded bg-styx-950 text-slate-300 border border-styx-800 text-[10px]">
+                    <span className="px-1.5 py-0.5 rounded bg-syndae-950 text-slate-300 border border-syndae-800 text-[10px]">
                       {c.protocol}
                     </span>
                   </td>
 
                   {/* Trigger Policy Buttons */}
                   <td className="py-2 px-2 whitespace-nowrap">
-                    <div className="flex items-center bg-styx-950 p-0.5 rounded border border-styx-800 w-fit">
+                    <div className="flex items-center bg-syndae-950 p-0.5 rounded border border-syndae-800 w-fit">
                       <button
                         type="button"
                         onClick={() => updatePolicy(c.channel_id, 'all')}
@@ -276,7 +276,7 @@ export const ChannelTriggerMatrix: React.FC = () => {
                             ? 'bg-amber-950 text-amber-300 border border-amber-800'
                             : 'text-slate-500 hover:text-slate-300'
                         }`}
-                        title="Trigger AI only when explicitly mentioned (@Styx, keywords, or direct reply)"
+                        title="Trigger AI only when explicitly mentioned (@Syndae, keywords, or direct reply)"
                       >
                         Mentions Only
                       </button>

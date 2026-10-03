@@ -22,8 +22,8 @@ export const TestToolDrawer: React.FC<TestToolDrawerProps> = ({
   onClose,
 }) => {
   return (
-    <div className="bg-styx-900 border border-cyan-800/80 rounded-lg p-4 font-mono space-y-3">
-      <div className="flex items-center justify-between border-b border-styx-800 pb-2">
+    <div className="bg-syndae-900 border border-cyan-800/80 rounded-lg p-4 font-mono space-y-3">
+      <div className="flex items-center justify-between border-b border-syndae-800 pb-2">
         <div className="flex items-center space-x-2 text-cyan-300 font-bold">
           <Terminal className="w-4 h-4" />
           <span>TEST EXECUTION: {testingTool.name}</span>
@@ -43,14 +43,14 @@ export const TestToolDrawer: React.FC<TestToolDrawerProps> = ({
           rows={4}
           value={testArgs}
           onChange={e => onChangeArgs(e.target.value)}
-          className="w-full bg-styx-950 border border-styx-700 rounded p-2 text-slate-200 mt-1 font-mono text-xs focus:outline-none focus:border-cyan-500"
+          className="w-full bg-syndae-950 border border-syndae-700 rounded p-2 text-slate-200 mt-1 font-mono text-xs focus:outline-none focus:border-cyan-500"
         />
       </div>
 
       {testOutput && (
         <div>
           <label className="text-[11px] text-slate-400">Execution Result:</label>
-          <pre className="bg-styx-950 p-2.5 rounded border border-styx-800 text-[11px] text-emerald-300 overflow-x-auto max-h-48 mt-1">
+          <pre className="bg-syndae-950 p-2.5 rounded border border-syndae-800 text-[11px] text-emerald-300 overflow-x-auto max-h-48 mt-1">
             {JSON.stringify(testOutput, null, 2)}
           </pre>
         </div>

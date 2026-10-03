@@ -276,13 +276,13 @@ mod tests {
     #[test]
     fn test_stream_tag_parser_hermes_function_call() {
         let mut parser = StreamTagParser::new();
-        let chunks = parser.process("<function=send_message>\n<parameter=to>\nHirrag Family (919904970631-1503553071@g.us)\n</parameter>\n<parameter=message>\nhttps://www.facebook.com/share/r/1CwHSrXHaU/\n</parameter>\n</function>");
+        let chunks = parser.process("<function=send_message>\n<parameter=to>\nProject Team (120363000000000002@g.us)\n</parameter>\n<parameter=message>\nhttps://example.com/demo\n</parameter>\n</function>");
         assert_eq!(chunks.len(), 1);
         if let StreamChunk::ToolCallDelta { name, arguments_delta, .. } = &chunks[0] {
             assert_eq!(name.as_deref(), Some("send_message"));
             let parsed: serde_json::Value = serde_json::from_str(arguments_delta).unwrap();
-            assert_eq!(parsed["to"], "Hirrag Family (919904970631-1503553071@g.us)");
-            assert_eq!(parsed["message"], "https://www.facebook.com/share/r/1CwHSrXHaU/");
+            assert_eq!(parsed["to"], "Project Team (120363000000000002@g.us)");
+            assert_eq!(parsed["message"], "https://example.com/demo");
         } else {
             panic!("Expected ToolCallDelta, got {:?}", chunks[0]);
         }

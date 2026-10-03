@@ -3,17 +3,17 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-// Automatically attach Styx Device Access Key to all outbound API requests
+// Automatically attach Syndae Device Access Key to all outbound API requests
 const originalFetch = window.fetch;
 window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
-  const token = localStorage.getItem('styx_access_key');
+  const token = localStorage.getItem('syndae_access_key');
   if (token) {
     const headers = new Headers(init?.headers || {});
     if (!headers.has('Authorization')) {
       headers.set('Authorization', `Bearer ${token}`);
     }
-    if (!headers.has('X-Styx-Access-Key')) {
-      headers.set('X-Styx-Access-Key', token);
+    if (!headers.has('X-Syndae-Access-Key')) {
+      headers.set('X-Syndae-Access-Key', token);
     }
     return originalFetch(input, { ...init, headers });
   }
@@ -42,11 +42,11 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   </React.StrictMode>
 );
 
-// Register Styx local service worker for device-level notifications and vibration
+// Register Syndae local service worker for device-level notifications and vibration
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator && process.env.NODE_ENV !== 'test') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.warn('Styx ServiceWorker registration failed:', err);
+      console.warn('Syndae ServiceWorker registration failed:', err);
     });
   });
 }

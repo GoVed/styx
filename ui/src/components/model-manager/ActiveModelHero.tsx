@@ -27,7 +27,7 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
   onLoadDifferentModel,
 }) => {
   return (
-    <div className="bg-gradient-to-r from-emerald-950/80 via-styx-900 to-cyan-950/80 border-2 border-emerald-500/70 rounded-xl p-5 shadow-2xl space-y-4">
+    <div className="bg-gradient-to-r from-emerald-950/80 via-syndae-900 to-cyan-950/80 border-2 border-emerald-500/70 rounded-xl p-5 shadow-2xl space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -60,7 +60,7 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
 
       {/* Key Specifications Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 font-mono text-xs">
-        <div className="p-3 rounded-lg bg-styx-950/90 border border-styx-800 space-y-1">
+        <div className="p-3 rounded-lg bg-syndae-950/90 border border-syndae-800 space-y-1">
           <div className="text-[10px] text-slate-400 uppercase">Context Length</div>
           <div className="font-bold text-slate-100">
             {activeConfig?.context_length
@@ -68,13 +68,13 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
               : '128k (131,072)'}
           </div>
         </div>
-        <div className="p-3 rounded-lg bg-styx-950/90 border border-styx-800 space-y-1">
+        <div className="p-3 rounded-lg bg-syndae-950/90 border border-syndae-800 space-y-1">
           <div className="text-[10px] text-slate-400 uppercase">Inference Engine</div>
           <div className="font-bold text-cyan-300">
             {activeContainer?.image.includes('llama') ? 'llama.cpp ROCm' : 'vLLM OpenAI'}
           </div>
         </div>
-        <div className="p-3 rounded-lg bg-styx-950/90 border border-styx-800 space-y-1">
+        <div className="p-3 rounded-lg bg-syndae-950/90 border border-syndae-800 space-y-1">
           <div className="text-[10px] text-slate-400 uppercase">GPU VRAM Usage</div>
           <div className="font-bold text-emerald-300">
             {telemetry?.gpu
@@ -82,7 +82,7 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
               : '~9.3 GB / 16 GB'}
           </div>
         </div>
-        <div className="p-3 rounded-lg bg-styx-950/90 border border-styx-800 space-y-1">
+        <div className="p-3 rounded-lg bg-syndae-950/90 border border-syndae-800 space-y-1">
           <div className="text-[10px] text-slate-400 uppercase">Vision & MTP</div>
           <div className="font-bold text-purple-300">
             Image Input 🖼️ • Flash Attention
@@ -94,11 +94,11 @@ export const ActiveModelHero: React.FC<ActiveModelHeroProps> = ({
       <ReasoningSelector />
 
       {/* Two User-Requested Options: Advance Info & Logs / Load a Different Model */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-styx-800/80 font-mono">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 border-t border-syndae-800/80 font-mono">
         <button
           type="button"
           onClick={onToggleAdvanced}
-          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-styx-850 hover:bg-styx-800 text-slate-200 border border-styx-700 font-semibold text-xs flex items-center justify-center space-x-2 transition-colors"
+          className="w-full sm:w-auto px-4 py-2 rounded-lg bg-syndae-850 hover:bg-syndae-800 text-slate-200 border border-syndae-700 font-semibold text-xs flex items-center justify-center space-x-2 transition-colors"
         >
           <Terminal className="w-3.5 h-3.5 text-purple-400" />
           <span>{showAdvancedActive ? 'Hide Advance Info & Logs' : 'Advance Info & Logs'}</span>

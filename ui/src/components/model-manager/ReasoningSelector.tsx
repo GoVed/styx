@@ -76,7 +76,7 @@ export const ReasoningSelector: React.FC<ReasoningSelectorProps> = ({ compact = 
   };
 
   return (
-    <div className={`rounded-xl border border-styx-800 bg-styx-950/80 p-4 space-y-3 ${compact ? 'text-xs' : ''}`}>
+    <div className={`rounded-xl border border-syndae-800 bg-syndae-950/80 p-4 space-y-3 ${compact ? 'text-xs' : ''}`}>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="w-7 h-7 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300">
@@ -117,7 +117,7 @@ export const ReasoningSelector: React.FC<ReasoningSelectorProps> = ({ compact = 
               className={`p-2.5 rounded-lg border text-left transition-all ${
                 isActive
                   ? 'bg-purple-950/60 border-purple-500 text-purple-100 shadow-md ring-1 ring-purple-500/50'
-                  : 'bg-styx-900/60 border-styx-800 text-slate-300 hover:border-styx-700 hover:bg-styx-900'
+                  : 'bg-syndae-900/60 border-syndae-800 text-slate-300 hover:border-syndae-700 hover:bg-syndae-900'
               }`}
             >
               <div className="flex items-center justify-between">

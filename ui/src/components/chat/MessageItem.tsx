@@ -76,14 +76,14 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         ) : (
           <>
             <Bot className="w-3 h-3 text-emerald-400" />
-            <span>STYX AGENT</span>
+            <span>SYNDAE AGENT</span>
           </>
         )}
       </div>
 
       {/* Collapsible Thought / Reasoning Trace Block */}
       {thought && (
-        <details open className="w-full max-w-3xl mb-2 rounded-lg bg-styx-900/60 border border-purple-900/30 text-xs font-mono p-2 shadow-sm transition-all group min-w-0 overflow-hidden">
+        <details open className="w-full max-w-3xl mb-2 rounded-lg bg-syndae-900/60 border border-purple-900/30 text-xs font-mono p-2 shadow-sm transition-all group min-w-0 overflow-hidden">
           <summary className="flex items-center justify-between w-full text-left text-purple-400/90 text-[11px] font-medium select-none hover:text-purple-300 transition-colors py-0.5 px-1 cursor-pointer list-none">
             <div className="flex items-center space-x-1.5">
               <BrainCircuit className="w-3.5 h-3.5 text-purple-400" />
@@ -102,7 +102,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
 
       {/* Message Content */}
       {isToolEvent ? (
-        <div className="w-full max-w-full sm:max-w-3xl rounded-lg p-3.5 text-xs leading-relaxed bg-gradient-to-r from-emerald-950/60 via-styx-900 to-styx-900 border border-emerald-500/40 shadow-sm space-y-2 min-w-0 overflow-hidden">
+        <div className="w-full max-w-full sm:max-w-3xl rounded-lg p-3.5 text-xs leading-relaxed bg-gradient-to-r from-emerald-950/60 via-syndae-900 to-syndae-900 border border-emerald-500/40 shadow-sm space-y-2 min-w-0 overflow-hidden">
           <div className="flex items-center justify-between text-[11px] font-mono text-emerald-300/90 border-b border-emerald-900/40 pb-1.5 gap-2">
             <span className="font-semibold flex items-center space-x-1 shrink-0">
               <span>Incoming {parsedToolEvent.protocol} Message</span>
@@ -126,7 +126,7 @@ export const MessageItem: React.FC<MessageItemProps> = ({
               <summary className="cursor-pointer hover:text-slate-300 select-none">
                 Technical event details
               </summary>
-              <div className="mt-1.5 p-2 rounded bg-styx-950/80 border border-slate-800 text-[10px] text-slate-400 whitespace-pre-wrap max-h-40 overflow-y-auto overflow-x-auto break-all">
+              <div className="mt-1.5 p-2 rounded bg-syndae-950/80 border border-slate-800 text-[10px] text-slate-400 whitespace-pre-wrap max-h-40 overflow-y-auto overflow-x-auto break-all">
                 {parsedToolEvent.rawContent}
               </div>
             </details>
@@ -136,8 +136,8 @@ export const MessageItem: React.FC<MessageItemProps> = ({
         <div
           className={`max-w-[88%] sm:max-w-3xl rounded-lg p-3 text-xs leading-relaxed min-w-0 overflow-hidden break-words ${
             isUser
-              ? 'bg-styx-800 text-slate-100 border border-styx-700/60'
-              : 'bg-styx-900 text-slate-200 border border-styx-800 shadow-sm'
+              ? 'bg-syndae-800 text-slate-100 border border-syndae-700/60'
+              : 'bg-syndae-900 text-slate-200 border border-syndae-800 shadow-sm'
           }`}
         >
           <div

@@ -42,7 +42,7 @@ impl Database {
     }
 
     pub async fn is_auth_initialized(&self) -> Result<bool> {
-        if let Ok(env_key) = std::env::var("STYX_ACCESS_KEY")
+        if let Ok(env_key) = std::env::var("SYNDAE_ACCESS_KEY")
             && !env_key.trim().is_empty() {
                 return Ok(true);
             }
@@ -60,7 +60,7 @@ impl Database {
         }
 
         // Check local development key for local tool connectors and tests
-        if key_trimmed == "styx-local-dev-key" {
+        if key_trimmed == "syndae-local-dev-key" {
             return Ok(true);
         }
 
@@ -93,7 +93,7 @@ impl Database {
         }
 
         // Check env override as fallback when database has no stored hash
-        if let Ok(env_key) = std::env::var("STYX_ACCESS_KEY") {
+        if let Ok(env_key) = std::env::var("SYNDAE_ACCESS_KEY") {
             let env_trimmed = env_key.trim();
             if !env_trimmed.is_empty() {
                 let is_match: bool = if env_trimmed.len() == key_trimmed.len() {

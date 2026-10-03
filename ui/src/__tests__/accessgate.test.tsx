@@ -40,7 +40,7 @@ describe('AccessGate Component', () => {
 
     expect(screen.getByText(/ENCLAVE GUARD \/\/ DEVICE LOCKED/i)).toBeInTheDocument();
     expect(screen.getByText(/Alex/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /UNLOCK STYX OS/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /UNLOCK SYNDAE OS/i })).toBeInTheDocument();
     expect(screen.queryByText(/CONFIRM ACCESS KEY/i)).not.toBeInTheDocument();
   });
 

@@ -6,7 +6,7 @@ window.HTMLElement.prototype.scrollIntoView = vi.fn();
 Element.prototype.scrollIntoView = vi.fn();
 
 // Pre-seed mock auth key in localStorage for tests
-localStorage.setItem('styx_access_key', 'test-key');
+localStorage.setItem('syndae_access_key', 'test-key');
 
 // Global fetch mock fallback for relative URLs in jsdom
 global.fetch = vi.fn().mockImplementation((url: string) => {

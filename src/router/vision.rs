@@ -43,7 +43,7 @@ pub async fn load_image_bytes(input: &str) -> Result<Vec<u8>> {
 
         let resp = client
             .get(&fetch_url)
-            .header("User-Agent", "StyxAgentOS/1.0 (VisionRouter)")
+            .header("User-Agent", "SyndaeAgentOS/1.0 (VisionRouter)")
             .send()
             .await
             .context(format!("Failed to reach image URL: {}", fetch_url))?;

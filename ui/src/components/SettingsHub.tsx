@@ -118,7 +118,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
     {
       id: 'security',
       title: 'Privacy & Safety Approvals',
-      subtitle: `Safe Mode Active: Styx always asks your permission before sending anything`,
+      subtitle: `Safe Mode Active: Syndae always asks your permission before sending anything`,
       icon: Shield,
       color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
       badge: 'Safe',
@@ -137,8 +137,8 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
       id: 'onboarding',
       title: 'Personal Setup & Preferences',
       subtitle: authStatus?.onboarded
-        ? 'Update how Styx talks, your daily routine, and what to remember'
-        : 'Get started: Tell Styx how you would like to be helped',
+        ? 'Update how Syndae talks, your daily routine, and what to remember'
+        : 'Get started: Tell Syndae how you would like to be helped',
       icon: Sparkles,
       color: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
       badge: authStatus?.onboarded ? 'Profile' : 'Setup',
@@ -155,9 +155,9 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
     : menuItems;
 
   return (
-    <div className="h-full w-full overflow-y-auto bg-styx-950 text-slate-100 flex flex-col font-sans select-none">
+    <div className="h-full w-full overflow-y-auto bg-syndae-950 text-slate-100 flex flex-col font-sans select-none">
       {/* Android-style Header Bar */}
-      <div className="sticky top-0 z-30 bg-styx-900/95 backdrop-blur-md border-b border-styx-800 px-4 py-3 flex items-center justify-between">
+      <div className="sticky top-0 z-30 bg-syndae-900/95 backdrop-blur-md border-b border-syndae-800 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <button
             onClick={() => {
@@ -169,7 +169,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                 handleNav('chat');
               }
             }}
-            className="p-1.5 rounded-full hover:bg-styx-800 text-slate-300 hover:text-white transition-colors flex items-center justify-center"
+            className="p-1.5 rounded-full hover:bg-syndae-800 text-slate-300 hover:text-white transition-colors flex items-center justify-center"
             title="Back"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -197,8 +197,8 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => onLock?.()}
-            className="px-2.5 py-1.5 rounded-lg bg-styx-850 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 border border-styx-700/60 hover:border-amber-500/40 text-xs font-medium flex items-center space-x-1.5 transition-all"
-            title="Lock Styx device"
+            className="px-2.5 py-1.5 rounded-lg bg-syndae-850 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 border border-syndae-700/60 hover:border-amber-500/40 text-xs font-medium flex items-center space-x-1.5 transition-all"
+            title="Lock Syndae device"
           >
             <Lock className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Lock Device</span>
@@ -210,7 +210,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
         {subView === 'main' ? (
           <>
             {/* Operator Profile Card (Android style) */}
-            <div className="rounded-2xl bg-gradient-to-br from-styx-900 to-styx-850 border border-styx-800 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-4">
+            <div className="rounded-2xl bg-gradient-to-br from-syndae-900 to-syndae-850 border border-syndae-800 p-4 sm:p-5 shadow-lg flex items-center justify-between gap-4">
               <div className="flex items-center space-x-3.5 min-w-0">
                 <div className="w-12 h-12 rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-300 font-bold text-lg flex-shrink-0 shadow-inner">
                   {initial}
@@ -231,7 +231,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
               <div className="flex items-center space-x-2 flex-shrink-0">
                 <button
                   onClick={() => setSubView('password')}
-                  className="px-2.5 py-1.5 rounded-xl bg-styx-800 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 text-xs font-medium border border-styx-700/60 hover:border-amber-500/40 transition-all active:scale-95 shadow-sm flex items-center space-x-1.5"
+                  className="px-2.5 py-1.5 rounded-xl bg-syndae-800 hover:bg-amber-950/40 text-slate-300 hover:text-amber-300 text-xs font-medium border border-syndae-700/60 hover:border-amber-500/40 transition-all active:scale-95 shadow-sm flex items-center space-x-1.5"
                   title="Change master password"
                 >
                   <KeyRound className="w-3.5 h-3.5 text-amber-400" />
@@ -239,7 +239,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                 </button>
                 <button
                   onClick={() => (onStartOnboarding ? onStartOnboarding() : handleNav('chat'))}
-                  className="px-3 py-1.5 rounded-xl bg-styx-800 hover:bg-styx-700 text-slate-200 text-xs font-medium border border-styx-700 transition-all active:scale-95 shadow-sm"
+                  className="px-3 py-1.5 rounded-xl bg-syndae-800 hover:bg-syndae-700 text-slate-200 text-xs font-medium border border-syndae-700 transition-all active:scale-95 shadow-sm"
                 >
                   Edit Profile
                 </button>
@@ -254,7 +254,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search settings..."
-                className="w-full bg-styx-900 border border-styx-800 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all font-mono"
+                className="w-full bg-syndae-900 border border-syndae-800 focus:border-emerald-500 rounded-xl pl-10 pr-4 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500/30 transition-all font-mono"
               />
             </div>
 
@@ -264,14 +264,14 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                 SYSTEM PREFERENCES & MANAGEMENT
               </h3>
 
-              <div className="rounded-2xl bg-styx-900/90 border border-styx-800 overflow-hidden divide-y divide-styx-800/80 shadow-md">
+              <div className="rounded-2xl bg-syndae-900/90 border border-syndae-800 overflow-hidden divide-y divide-syndae-800/80 shadow-md">
                 {filteredItems.map(item => {
                   const Icon = item.icon;
                   return (
                     <div
                       key={item.id}
                       onClick={item.action}
-                      className="group p-3.5 sm:p-4 flex items-center justify-between hover:bg-styx-850/80 cursor-pointer transition-colors active:bg-styx-800"
+                      className="group p-3.5 sm:p-4 flex items-center justify-between hover:bg-syndae-850/80 cursor-pointer transition-colors active:bg-syndae-800"
                     >
                       <div className="flex items-center space-x-3.5 min-w-0 pr-2">
                         <div
@@ -284,7 +284,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                             <span className="text-xs sm:text-sm font-semibold text-slate-100 group-hover:text-emerald-300 transition-colors truncate">
                               {item.title}
                             </span>
-                            <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-styx-800 text-slate-400 border border-styx-700">
+                            <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] font-mono bg-syndae-800 text-slate-400 border border-syndae-700">
                               {item.badge}
                             </span>
                           </div>
@@ -319,7 +319,7 @@ export const SettingsHub: React.FC<SettingsHubProps> = ({
                   if (onOpenAudit) onOpenAudit();
                   else handleNav('chat');
                 }}
-                className="py-2.5 px-4 rounded-xl bg-styx-900 hover:bg-styx-850 border border-styx-800 text-slate-300 text-xs font-medium flex items-center justify-center space-x-2 transition-all"
+                className="py-2.5 px-4 rounded-xl bg-syndae-900 hover:bg-syndae-850 border border-syndae-800 text-slate-300 text-xs font-medium flex items-center justify-center space-x-2 transition-all"
               >
                 <Shield className="w-3.5 h-3.5 text-blue-400" />
                 <span>Security Audit Log</span>

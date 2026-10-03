@@ -204,12 +204,12 @@ mod tests {
     #[test]
     fn test_is_origin_allowed_custom_whitelist() {
         let mut config = AppConfig::from_env();
-        config.allowed_origins = vec!["https://styx.mycompany.com".to_string()];
+        config.allowed_origins = vec!["https://syndae.mycompany.com".to_string()];
         let headers = HeaderMap::new();
 
         // Configured origin allowed
-        assert!(is_origin_allowed("https://styx.mycompany.com", &headers, &config));
-        assert!(is_origin_allowed("https://styx.mycompany.com/", &headers, &config));
+        assert!(is_origin_allowed("https://syndae.mycompany.com", &headers, &config));
+        assert!(is_origin_allowed("https://syndae.mycompany.com/", &headers, &config));
 
         // Non-whitelisted origins rejected
         assert!(!is_origin_allowed("https://other-domain.com", &headers, &config));

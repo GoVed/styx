@@ -14,7 +14,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
   onSelectTab,
 }) => {
   return (
-    <div className="md:hidden flex-shrink-0 bg-styx-900 border-t border-styx-800 px-6 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-around z-30">
+    <div className="md:hidden flex-shrink-0 bg-syndae-900 border-t border-syndae-800 px-6 py-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] flex items-center justify-around z-30">
       <button
         type="button"
         onClick={() => onSelectTab('chat')}

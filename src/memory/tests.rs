@@ -5,7 +5,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_hierarchical_memory_creation_and_listing() {
-        let base_path = std::env::temp_dir().join(format!("styx_mem_hier_{}", uuid::Uuid::new_v4()));
+        let base_path = std::env::temp_dir().join(format!("syndae_mem_hier_{}", uuid::Uuid::new_v4()));
         let search_idx = Arc::new(search::MemorySearchIndex::new(&base_path.join("search_index")).unwrap());
         let memory = MemoryManager::new(base_path.clone(), search_idx);
         memory.ensure_directories().unwrap();
@@ -34,7 +34,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_is_channel_ignored() {
-        let base_path = std::env::temp_dir().join(format!("styx_mem_test_{}", uuid::Uuid::new_v4()));
+        let base_path = std::env::temp_dir().join(format!("syndae_mem_test_{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(base_path.join("core")).unwrap();
         std::fs::create_dir_all(base_path.join("skills")).unwrap();
         std::fs::create_dir_all(base_path.join("scratchpad")).unwrap();
@@ -73,7 +73,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_write_file_preserves_profile_sections() {
-        let base_path = std::env::temp_dir().join(format!("styx_mem_pres_{}", uuid::Uuid::new_v4()));
+        let base_path = std::env::temp_dir().join(format!("syndae_mem_pres_{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(base_path.join("core")).unwrap();
 
         let initial_profile = "# User Profile\n\n## Identity\n- Name: Alex\n\n## Location & Routine\n- City: San Francisco\n";
@@ -101,8 +101,8 @@ mod tests {
 
     #[test]
     fn test_semantic_embedding_cosine_similarity() {
-        let vec1 = embeddings::SemanticEmbedder::fast_semantic_encode("Styx Personal AI Operating System harness in Rust");
-        let vec2 = embeddings::SemanticEmbedder::fast_semantic_encode("Styx autonomous agent OS written in Rust");
+        let vec1 = embeddings::SemanticEmbedder::fast_semantic_encode("Syndae Personal AI Operating System harness in Rust");
+        let vec2 = embeddings::SemanticEmbedder::fast_semantic_encode("Syndae autonomous agent OS written in Rust");
         let vec3 = embeddings::SemanticEmbedder::fast_semantic_encode("Baking chocolate chip cookies recipe");
 
         let sim_related = vector::cosine_similarity(&vec1, &vec2);
@@ -118,7 +118,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_hybrid_search_and_image_indexing() {
-        let base_path = std::env::temp_dir().join(format!("styx_mem_hybrid_{}", uuid::Uuid::new_v4()));
+        let base_path = std::env::temp_dir().join(format!("syndae_mem_hybrid_{}", uuid::Uuid::new_v4()));
         let search_dir = base_path.join("search_index");
         let search_idx = Arc::new(search::MemorySearchIndex::new(&search_dir).unwrap());
         let memory = MemoryManager::new(base_path.clone(), search_idx.clone());
@@ -126,7 +126,7 @@ mod tests {
 
         // 1. Create a markdown note
         memory
-            .write_file("projects/styx_architecture.md", "# Styx Architecture\nAutonomous AI Harness with Tantivy and Vector search", None)
+            .write_file("projects/syndae_architecture.md", "# Syndae Architecture\nAutonomous AI Harness with Tantivy and Vector search", None)
             .await
             .unwrap();
 
@@ -139,15 +139,15 @@ mod tests {
         }
         let img_path = media_dir.join("diagram.png");
         img.save(&img_path).unwrap();
-        std::fs::write(media_dir.join("diagram.png.txt"), "System Architecture Diagram for Styx Harness").unwrap();
+        std::fs::write(media_dir.join("diagram.png.txt"), "System Architecture Diagram for Syndae Harness").unwrap();
 
         // 3. Sync all files into search index
         search_idx.sync_all_files(&base_path).await.unwrap();
 
         // 4. Search text
-        let results = memory.search("Styx Architecture", 5).unwrap();
+        let results = memory.search("Syndae Architecture", 5).unwrap();
         assert!(!results.is_empty());
-        assert!(results.iter().any(|r| r.path.contains("styx_architecture.md")));
+        assert!(results.iter().any(|r| r.path.contains("syndae_architecture.md")));
 
         // 5. Search image
         let img_results = memory.search("System Architecture Diagram", 5).unwrap();
@@ -159,7 +159,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_active_memory_context_fetching_for_group() {
-        let base_path = std::env::temp_dir().join(format!("styx_mem_active_{}", uuid::Uuid::new_v4()));
+        let base_path = std::env::temp_dir().join(format!("syndae_mem_active_{}", uuid::Uuid::new_v4()));
         let search_dir = base_path.join("search_index");
         let search_idx = Arc::new(search::MemorySearchIndex::new(&search_dir).unwrap());
         let memory = MemoryManager::new(base_path.clone(), search_idx.clone());
@@ -177,8 +177,8 @@ mod tests {
 
         search_idx.sync_all_files(&base_path).await.unwrap();
 
-        // User asks: "can you check tech peers if anyone used styx?"
-        let active = memory.fetch_active_context("can you check tech peers if anyone used styx?", None);
+        // User asks: "can you check tech peers if anyone used syndae?"
+        let active = memory.fetch_active_context("can you check tech peers if anyone used syndae?", None);
         assert!(!active.is_empty(), "Active memory should find the entity!");
         let block = active.formatted_prompt.expect("Formatted prompt block must be generated");
 

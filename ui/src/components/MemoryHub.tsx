@@ -129,15 +129,15 @@ export const MemoryHub: React.FC<MemoryHubProps> = ({ files, onRefreshFiles }) =
   };
 
   return (
-    <div className="flex flex-col h-full w-full overflow-hidden bg-styx-950 font-sans text-xs">
+    <div className="flex flex-col h-full w-full overflow-hidden bg-syndae-950 font-sans text-xs">
       {/* Mobile Top Segmented Bar */}
-      <div className="md:hidden flex border-b border-styx-800 bg-styx-900/90 px-3 py-1.5 gap-2 flex-shrink-0 font-mono select-none">
+      <div className="md:hidden flex border-b border-syndae-800 bg-syndae-900/90 px-3 py-1.5 gap-2 flex-shrink-0 font-mono select-none">
         <button
           type="button"
           onClick={() => setMobileTab('files')}
           className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
             mobileTab === 'files'
-              ? 'bg-styx-800 text-emerald-300 shadow-sm border border-styx-700/80'
+              ? 'bg-syndae-800 text-emerald-300 shadow-sm border border-syndae-700/80'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
@@ -149,7 +149,7 @@ export const MemoryHub: React.FC<MemoryHubProps> = ({ files, onRefreshFiles }) =
           onClick={() => setMobileTab('editor')}
           className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold flex items-center justify-center space-x-1.5 transition-all ${
             mobileTab === 'editor'
-              ? 'bg-styx-800 text-cyan-300 shadow-sm border border-styx-700/80'
+              ? 'bg-syndae-800 text-cyan-300 shadow-sm border border-syndae-700/80'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >

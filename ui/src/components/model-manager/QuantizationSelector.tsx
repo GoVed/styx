@@ -29,7 +29,7 @@ export const QuantizationSelector: React.FC<QuantizationSelectorProps> = ({
     : `${calculateModelWeightsGb(selectedModelSize, quantization)} GB`;
 
   return (
-    <div className="space-y-1.5 pt-1 border-t border-styx-800">
+    <div className="space-y-1.5 pt-1 border-t border-syndae-800">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-1.5">
           <label className="text-[11px] text-slate-400">Model Quantization:</label>
@@ -63,7 +63,7 @@ export const QuantizationSelector: React.FC<QuantizationSelectorProps> = ({
                 className={`px-2.5 py-1 rounded text-xs border transition-colors ${
                   isSelected
                     ? 'bg-emerald-950 border-emerald-500 text-emerald-200 font-bold shadow-sm'
-                    : 'bg-styx-950 border-styx-800 text-slate-400 hover:text-slate-200'
+                    : 'bg-syndae-950 border-syndae-800 text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {q.quant} ({q.size_gb.toFixed(1)} GB)
@@ -84,7 +84,7 @@ export const QuantizationSelector: React.FC<QuantizationSelectorProps> = ({
               className={`px-2.5 py-1 rounded text-xs border transition-colors ${
                 quantization === q.id
                   ? 'bg-emerald-950 border-emerald-500 text-emerald-200 font-bold shadow-sm'
-                  : 'bg-styx-950 border-styx-800 text-slate-400 hover:text-slate-200'
+                  : 'bg-syndae-950 border-syndae-800 text-slate-400 hover:text-slate-200'
               }`}
             >
               {q.label}

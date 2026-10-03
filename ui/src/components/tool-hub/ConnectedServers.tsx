@@ -16,7 +16,7 @@ export const ConnectedServers: React.FC<ConnectedServersProps> = ({
   onRemoveServer,
 }) => {
   return (
-    <div className="bg-styx-900 border border-styx-800 rounded-lg p-3 font-mono space-y-2">
+    <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-3 font-mono space-y-2">
       <div className="flex items-center justify-between">
         <div className="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
           <Server className="w-3.5 h-3.5 text-cyan-400" />
@@ -41,7 +41,7 @@ export const ConnectedServers: React.FC<ConnectedServersProps> = ({
           return (
             <div
               key={s.id}
-              className="p-3 rounded-lg bg-styx-950 border border-styx-800 space-y-2 relative shadow-sm"
+              className="p-3 rounded-lg bg-syndae-950 border border-syndae-800 space-y-2 relative shadow-sm"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
@@ -62,7 +62,7 @@ export const ConnectedServers: React.FC<ConnectedServersProps> = ({
                 {s.url && <div className="truncate text-slate-300">URL: {s.url}</div>}
               </div>
 
-              <div className="flex items-center justify-between pt-1 border-t border-styx-800/60">
+              <div className="flex items-center justify-between pt-1 border-t border-syndae-800/60">
                 <span className="text-[10px] text-slate-500">
                   Daemon Active
                 </span>

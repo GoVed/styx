@@ -26,7 +26,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
   return (
     <div className="space-y-4 font-mono">
       {/* Running Containers */}
-      <div className="bg-styx-900 border border-styx-800 rounded-lg p-3 space-y-2">
+      <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-3 space-y-2">
         <div className="text-xs font-bold text-slate-200 flex items-center justify-between">
           <div className="flex items-center space-x-1.5">
             <Box className="w-3.5 h-3.5 text-blue-400" />
@@ -52,7 +52,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
               return (
                 <div
                   key={c.id}
-                  className="p-2.5 rounded bg-styx-950 border border-styx-800 space-y-1.5"
+                  className="p-2.5 rounded bg-syndae-950 border border-syndae-800 space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-slate-200 truncate">
@@ -68,7 +68,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                           <button
                             type="button"
                             onClick={() => onActivateContainer(c.id)}
-                            className="px-2 py-0.5 rounded bg-styx-850 hover:bg-emerald-900 text-emerald-300 border border-styx-700 text-[10px] font-bold"
+                            className="px-2 py-0.5 rounded bg-syndae-850 hover:bg-emerald-900 text-emerald-300 border border-syndae-700 text-[10px] font-bold"
                           >
                             Set Active
                           </button>
@@ -94,7 +94,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                       <button
                         type="button"
                         onClick={() => onContainerAction(c.id, 'start')}
-                        className="p-1 rounded bg-styx-850 hover:bg-styx-800 text-emerald-400"
+                        className="p-1 rounded bg-syndae-850 hover:bg-syndae-800 text-emerald-400"
                         title="Start"
                       >
                         <Play className="w-3 h-3" />
@@ -103,7 +103,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                       <button
                         type="button"
                         onClick={() => onContainerAction(c.id, 'stop')}
-                        className="p-1 rounded bg-styx-850 hover:bg-styx-800 text-amber-400"
+                        className="p-1 rounded bg-syndae-850 hover:bg-syndae-800 text-amber-400"
                         title="Stop"
                       >
                         <Square className="w-3 h-3" />
@@ -112,7 +112,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                     <button
                       type="button"
                       onClick={() => onContainerAction(c.id, 'restart')}
-                      className="p-1 rounded bg-styx-850 hover:bg-styx-800 text-cyan-400"
+                      className="p-1 rounded bg-syndae-850 hover:bg-syndae-800 text-cyan-400"
                       title="Restart"
                     >
                       <RotateCcw className="w-3 h-3" />
@@ -120,7 +120,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                     <button
                       type="button"
                       onClick={() => onSelectLogContainer(c.id)}
-                      className="px-2 py-0.5 rounded bg-styx-850 hover:bg-styx-800 text-slate-300 text-[10px] flex items-center space-x-1"
+                      className="px-2 py-0.5 rounded bg-syndae-850 hover:bg-syndae-800 text-slate-300 text-[10px] flex items-center space-x-1"
                     >
                       <Terminal className="w-3 h-3 text-purple-400" />
                       <span>Logs</span>
@@ -128,7 +128,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
                     <button
                       type="button"
                       onClick={() => onContainerAction(c.id, 'delete')}
-                      className="p-1 rounded bg-styx-850 hover:bg-rose-900 text-rose-400 ml-auto"
+                      className="p-1 rounded bg-syndae-850 hover:bg-rose-900 text-rose-400 ml-auto"
                       title="Remove"
                     >
                       <Trash2 className="w-3 h-3" />
@@ -142,7 +142,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
       </div>
 
       {/* Live Logs Terminal */}
-      <div className="bg-styx-900 border border-styx-800 rounded-lg p-3 space-y-2">
+      <div className="bg-syndae-900 border border-syndae-800 rounded-lg p-3 space-y-2">
         <div className="flex items-center justify-between">
           <div className="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
             <Terminal className="w-3.5 h-3.5 text-purple-400" />
@@ -159,7 +159,7 @@ export const LocalContainersCard: React.FC<LocalContainersCardProps> = ({
           )}
         </div>
 
-        <div className="h-64 bg-styx-950 p-3 rounded border border-styx-800 text-[11px] text-slate-300 overflow-y-auto space-y-0.5">
+        <div className="h-64 bg-syndae-950 p-3 rounded border border-syndae-800 text-[11px] text-slate-300 overflow-y-auto space-y-0.5">
           {containerLogs.length === 0 ? (
             <div className="text-slate-600 italic">Select a container to stream stdout/stderr logs...</div>
           ) : (

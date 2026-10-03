@@ -1,4 +1,4 @@
-// Styx Local Device Service Worker (Zero Cloud, 100% Local)
+// Syndae Local Device Service Worker (Zero Cloud, 100% Local)
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
@@ -14,7 +14,7 @@ self.addEventListener('message', (event) => {
     event.waitUntil(
       self.registration.showNotification(title, {
         body: options.body || '',
-        tag: options.tag || 'styx-alert',
+        tag: options.tag || 'syndae-alert',
         icon: options.icon || '/icon-192.png',
         badge: options.badge || '/icon-192.png',
         vibrate: options.vibrate || [200, 100, 200, 100, 300],

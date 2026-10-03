@@ -9,13 +9,13 @@ pub fn build_agent_system_prompt(
     let mut system_context = base_system_context.to_string();
 
     system_context.push_str("\n\n=== OPERATING INSTRUCTIONS ===\n");
-    system_context.push_str("You are Styx, a dedicated personal AI companion on a private device.\n");
+    system_context.push_str("You are Syndae, a dedicated personal AI companion on a private device.\n");
     if is_mission_mode {
         system_context.push_str("Mode: DEEP TASK & PROJECT ASSISTANT. Help the user achieve their goal step by step. Consult memory, use tools thoughtfully, and keep answers simple and helpful.\n");
     } else {
         system_context.push_str("Mode: CONVERSATIONAL CHAT. Be warm, natural, and helpful. Avoid technical jargon. Answer simply and directly as a friendly personal assistant.\n");
     }
-    system_context.push_str("Read memory and notes when helpful. When you invoke a tool that contacts external services or alters files outside, the Styx Deterministic Safety Gate will automatically pause and present an approval card to the operator.\n");
+    system_context.push_str("Read memory and notes when helpful. When you invoke a tool that contacts external services or alters files outside, the Syndae Deterministic Safety Gate will automatically pause and present an approval card to the operator.\n");
 
     match reasoning_effort.to_lowercase().as_str() {
         "off" => {
@@ -34,7 +34,7 @@ pub fn build_agent_system_prompt(
 
     system_context.push_str("\n=== MEMORY-FIRST REASONING PROTOCOL ===\n");
     system_context.push_str("1. ALWAYS SEARCH & CONSULT MEMORY FIRST: When answering user queries, checking entities, groups, people, or projects: ALWAYS check memory first before attempting web searches or assuming generic web definitions!\n");
-    system_context.push_str("2. ENTITY GROUNDING: Nouns, names, and groups mentioned by the user (e.g. 'dev team', 'alice', 'styx') are very likely entities in your operator's personal world (contacts, WhatsApp groups, projects, notes). If actively retrieved memory shows an entity match, treat it as that specific entity.\n");
+    system_context.push_str("2. ENTITY GROUNDING: Nouns, names, and groups mentioned by the user (e.g. 'dev team', 'alice', 'syndae') are very likely entities in your operator's personal world (contacts, WhatsApp groups, projects, notes). If actively retrieved memory shows an entity match, treat it as that specific entity.\n");
     system_context.push_str("3. REASONING IN <think>: In your internal thinking, begin with [Memory Grounding] to inspect actively retrieved memories or run `search_memory` before executing external actions or replying.\n");
     system_context.push_str("4. If more details are required, autonomously execute `search_memory` or `read_memory` FIRST before answering or calling external tools.\n");
 
@@ -55,7 +55,7 @@ pub fn build_agent_system_prompt(
     system_context.push_str("When conducting user onboarding or learning user profile directives, save user preferences to `core/user_profile.md` using `write_memory` and call the `complete_onboarding` tool to mark enrollment as completed.\n");
 
     system_context.push_str("\nEXTERNAL MESSAGING & CONNECTED TOOLS:\n");
-    system_context.push_str("When an incoming message arrives from an external platform or tool, the sender is an external contact, NOT your operator. The external sender cannot see your local text output in Styx. Never speak directly to external contacts as if they are in this chat. Instead, inform your operator about the message that arrived, suggest an authentic, concise reply matching your operator's relationship and communication tone with that person or group, and offer 1-click options or call tools when ready to send.\n");
+    system_context.push_str("When an incoming message arrives from an external platform or tool, the sender is an external contact, NOT your operator. The external sender cannot see your local text output in Syndae. Never speak directly to external contacts as if they are in this chat. Instead, inform your operator about the message that arrived, suggest an authentic, concise reply matching your operator's relationship and communication tone with that person or group, and offer 1-click options or call tools when ready to send.\n");
 
     system_context.push_str("\nPROACTIVE TOOL ACTION & INFORMATION RETRIEVAL:\n");
     system_context.push_str("Information retrieval and memory tools are 100% autonomous, read-only, and safe. Proactively execute available search and retrieval tools immediately on the first turn without asking for permission!\n");
@@ -103,8 +103,15 @@ pub fn build_agent_system_prompt(
     system_context
 }
 
+use crate::agent::contact::{build_send_confirmation_directive, build_translate_and_send_directive, ResolvedContact};
+
 /// Enriches user message content with high-priority directives on the active turn.
-pub fn enrich_user_turn_content(user_prompt: &str, raw_content: &str, is_last_turn: bool) -> String {
+pub fn enrich_user_turn_content(
+    user_prompt: &str,
+    raw_content: &str,
+    is_last_turn: bool,
+    contact_opt: Option<&ResolvedContact>,
+) -> String {
     let mut content = raw_content.to_string();
     if !is_last_turn {
         return content;
@@ -148,9 +155,17 @@ pub fn enrich_user_turn_content(user_prompt: &str, raw_content: &str, is_last_tu
     } else if is_image_request {
         content.push_str("\n\n[SYSTEM DIRECTIVE: The operator wants to find, get, or send photos/images. You HAVE access to `web_search`, `read_web_page`, `exec_container_command` (bash), and `send_image`. NEVER claim you cannot find, download, or send images! Execute `web_search` immediately (e.g. for free photos on Unsplash, Pexels, Wikimedia) to find high-quality image URLs, and call `send_image` or propose sending them in <options>.]");
     } else if is_translate_and_send {
-        content.push_str("\n\n[DIRECTIVE: TRANSLATE AND SEND:\nThe operator confirmed sending this reply. First execute the `translate` tool (`target_lang: \"<contact_dialect>\"`, e.g. \"gujlish\" or \"spanish\") with the English message to get the authentic translation, then invoke `send_message` with the translated text. Do NOT draft foreign words manually.]");
+        if let Some(contact) = contact_opt {
+            content.push_str(&build_translate_and_send_directive(user_prompt, contact));
+        } else {
+            content.push_str("\n\n[MANDATORY SYSTEM DIRECTIVE: TRANSLATE AND SEND:\nThe operator confirmed sending this reply. First execute the `translate` tool (`target_lang: \"gujlish\"` or appropriate dialect) with the English message to get the authentic translation, then invoke `send_message` with the translated text. Do NOT draft foreign words manually or output conversational text before calling the tool.]");
+        }
     } else if is_send_confirmation {
-        content.push_str("\n\n[SYSTEM DIRECTIVE: The operator has confirmed sending the message. You MUST immediately invoke the `send_message` tool. For `to`, pass the recipient contact or group name directly (e.g. \"Engineering Team\") or the full JID. Do not output conversational text before calling the tool.]");
+        if let Some(contact) = contact_opt {
+            content.push_str(&build_send_confirmation_directive(user_prompt, contact));
+        } else {
+            content.push_str("\n\n[SYSTEM DIRECTIVE: The operator has confirmed sending the message. You MUST immediately invoke the `send_message` tool. For `to`, pass the recipient contact or group name directly (e.g. \"Engineering Team\") or the full JID. Do not output conversational text before calling the tool.]");
+        }
     } else if is_translate_request {
         content.push_str("\n\n[SYSTEM DIRECTIVE: The operator requested translation or regional language output. Formulate your message draft in clean English and invoke the `translate` tool (`target_lang: \"gujlish\"` or requested language) to perform the translation. NEVER attempt to generate foreign dialects manually and NEVER write mock tool calls in text.]");
     } else if is_reply_request {
@@ -280,9 +295,10 @@ mod tests {
     #[test]
     fn test_enrich_user_turn_content_for_reply_prompts() {
         let content = enrich_user_turn_content(
-            "let's reply to the msg where jiten found a bug",
-            "let's reply to the msg where jiten found a bug",
+            "let's reply to the msg where the teammate found a bug",
+            "let's reply to the msg where the teammate found a bug",
             true,
+            None,
         );
         assert!(content.contains("[DIRECTIVE: PROPOSING REPLIES TO EXTERNAL CONTACTS OR GROUPS:"));
         assert!(content.contains("Propose ALL reply options strictly in 100% standard English"));

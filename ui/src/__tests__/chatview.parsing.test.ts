@@ -7,7 +7,7 @@ import {
 describe('ChatView Parsing Utilities', () => {
   it('extractOptionsAndContent correctly parses tags, flags Other, and auto-appends Other if missing', () => {
     // Case 1: XML tags with explicit other
-    const raw1 = `Welcome to Styx!
+    const raw1 = `Welcome to Syndae!
 <options>
 <option>Software Engineer</option>
 <option>DevOps / Cloud</option>
@@ -15,7 +15,7 @@ describe('ChatView Parsing Utilities', () => {
 </options>`;
 
     const parsed1 = extractOptionsAndContent(raw1);
-    expect(parsed1.content).toBe('Welcome to Styx!');
+    expect(parsed1.content).toBe('Welcome to Syndae!');
     expect(parsed1.options.length).toBe(3);
     expect(parsed1.options[0].label).toBe('Software Engineer');
     expect(parsed1.options[0].isOther).toBeFalsy();
@@ -39,21 +39,21 @@ describe('ChatView Parsing Utilities', () => {
   it('extractOptionsAndContent does not get stuck at "keeping the" when <options> is mentioned in text', () => {
     const raw = `I should introduce myself warmly, keeping the <options> block consistent with the system instructions.
 
-I'm Styx, your personal assistant! I'm here to help with tasks and notes.
+I'm Syndae, your personal assistant! I'm here to help with tasks and notes.
 
 <options>
 <option>Help me set a reminder</option>
 <option>Jot down a quick note</option>
 <`;
     const res = extractOptionsAndContent(raw);
-    expect(res.content).toContain("I'm Styx, your personal assistant!");
+    expect(res.content).toContain("I'm Syndae, your personal assistant!");
     expect(res.options.length).toBeGreaterThanOrEqual(2);
     expect(res.options[0].label).toBe('Help me set a reminder');
     expect(res.options[1].label).toBe('Jot down a quick note');
   });
 
   it('parseToolEvent parses standard, generic protocol, and legacy formats correctly', () => {
-    // 1. Standard protocol-agnostic Styx format
+    // 1. Standard protocol-agnostic Syndae format
     const stdFormat = `[INCOMING TOOL EVENT: WHATSAPP]
 Sender: Sarah
 Channel: Direct Chat (155500011122233@lid)
@@ -115,12 +115,12 @@ Payload:
 {
   "sender": "155500011122233@lid",
   "pushName": "Sarah",
-  "message": "hello styx!"
+  "message": "hello syndae!"
 }`;
     const parsedHist = parseToolEvent(histFormat);
     expect(parsedHist).not.toBeNull();
     expect(parsedHist?.protocol).toBe('WhatsApp');
     expect(parsedHist?.senderName).toBe('Sarah (155500011122233@lid)');
-    expect(parsedHist?.messageText).toBe('hello styx!');
+    expect(parsedHist?.messageText).toBe('hello syndae!');
   });
 });

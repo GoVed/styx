@@ -12,7 +12,7 @@ import { MobileNav } from './components/navigation/MobileNav';
 import { OnboardingBanner } from './components/navigation/OnboardingBanner';
 import { SubViewBackBanner } from './components/navigation/SubViewBackBanner';
 import { NotificationToast } from './components/navigation/NotificationToast';
-import { useStyxApp } from './hooks/useStyxApp';
+import { useSyndaeApp } from './hooks/useSyndaeApp';
 
 export const App: React.FC = () => {
   const {
@@ -61,7 +61,7 @@ export const App: React.FC = () => {
     refreshModelData,
     refreshToolsData,
     refreshAuditData,
-  } = useStyxApp();
+  } = useSyndaeApp();
 
   if (authChecking) {
     return (
@@ -90,7 +90,7 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className="h-screen w-screen w-full max-w-full overflow-hidden bg-styx-950 text-slate-100 flex flex-col font-sans select-none"
+      className="h-screen w-screen w-full max-w-full overflow-hidden bg-syndae-950 text-slate-100 flex flex-col font-sans select-none"
       style={{ height: 'var(--app-height, 100svh)', maxHeight: 'var(--app-height, 100svh)' }}
     >
       {/* 1. Optional Hardware Vitals Strip */}
@@ -150,7 +150,7 @@ export const App: React.FC = () => {
       />
 
       {/* 2. Main Content Area */}
-      <main className="flex-1 min-h-0 relative overflow-hidden bg-styx-950 flex flex-col">
+      <main className="flex-1 min-h-0 relative overflow-hidden bg-syndae-950 flex flex-col">
         {activeTab === 'chat' && (
           <ChatView
             sessions={sessions}

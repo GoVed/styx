@@ -20,7 +20,7 @@ pub struct ChannelPolicyRecord {
 pub struct ChannelDefaultsRecord {
     pub default_group_policy: String,  // default "mentions"
     pub default_direct_policy: String, // default "all"
-    pub mention_keywords: String,      // default "styx,assistant,ai,bot"
+    pub mention_keywords: String,      // default "syndae,assistant,ai,bot"
 }
 
 impl Database {
@@ -149,7 +149,7 @@ impl Database {
         let mention_keywords = self
             .get_setting("tool_mention_keywords")
             .await?
-            .unwrap_or_else(|| "styx,assistant,ai,bot".to_string());
+            .unwrap_or_else(|| "syndae,assistant,ai,bot".to_string());
         Ok(ChannelDefaultsRecord {
             default_group_policy,
             default_direct_policy,
@@ -184,7 +184,7 @@ impl Database {
         let defaults = self.get_channel_defaults().await.unwrap_or(ChannelDefaultsRecord {
             default_group_policy: "mentions".into(),
             default_direct_policy: "all".into(),
-            mention_keywords: "styx,assistant,ai,bot".into(),
+            mention_keywords: "syndae,assistant,ai,bot".into(),
         });
 
         let policy_record = self.get_channel_policy(channel_id).await?;
@@ -217,7 +217,7 @@ impl Database {
                 let text_lower = text.to_lowercase();
                 let reply_lower = reply_info.to_lowercase();
 
-                let mut keywords: Vec<String> = vec!["styx".to_string(), "bot".to_string(), "assistant".to_string()];
+                let mut keywords: Vec<String> = vec!["syndae".to_string(), "bot".to_string(), "assistant".to_string()];
                 if !operator_name.is_empty() {
                     keywords.push(operator_name.to_lowercase());
                 }
@@ -239,7 +239,7 @@ impl Database {
                 });
 
                 let is_reply_to_me = !reply_lower.is_empty()
-                    && (reply_lower.contains("styx")
+                    && (reply_lower.contains("syndae")
                         || (!operator_name.is_empty() && reply_lower.contains(&operator_name.to_lowercase())));
 
                 if has_keyword || is_reply_to_me {

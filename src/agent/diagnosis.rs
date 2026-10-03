@@ -71,11 +71,11 @@ pub async fn diagnose_inference_failure(
     if is_docker
         && let Ok(containers) = docker.list_containers(true).await {
             let target = containers.into_iter().find(|c| {
-                c.is_styx_managed
+                c.is_syndae_managed
                     || c.model_id.as_deref() == Some(&model_cfg.model_id)
                     || c.names
                         .iter()
-                        .any(|n| n.contains("styx") || n.contains("vllm") || n.contains("qwen"))
+                        .any(|n| n.contains("syndae") || n.contains("vllm") || n.contains("qwen"))
                     || c.ports
                         .iter()
                         .any(|p| p.contains("8000") || p.contains("8080") || p.contains("11434"))

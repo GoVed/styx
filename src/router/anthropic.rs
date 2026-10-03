@@ -95,6 +95,7 @@ impl AnthropicClient {
         tools: Vec<ToolParam>,
         tx: mpsc::Sender<StreamChunk>,
         max_tokens: Option<u32>,
+        tool_choice: Option<String>,
     ) -> Result<()> {
         let url = "https://api.anthropic.com/v1/messages";
 
@@ -183,6 +184,12 @@ impl AnthropicClient {
                 })
                 .collect();
             body["tools"] = json!(tools_json);
+
+            if let Some(ref tc) = tool_choice {
+                if tc == "required" {
+                    body["tool_choice"] = json!({ "type": "any" });
+                }
+            }
         }
 
         let resp = self

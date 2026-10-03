@@ -6,7 +6,7 @@ import {
   AuthStatus,
 } from '../types';
 import { useAuxiliaryData } from './useAuxiliaryData';
-import { useStyxWebSocket } from './useStyxWebSocket';
+import { useSyndaeWebSocket } from './useSyndaeWebSocket';
 import { useChatState } from './useChatState';
 import {
   NotificationPayload,
@@ -14,7 +14,7 @@ import {
   sendBrowserNotification,
 } from '../utils/notifications';
 
-export const useStyxApp = () => {
+export const useSyndaeApp = () => {
   // Authentication & Device Security
   const [authStatus, setAuthStatus] = useState<AuthStatus | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -60,7 +60,7 @@ export const useStyxApp = () => {
 
   const [activeNotification, setActiveNotification] = useState<NotificationPayload | null>(null);
 
-  const { connectWebSocket, closeWebSocket } = useStyxWebSocket({
+  const { connectWebSocket, closeWebSocket } = useSyndaeWebSocket({
     onTelemetry: setTelemetry,
     onConnected: payload => {
       if (payload?.pending_tickets) {
@@ -118,7 +118,7 @@ export const useStyxApp = () => {
       if (!data.initialized) {
         setIsAuthenticated(false);
       } else {
-        const storedKey = localStorage.getItem('styx_access_key');
+        const storedKey = localStorage.getItem('syndae_access_key');
         if (!storedKey) {
           setIsAuthenticated(false);
         } else {
@@ -129,7 +129,7 @@ export const useStyxApp = () => {
             connectWebSocket();
           } else {
             setIsAuthenticated(false);
-            localStorage.removeItem('styx_access_key');
+            localStorage.removeItem('syndae_access_key');
           }
         }
       }
@@ -161,7 +161,7 @@ export const useStyxApp = () => {
       if (data.success && data.session_id) {
         const onboardingSession: ChatSession = {
           id: data.session_id,
-          title: 'Welcome to Styx',
+          title: 'Welcome to Syndae',
           mode: 'chat',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
@@ -199,7 +199,7 @@ export const useStyxApp = () => {
   };
 
   const handleAuthenticated = (token: string, newStatus: AuthStatus) => {
-    localStorage.setItem('styx_access_key', token);
+    localStorage.setItem('syndae_access_key', token);
     setAuthStatus(newStatus);
     setIsAuthenticated(true);
     fetchInitialData();
@@ -213,7 +213,7 @@ export const useStyxApp = () => {
   };
 
   const handleLock = () => {
-    localStorage.removeItem('styx_access_key');
+    localStorage.removeItem('syndae_access_key');
     setIsAuthenticated(false);
     closeWebSocket();
   };

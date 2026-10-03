@@ -1,15 +1,15 @@
-# STYX // Agent Harness, Model Manager & Mission Control Dashboard
+# SYNDAE // Agent Harness, Model Manager & Mission Control Dashboard
 
-**Styx** is a zero-overhead personal AI operating system and runtime written in Rust, designed to run natively inside a Linux VM or container host.
+**Syndae** is a zero-overhead personal AI operating system and runtime written in Rust, designed to run natively inside a Linux VM or container host.
 
 ```
 ========================================================================
-   ███████╗████████╗██╗   ██╗██╗  ██╗
-   ██╔════╝╚══██╔══╝╚██╗ ██╔╝╚██╗██╔╝
-   ███████╗   ██║    ╚████╔╝  ╚███╔╝ 
-   ╚════██║   ██║     ╚██╔╝   ██╔██╗ 
-   ███████║   ██║      ██║   ██╔╝ ██╗
-   ╚══════╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝
+   ███████╗██╗   ██╗███╗   ██╗██████╗   █████╗ ███████╗
+   ██╔════╝╚██╗ ██╔╝████╗  ██║██╔══██╗ ██╔══██╗██╔════╝
+   ███████╗ ╚████╔╝ ██╔██╗ ██║██║  ██║ ███████║█████╗  
+   ╚════██║  ╚██╔╝  ██║╚██╗██║██║  ██║ ██╔══██║██╔══╝  
+   ███████║   ██║   ██║ ╚████║██████╔╝ ██║  ██║███████╗
+   ╚══════╝   ╚═╝   ╚═╝  ╚═══╝╚═════╝  ╚═╝  ╚═╝╚══════╝
    AGENT HARNESS, MODEL MANAGER & MISSION CONTROL DASHBOARD
 ========================================================================
 ```
@@ -18,16 +18,16 @@
 
 ## Architectural Overview
 
-Styx unifies personal agent orchestration, local Dockerized inference engines, dynamic Model Context Protocol (MCP) micro-daemons, and human-in-the-loop governance into a single, cohesive binary.
+Syndae unifies personal agent orchestration, local Dockerized inference engines, dynamic Model Context Protocol (MCP) micro-daemons, and human-in-the-loop governance into a single, cohesive binary.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                   STYX MISSION CONTROL DASHBOARD                       │
+│                   SYNDAE MISSION CONTROL DASHBOARD                       │
 │  [Telemetry Strip] [Chat & Missions] [Memory Hub] [Models] [Tool Bus]   │
 └────────────────────────────────────▲───────────────────────────────────┘
                                      │ (HTTP REST + Bi-directional WebSockets)
 ┌────────────────────────────────────▼───────────────────────────────────┐
-│                           STYX BACKEND (RUST)                          │
+│                           SYNDAE BACKEND (RUST)                          │
 │                                                                        │
 │  ┌───────────────────────┐             ┌─────────────────────────────┐ │
 │  │   Multi-Model Router  │             │   Deterministic HITL Gate   │ │
@@ -132,8 +132,8 @@ Directly deploy and configure local LLM inference engines inside Docker from the
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-org/styx.git
-   cd styx
+   git clone https://github.com/your-org/syndae.git
+   cd syndae
    ```
 
 2. **Build the Frontend UI:**
@@ -144,7 +144,7 @@ Directly deploy and configure local LLM inference engines inside Docker from the
    cd ..
    ```
 
-3. **Run the Styx Runtime:**
+3. **Run the Syndae Runtime:**
    ```bash
    cargo run
    ```
@@ -159,7 +159,7 @@ Directly deploy and configure local LLM inference engines inside Docker from the
 
 ### Docker & Docker Compose Deployment
 
-To deploy Styx inside Docker with host Docker socket passthrough:
+To deploy Syndae inside Docker with host Docker socket passthrough:
 
 ```bash
 docker compose up -d --build
@@ -171,7 +171,7 @@ Then navigate to `http://localhost:3000`.
 
 ## Reference Tool Daemon (`examples/reference_mcp_daemon.py`)
 
-Styx includes a standalone Python reference daemon demonstrating the Model Context Protocol:
+Syndae includes a standalone Python reference daemon demonstrating the Model Context Protocol:
 
 ```bash
 # Test the reference daemon directly over stdio
@@ -226,7 +226,7 @@ The reference daemon exposes:
 ## Directory Structure
 
 ```
-styx/
+syndae/
 ├── Cargo.toml
 ├── Cargo.lock
 ├── Dockerfile

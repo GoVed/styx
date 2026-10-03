@@ -220,10 +220,10 @@ impl AgentRunner {
             let mut model_name = "QuantTrio/Qwen3.5-9B-AWQ".to_string();
             if let Ok(containers) = self.docker.list_containers(true).await
                 && let Some(c) = containers.into_iter().find(|c| {
-                    c.is_styx_managed
+                    c.is_syndae_managed
                         || c.names
                             .iter()
-                            .any(|n| n.contains("styx") || n.contains("vllm") || n.contains("qwen"))
+                            .any(|n| n.contains("syndae") || n.contains("vllm") || n.contains("qwen"))
                 }) {
                     is_running = c.state == "running";
                     c_status = c.status.clone();
@@ -272,10 +272,10 @@ impl AgentRunner {
             let mut restarted = false;
             if let Ok(containers) = self.docker.list_containers(true).await
                 && let Some(c) = containers.into_iter().find(|c| {
-                    c.is_styx_managed
+                    c.is_syndae_managed
                         || c.names
                             .iter()
-                            .any(|n| n.contains("styx") || n.contains("vllm") || n.contains("qwen"))
+                            .any(|n| n.contains("syndae") || n.contains("vllm") || n.contains("qwen"))
                 }) {
                     let _ = event_tx
                         .send(AgentEvent::Token {

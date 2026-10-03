@@ -70,7 +70,7 @@ pub fn get_builtin_tools() -> Vec<McpTool> {
         },
         McpTool {
             name: "exec_container_command".to_string(),
-            description: "Execute a bash shell command or script inside the isolated Styx container sandbox. Requires operator approval before execution.".to_string(),
+            description: "Execute a bash shell command or script inside the isolated Syndae container sandbox. Requires operator approval before execution.".to_string(),
             input_schema: json!({
                 "type": "object",
                 "properties": {
@@ -102,7 +102,7 @@ pub fn get_builtin_tools() -> Vec<McpTool> {
         },
         McpTool {
             name: "complete_onboarding".to_string(),
-            description: "Mark user enrollment and initial onboarding setup as completed in Styx. Call this tool once you have greeted the user, learned their initial preferences, and saved their profile.".to_string(),
+            description: "Mark user enrollment and initial onboarding setup as completed in Syndae. Call this tool once you have greeted the user, learned their initial preferences, and saved their profile.".to_string(),
             input_schema: json!({
                 "type": "object",
                 "properties": {

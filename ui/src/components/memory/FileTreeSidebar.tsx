@@ -73,8 +73,8 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
   });
 
   return (
-    <aside className={`border-r border-styx-800 bg-styx-900 flex flex-col flex-shrink-0 font-mono h-full overflow-hidden select-none ${className || 'w-full md:w-72'}`}>
-      <div className="p-3 border-b border-styx-800 flex items-center justify-between flex-shrink-0">
+    <aside className={`border-r border-syndae-800 bg-syndae-900 flex flex-col flex-shrink-0 font-mono h-full overflow-hidden select-none ${className || 'w-full md:w-72'}`}>
+      <div className="p-3 border-b border-syndae-800 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center space-x-2">
           <Layers className="w-4 h-4 text-emerald-400" />
           <span className="font-bold text-slate-200">MEMORY HUB</span>
@@ -84,7 +84,7 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
             <button
               type="button"
               onClick={onViewEditor}
-              className="md:hidden px-2.5 py-1 rounded bg-styx-800 hover:bg-styx-750 text-cyan-400 border border-styx-700 text-xs font-semibold flex items-center space-x-1 active:scale-95 transition-all"
+              className="md:hidden px-2.5 py-1 rounded bg-syndae-800 hover:bg-syndae-750 text-cyan-400 border border-syndae-700 text-xs font-semibold flex items-center space-x-1 active:scale-95 transition-all"
               title="Switch to file editor"
             >
               <span>Editor</span>
@@ -94,7 +94,7 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
           <button
             type="button"
             onClick={onOpenNewModal}
-            className="px-2.5 py-1 rounded bg-styx-800 hover:bg-styx-700 text-emerald-400 border border-styx-700 text-xs flex items-center space-x-1 font-semibold active:scale-95 transition-all"
+            className="px-2.5 py-1 rounded bg-syndae-800 hover:bg-syndae-700 text-emerald-400 border border-syndae-700 text-xs flex items-center space-x-1 font-semibold active:scale-95 transition-all"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New File</span>
@@ -121,8 +121,8 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
                     onClick={() => onSelectPath(f.path)}
                     className={`group flex items-center justify-between p-2 sm:p-1.5 rounded cursor-pointer transition-colors active:scale-[0.99] ${
                       selectedPath === f.path
-                        ? `bg-styx-800 ${meta.activeBorder} font-semibold border`
-                        : 'text-slate-400 hover:bg-styx-850 hover:text-slate-200'
+                        ? `bg-syndae-800 ${meta.activeBorder} font-semibold border`
+                        : 'text-slate-400 hover:bg-syndae-850 hover:text-slate-200'
                     }`}
                   >
                     <div className="flex items-center space-x-2 truncate">
@@ -155,21 +155,21 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
       </div>
 
       {/* Tantivy Fast Search Box */}
-      <div className="p-3 border-t border-styx-800 bg-styx-950/80">
+      <div className="p-3 border-t border-syndae-800 bg-syndae-950/80">
         <form onSubmit={onSearch} className="relative">
           <input
             type="text"
             placeholder="Tantivy BM25 search..."
             value={searchQuery}
             onChange={e => onChangeSearchQuery(e.target.value)}
-            className="w-full bg-styx-900 border border-styx-700 rounded pl-7 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+            className="w-full bg-syndae-900 border border-syndae-700 rounded pl-7 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
           />
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2 top-2.5" />
         </form>
 
         {/* Search Result Snippets */}
         {searchResults.length > 0 && (
-          <div className="mt-2 max-h-48 overflow-y-auto space-y-1 bg-styx-900 p-1.5 rounded border border-styx-800">
+          <div className="mt-2 max-h-48 overflow-y-auto space-y-1 bg-syndae-900 p-1.5 rounded border border-syndae-800">
             <div className="text-[10px] text-emerald-400 font-bold mb-1">
               {searchResults.length} Match(es) found:
             </div>
@@ -177,7 +177,7 @@ export const FileTreeSidebar: React.FC<FileTreeSidebarProps> = ({
               <div
                 key={i}
                 onClick={() => onSelectPath(r.path)}
-                className="p-1.5 rounded bg-styx-950 hover:bg-styx-850 cursor-pointer border border-styx-800"
+                className="p-1.5 rounded bg-syndae-950 hover:bg-syndae-850 cursor-pointer border border-syndae-800"
               >
                 <div className="font-bold text-slate-200 truncate">{r.title || r.path}</div>
                 <div className="text-[10px] text-slate-400 truncate">{r.snippet}</div>

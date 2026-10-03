@@ -57,7 +57,7 @@ export const AccessGate: React.FC<AccessGateProps> = ({ status, onAuthenticated 
           return;
         }
 
-        localStorage.setItem('styx_access_key', key);
+        localStorage.setItem('syndae_access_key', key);
         onAuthenticated(key, {
           initialized: true,
           onboarded: false,
@@ -86,7 +86,7 @@ export const AccessGate: React.FC<AccessGateProps> = ({ status, onAuthenticated 
           return;
         }
 
-        localStorage.setItem('styx_access_key', key);
+        localStorage.setItem('syndae_access_key', key);
         onAuthenticated(key, {
           initialized: true,
           onboarded: data.onboarded,

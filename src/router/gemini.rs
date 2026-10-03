@@ -80,6 +80,7 @@ impl GeminiClient {
         tools: Vec<ToolParam>,
         tx: mpsc::Sender<StreamChunk>,
         max_tokens: Option<u32>,
+        tool_choice: Option<String>,
     ) -> Result<()> {
         let url = format!(
             "https://generativelanguage.googleapis.com/v1beta/models/{}:streamGenerateContent?key={}&alt=sse",
@@ -159,6 +160,14 @@ impl GeminiClient {
             body["tools"] = json!([{
                 "functionDeclarations": func_decls
             }]);
+
+            if let Some(ref tc) = tool_choice {
+                if tc == "required" {
+                    body["toolConfig"] = json!({
+                        "functionCallingConfig": { "mode": "ANY" }
+                    });
+                }
+            }
         }
 
         let resp = self

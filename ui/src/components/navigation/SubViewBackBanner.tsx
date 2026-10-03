@@ -11,11 +11,11 @@ export const SubViewBackBanner: React.FC<SubViewBackBannerProps> = ({
   onBackToSettings,
 }) => {
   return (
-    <div className="flex-shrink-0 bg-styx-900/95 border-b border-styx-800 px-3 sm:px-4 py-1.5 flex items-center justify-between text-xs font-mono select-none">
+    <div className="flex-shrink-0 bg-syndae-900/95 border-b border-syndae-800 px-3 sm:px-4 py-1.5 flex items-center justify-between text-xs font-mono select-none">
       <button
         type="button"
         onClick={onBackToSettings}
-        className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-styx-800 hover:bg-styx-750 text-emerald-400 hover:text-emerald-300 font-semibold transition-colors border border-styx-700/60 active:scale-95"
+        className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-syndae-800 hover:bg-syndae-750 text-emerald-400 hover:text-emerald-300 font-semibold transition-colors border border-syndae-700/60 active:scale-95"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
         <span className="sm:hidden">Settings</span>

@@ -46,7 +46,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-zinc-100 uppercase tracking-wider font-sans">
-                    Welcome to Styx
+                    Welcome to Syndae
                   </h2>
                   <p className="text-[11px] text-emerald-400 font-mono">
                     Getting Started Guide
@@ -55,7 +55,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
               </div>
 
               <p className="text-xs text-zinc-300 font-sans leading-relaxed mb-5">
-                Styx is your 100% private, on-device AI companion. It runs directly on this machine with no cloud accounts, tracking, or external subscriptions.
+                Syndae is your 100% private, on-device AI companion. It runs directly on this machine with no cloud accounts, tracking, or external subscriptions.
               </p>
 
               {/* 3 Step Walkthrough */}
@@ -67,7 +67,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                   <div>
                     <h3 className="font-semibold text-zinc-200 text-xs">Set Your Name</h3>
                     <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">
-                      Tell Styx who it's assisting so your interactions feel natural and personal.
+                      Tell Syndae who it's assisting so your interactions feel natural and personal.
                     </p>
                   </div>
                 </div>
@@ -79,7 +79,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                   <div>
                     <h3 className="font-semibold text-zinc-200 text-xs">Create Private Passcode</h3>
                     <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">
-                      Choose a PIN or key (4+ characters) to lock your assistant. Since Styx is local, this protects your data on this machine.
+                      Choose a PIN or key (4+ characters) to lock your assistant. Since Syndae is local, this protects your data on this machine.
                     </p>
                   </div>
                 </div>
@@ -91,7 +91,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                   <div>
                     <h3 className="font-semibold text-zinc-200 text-xs">Interactive Onboarding</h3>
                     <p className="text-[11px] text-zinc-400 leading-snug mt-0.5">
-                      When you click launch, Styx greets you with friendly choices to personalize your tasks, habits, and tone.
+                      When you click launch, Syndae greets you with friendly choices to personalize your tasks, habits, and tone.
                     </p>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                 </div>
 
                 <h1 className="mt-2 text-xl font-bold tracking-tight text-zinc-100 uppercase">
-                  Styx Personal AI
+                  Syndae Personal AI
                 </h1>
 
                 <p className="mt-1 text-xs text-zinc-400">
@@ -169,7 +169,7 @@ export const FirstBootScreen: React.FC<FirstBootScreenProps> = ({
                       type="text"
                       value={operatorName}
                       onChange={(e) => setOperatorName(e.target.value)}
-                      placeholder="What should Styx call you?"
+                      placeholder="What should Syndae call you?"
                       className="w-full rounded-lg border border-zinc-800 bg-zinc-950/60 py-2.5 pl-9 pr-3 text-sm text-zinc-100 placeholder-zinc-600 transition-colors focus:border-emerald-500/50 focus:outline-none focus:ring-1 focus:ring-emerald-500/50"
                     />
                   </div>

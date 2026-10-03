@@ -68,7 +68,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
 
     setLoading(true);
     try {
-      const activeToken = localStorage.getItem('styx_access_key') || current;
+      const activeToken = localStorage.getItem('syndae_access_key') || current;
       const res = await fetch('/api/auth/password', {
         method: 'POST',
         headers: {
@@ -87,7 +87,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
       }
 
       const newToken = data.token || next;
-      localStorage.setItem('styx_access_key', newToken);
+      localStorage.setItem('syndae_access_key', newToken);
       setSuccess('Master password successfully updated! Your active enclave session has been renewed.');
       setCurrentPassword('');
       setNewPassword('');
@@ -109,7 +109,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="inline-flex items-center space-x-2 text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors py-1.5 px-2.5 rounded-lg hover:bg-styx-900 border border-transparent hover:border-styx-800"
+          className="inline-flex items-center space-x-2 text-xs font-mono text-slate-400 hover:text-slate-200 transition-colors py-1.5 px-2.5 rounded-lg hover:bg-syndae-900 border border-transparent hover:border-syndae-800"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Settings Menu</span>
@@ -117,7 +117,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
       </div>
 
       {/* Hero Security Card */}
-      <div className="rounded-2xl bg-gradient-to-br from-styx-900 to-styx-850 border border-styx-800 p-5 shadow-lg">
+      <div className="rounded-2xl bg-gradient-to-br from-syndae-900 to-syndae-850 border border-syndae-800 p-5 shadow-lg">
         <div className="flex items-start space-x-4">
           <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 flex-shrink-0 shadow-inner">
             <KeyRound className="w-6 h-6" />
@@ -132,7 +132,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-              This master key unlocks Styx on your machine and authorizes access to your tools, memory, and chat sessions.
+              This master key unlocks Syndae on your machine and authorizes access to your tools, memory, and chat sessions.
               Updating it will store a new Argon2id password hash on your device and renew your active browser session.
             </p>
           </div>
@@ -171,7 +171,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
       )}
 
       {/* Password Change Form Card */}
-      <div className="rounded-2xl bg-styx-900/90 border border-styx-800 p-5 sm:p-6 shadow-md">
+      <div className="rounded-2xl bg-syndae-900/90 border border-syndae-800 p-5 sm:p-6 shadow-md">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Current Master Password */}
           <div>
@@ -186,7 +186,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
                 placeholder="Enter current master password"
                 required
                 disabled={loading}
-                className="w-full bg-styx-950 border border-styx-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
+                className="w-full bg-syndae-950 border border-syndae-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
               />
               <button
                 type="button"
@@ -199,7 +199,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
             </div>
           </div>
 
-          <div className="pt-1 border-t border-styx-800/60" />
+          <div className="pt-1 border-t border-syndae-800/60" />
 
           {/* New Master Password */}
           <div>
@@ -214,7 +214,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
                 placeholder="Enter new password (min. 8 characters)"
                 required
                 disabled={loading}
-                className="w-full bg-styx-950 border border-styx-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
+                className="w-full bg-syndae-950 border border-syndae-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
               />
               <button
                 type="button"
@@ -266,7 +266,7 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
                 placeholder="Re-enter new password"
                 required
                 disabled={loading}
-                className="w-full bg-styx-950 border border-styx-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
+                className="w-full bg-syndae-950 border border-syndae-800 focus:border-amber-500 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all font-mono pr-10"
               />
               <button
                 type="button"
@@ -295,14 +295,14 @@ export const ChangePasswordView: React.FC<ChangePasswordViewProps> = ({
               type="button"
               onClick={onBack}
               disabled={loading}
-              className="px-4 py-2.5 rounded-xl bg-styx-800 hover:bg-styx-700 text-slate-300 hover:text-white text-xs font-medium border border-styx-700 transition-all"
+              className="px-4 py-2.5 rounded-xl bg-syndae-800 hover:bg-syndae-700 text-slate-300 hover:text-white text-xs font-medium border border-syndae-700 transition-all"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!canSubmit}
-              className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:bg-styx-800 disabled:text-slate-500 disabled:border-styx-700 text-white font-medium text-xs flex items-center space-x-2 shadow-sm transition-all active:scale-95 disabled:active:scale-100"
+              className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 disabled:bg-syndae-800 disabled:text-slate-500 disabled:border-syndae-700 text-white font-medium text-xs flex items-center space-x-2 shadow-sm transition-all active:scale-95 disabled:active:scale-100"
             >
               {loading ? (
                 <>

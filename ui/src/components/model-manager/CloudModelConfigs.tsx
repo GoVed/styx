@@ -40,7 +40,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
   onSaveExternalConfig,
 }) => {
   return (
-    <div className="max-w-2xl bg-styx-900 border border-styx-800 rounded-lg p-4 font-mono space-y-3">
+    <div className="max-w-2xl bg-syndae-900 border border-syndae-800 rounded-lg p-4 font-mono space-y-3">
       <div className="text-xs font-bold text-slate-200 flex items-center space-x-1.5">
         <Layers className="w-3.5 h-3.5 text-cyan-400" />
         <span>CONNECT EXTERNAL OR CLOUD MODEL PROVIDER</span>
@@ -53,7 +53,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
             type="text"
             value={extName}
             onChange={e => onChangeName(e.target.value)}
-            className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+            className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
           />
         </div>
         <div>
@@ -61,7 +61,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
           <select
             value={extProvider}
             onChange={e => onChangeProvider(e.target.value)}
-            className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+            className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
           >
             <option value="anthropic">Anthropic (Claude)</option>
             <option value="gemini">Google Gemini</option>
@@ -79,7 +79,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
           value={extBaseUrl}
           onChange={e => onChangeBaseUrl(e.target.value)}
           placeholder="e.g. http://localhost:8000/v1 or https://api.anthropic.com/v1"
-          className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+          className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
         />
       </div>
 
@@ -90,7 +90,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
           value={extApiKey}
           onChange={e => onChangeApiKey(e.target.value)}
           placeholder="sk-ant-... or sk-..."
-          className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+          className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
         />
       </div>
 
@@ -102,7 +102,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
             value={extModelId}
             onChange={e => onChangeModelId(e.target.value)}
             placeholder="claude-3-7-sonnet-20250219"
-            className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+            className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
           />
         </div>
         <div>
@@ -111,7 +111,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
             type="number"
             value={extContextLength}
             onChange={e => onChangeContextLength(parseInt(e.target.value) || 4096)}
-            className="w-full bg-styx-950 border border-styx-700 rounded p-1.5 text-slate-200 mt-1"
+            className="w-full bg-syndae-950 border border-syndae-700 rounded p-1.5 text-slate-200 mt-1"
           />
         </div>
       </div>
@@ -144,7 +144,7 @@ export const CloudModelConfigs: React.FC<CloudModelConfigsProps> = ({
           type="button"
           onClick={onTestConnection}
           disabled={isTesting}
-          className="px-3 py-1.5 rounded bg-styx-800 hover:bg-styx-700 text-cyan-300 border border-styx-600 font-semibold"
+          className="px-3 py-1.5 rounded bg-syndae-800 hover:bg-syndae-700 text-cyan-300 border border-syndae-600 font-semibold"
         >
           {isTesting ? 'Testing Handshake...' : 'Test Connection'}
         </button>

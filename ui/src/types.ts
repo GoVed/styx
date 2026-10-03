@@ -98,7 +98,7 @@ export interface ContainerSummaryInfo {
   status: string;
   state: string;
   ports: string[];
-  is_styx_managed: boolean;
+  is_syndae_managed: boolean;
   created: number;
   model_id?: string | null;
 }

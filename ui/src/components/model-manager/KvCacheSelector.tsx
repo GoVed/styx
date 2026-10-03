@@ -41,7 +41,7 @@ export const KvCacheSelector: React.FC<KvCacheSelectorProps> = ({
   const currentKv = availableKvLevels[kvSliderIndex] || availableKvLevels[3];
 
   return (
-    <div className="space-y-1.5 pt-1 border-t border-styx-800">
+    <div className="space-y-1.5 pt-1 border-t border-syndae-800">
       <div className="flex items-center justify-between">
         <label className="text-[11px] text-slate-400">
           KV Cache Quantization ({selectedEngine === 'vllm' ? 'vLLM' : 'llama.cpp'}):
@@ -70,7 +70,7 @@ export const KvCacheSelector: React.FC<KvCacheSelectorProps> = ({
             onChangeKvCacheDtype(availableKvLevels[idx].id);
           }
         }}
-        className="w-full h-2 bg-styx-850 rounded appearance-none cursor-pointer accent-amber-500"
+        className="w-full h-2 bg-syndae-850 rounded appearance-none cursor-pointer accent-amber-500"
       />
 
       {/* Quick Snap Pills */}
@@ -83,7 +83,7 @@ export const KvCacheSelector: React.FC<KvCacheSelectorProps> = ({
             className={`px-2 py-0.5 rounded text-xs border ${
               kvSliderIndex === idx
                 ? 'bg-amber-950 border-amber-500 text-amber-200 font-bold'
-                : 'bg-styx-950 border-styx-800 text-slate-400'
+                : 'bg-syndae-950 border-syndae-800 text-slate-400'
             }`}
           >
             {kv.label}
@@ -95,7 +95,7 @@ export const KvCacheSelector: React.FC<KvCacheSelectorProps> = ({
           className={`px-2 py-0.5 rounded text-xs border ${
             kvCacheDtype === 'bf16'
               ? 'bg-amber-950 border-amber-500 text-amber-200 font-bold'
-              : 'bg-styx-950 border-styx-800 text-slate-400'
+              : 'bg-syndae-950 border-syndae-800 text-slate-400'
           }`}
         >
           BF16

@@ -27,7 +27,7 @@ const mockChannels = [
 const mockDefaults = {
   default_group_policy: 'mentions',
   default_direct_policy: 'all',
-  mention_keywords: 'styx,assistant,ai,bot',
+  mention_keywords: 'syndae,assistant,ai,bot',
 };
 
 describe('ChannelTriggerMatrix Component', () => {
@@ -136,8 +136,8 @@ describe('ChannelTriggerMatrix Component', () => {
       expect(screen.getByText('Engineering Team Group')).toBeDefined();
     });
 
-    const input = screen.getByPlaceholderText('styx, assistant, ai, bot') as HTMLInputElement;
-    fireEvent.change(input, { target: { value: 'styx, assistant, operator' } });
+    const input = screen.getByPlaceholderText('syndae, assistant, ai, bot') as HTMLInputElement;
+    fireEvent.change(input, { target: { value: 'syndae, assistant, operator' } });
 
     const saveBtn = screen.getByRole('button', { name: 'Save' });
     fireEvent.click(saveBtn);
@@ -147,7 +147,7 @@ describe('ChannelTriggerMatrix Component', () => {
         '/api/tools/channels/defaults',
         expect.objectContaining({
           method: 'POST',
-          body: expect.stringContaining('"mention_keywords":"styx, assistant, operator"'),
+          body: expect.stringContaining('"mention_keywords":"syndae, assistant, operator"'),
         })
       );
     });

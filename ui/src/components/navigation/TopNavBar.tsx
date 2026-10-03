@@ -41,7 +41,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
     }
   };
   return (
-    <nav className="flex-shrink-0 bg-styx-900 border-b border-styx-800 px-3 sm:px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex items-center justify-between text-xs font-mono z-30">
+    <nav className="flex-shrink-0 bg-syndae-900 border-b border-syndae-800 px-3 sm:px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] flex items-center justify-between text-xs font-mono z-30">
       <div className="flex items-center space-x-2.5 sm:space-x-3">
         <div
           onClick={() => onSelectTab('chat')}
@@ -50,7 +50,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         >
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
           <span className="font-bold tracking-wider text-sm sm:text-base text-slate-100 font-sans group-hover:text-emerald-400 transition-colors">
-            STYX
+            SYNDAE
           </span>
           <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/40">
             AI
@@ -62,7 +62,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           type="button"
           onClick={() => onSelectTab('models')}
           title="Click to view AI engine settings"
-          className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-styx-800/80 hover:bg-styx-750 border border-styx-700/60 text-slate-300 hover:text-emerald-300 transition-colors text-[11px]"
+          className="hidden sm:flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-syndae-800/80 hover:bg-syndae-750 border border-syndae-700/60 text-slate-300 hover:text-emerald-300 transition-colors text-[11px]"
         >
           <Cpu className="w-3 h-3 text-emerald-400 flex-shrink-0" />
           <span className="truncate max-w-[130px] md:max-w-[200px] font-mono">
@@ -72,14 +72,14 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
       </div>
 
       {/* Center Desktop Navigation Tabs */}
-      <div className="hidden md:flex items-center space-x-1 bg-styx-950/60 p-1 rounded-lg border border-styx-800/80">
+      <div className="hidden md:flex items-center space-x-1 bg-syndae-950/60 p-1 rounded-lg border border-syndae-800/80">
         <button
           type="button"
           onClick={() => onSelectTab('chat')}
           className={`px-3.5 py-1.5 rounded-md flex items-center space-x-2 font-medium transition-all ${
             activeTab === 'chat'
-              ? 'bg-styx-800 text-emerald-300 shadow-sm border border-emerald-500/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-styx-900/60'
+              ? 'bg-syndae-800 text-emerald-300 shadow-sm border border-emerald-500/30'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-syndae-900/60'
           }`}
         >
           <MessageSquare className="w-3.5 h-3.5" />
@@ -96,8 +96,8 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
           onClick={() => onSelectTab('settings')}
           className={`px-3.5 py-1.5 rounded-md flex items-center space-x-2 font-medium transition-all ${
             activeTab === 'settings' || activeTab === 'models' || activeTab === 'memory' || activeTab === 'tools'
-              ? 'bg-styx-800 text-emerald-300 shadow-sm border border-emerald-500/30'
-              : 'text-slate-400 hover:text-slate-200 hover:bg-styx-900/60'
+              ? 'bg-syndae-800 text-emerald-300 shadow-sm border border-emerald-500/30'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-syndae-900/60'
           }`}
         >
           <Settings className="w-3.5 h-3.5" />
@@ -154,7 +154,7 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         <button
           type="button"
           onClick={onLock}
-          title="Lock Styx device"
+          title="Lock Syndae device"
           className="flex items-center gap-1 px-2.5 py-1 rounded bg-zinc-800/60 hover:bg-amber-950/40 border border-zinc-700/50 hover:border-amber-500/40 text-zinc-400 hover:text-amber-300 transition-colors"
         >
           <Lock className="w-3 h-3" />

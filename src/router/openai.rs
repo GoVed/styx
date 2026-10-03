@@ -30,7 +30,7 @@ impl OpenAiClient {
         let mut clean_base = base_url.trim_end_matches('/').to_string();
 
         // If running inside Docker, adapt localhost / 127.0.0.1 to host.docker.internal
-        // so containerized Styx can reach host-published ports and sibling model containers
+        // so containerized Syndae can reach host-published ports and sibling model containers
         if std::path::Path::new("/.dockerenv").exists() {
             if clean_base.starts_with("http://localhost:") {
                 clean_base = clean_base.replace("http://localhost:", "http://host.docker.internal:");
@@ -122,12 +122,21 @@ impl OpenAiClient {
         }
     }
 
+    async fn post_json(&self, url: &str, body: &Value) -> reqwest::Result<reqwest::Response> {
+        let mut req = self.client.post(url).json(body);
+        if !self.api_key.is_empty() {
+            req = req.bearer_auth(&self.api_key);
+        }
+        req.send().await
+    }
+
     pub async fn stream_chat(
         &self,
         messages: Vec<ChatMessageParam>,
         tools: Vec<ToolParam>,
         tx: mpsc::Sender<super::StreamChunk>,
         max_tokens: Option<u32>,
+        tool_choice: Option<String>,
     ) -> Result<()> {
         let chat_url = format!("{}/chat/completions", self.base_url);
         let prepared_messages = super::vision::prepare_openai_messages(&messages).await;
@@ -146,6 +155,9 @@ impl OpenAiClient {
         }
 
         if let Some(ref re) = self.reasoning_effort {
+            if re == "off" || re == "low" {
+                body["chat_template_kwargs"] = json!({"enable_thinking": false});
+            }
             if re != "off" {
                 body["reasoning_effort"] = json!(re);
             }
@@ -166,14 +178,13 @@ impl OpenAiClient {
                 })
                 .collect();
             body["tools"] = json!(tools_json);
+
+            if let Some(ref tc) = tool_choice {
+                body["tool_choice"] = json!(tc);
+            }
         }
 
-        let mut req = self.client.post(&chat_url).json(&body);
-        if !self.api_key.is_empty() {
-            req = req.bearer_auth(&self.api_key);
-        }
-
-        let mut resp = match req.send().await {
+        let mut resp = match self.post_json(&chat_url, &body).await {
             Ok(r) => r,
             Err(e) => {
                 let err_str = e.to_string();
@@ -191,51 +202,31 @@ impl OpenAiClient {
             let status = resp.status();
             let text = resp.text().await.unwrap_or_default();
 
-            // 1. If failure was due to image input not supported on a text-only model (missing mmproj), perceive or strip images
-            if text.contains("image input is not supported") || text.contains("mmproj") {
+            let retry_opt = if text.contains("image input is not supported") || text.contains("mmproj") {
                 let raw_msgs = body.get("messages").and_then(|m| m.as_array()).map(|a| a.as_slice()).unwrap_or(&[]);
-                let perceived_messages = super::perceiver::perceive_or_strip_images(raw_msgs, None).await;
-                let mut retry_body = body.clone();
-                retry_body["messages"] = json!(perceived_messages);
-                let mut retry_req = self.client.post(&chat_url).json(&retry_body);
-                if !self.api_key.is_empty() {
-                    retry_req = retry_req.bearer_auth(&self.api_key);
-                }
-                let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without images failed: {}", e))?;
-                if retry_resp.status().is_success() {
-                    resp = retry_resp;
-                } else {
-                    let r_status = retry_resp.status();
-                    let r_text = retry_resp.text().await.unwrap_or_default();
-                    bail!("OpenAI API error {}: {}", r_status, r_text);
-                }
+                let perceived = super::perceiver::perceive_or_strip_images(raw_msgs, None).await;
+                let mut rb = body.clone();
+                rb["messages"] = json!(perceived);
+                Some(rb)
             } else if body.get("tools").is_some() && (text.contains("tool choice") || text.contains("tool") || text.contains("function")) {
-                let mut retry_body = body.clone();
-                if let Some(obj) = retry_body.as_object_mut() {
+                let mut rb = body.clone();
+                if let Some(obj) = rb.as_object_mut() {
+                    obj.remove("tool_choice");
                     obj.remove("tools");
                 }
-                let mut retry_req = self.client.post(&chat_url).json(&retry_body);
-                if !self.api_key.is_empty() {
-                    retry_req = retry_req.bearer_auth(&self.api_key);
-                }
-                let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without tools failed: {}", e))?;
-                if retry_resp.status().is_success() {
-                    resp = retry_resp;
-                } else {
-                    let r_status = retry_resp.status();
-                    let r_text = retry_resp.text().await.unwrap_or_default();
-                    bail!("OpenAI API error {}: {}", r_status, r_text);
-                }
+                Some(rb)
             } else if body.get("reasoning_effort").is_some() && (text.contains("reasoning_effort") || text.contains("extra_forbidden") || text.contains("unrecognized")) {
-                let mut retry_body = body.clone();
-                if let Some(obj) = retry_body.as_object_mut() {
+                let mut rb = body.clone();
+                if let Some(obj) = rb.as_object_mut() {
                     obj.remove("reasoning_effort");
                 }
-                let mut retry_req = self.client.post(&chat_url).json(&retry_body);
-                if !self.api_key.is_empty() {
-                    retry_req = retry_req.bearer_auth(&self.api_key);
-                }
-                let retry_resp = retry_req.send().await.map_err(|e| anyhow::anyhow!("Retry without reasoning_effort failed: {}", e))?;
+                Some(rb)
+            } else {
+                None
+            };
+
+            if let Some(rb) = retry_opt {
+                let retry_resp = self.post_json(&chat_url, &rb).await.map_err(|e| anyhow::anyhow!("Retry request failed: {}", e))?;
                 if retry_resp.status().is_success() {
                     resp = retry_resp;
                 } else {

@@ -22,7 +22,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between pb-2 border-b border-styx-800">
+      <div className="flex items-center justify-between pb-2 border-b border-syndae-800">
         <div>
           <h2 className="text-sm font-bold text-white">Device Performance & Health</h2>
           <p className="text-xs text-slate-400 font-mono">Real-time device responsiveness and memory</p>
@@ -34,7 +34,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {/* CPU Card */}
-        <div className="p-4 rounded-2xl bg-styx-900 border border-styx-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-syndae-900 border border-syndae-800 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span className="flex items-center space-x-1.5 text-emerald-400 font-bold">
               <Cpu className="w-4 h-4" />
@@ -46,7 +46,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
             <span className="text-2xl font-bold text-white font-mono">{cpu.toFixed(1)}%</span>
             <span className="text-xs text-slate-400 font-mono">Usage</span>
           </div>
-          <div className="w-full h-2 bg-styx-950 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-syndae-950 rounded-full overflow-hidden">
             <div
               className={`h-full transition-all duration-500 ${cpu > 80 ? 'bg-rose-500' : 'bg-emerald-500'}`}
               style={{ width: `${Math.min(100, Math.max(2, cpu))}%` }}
@@ -55,7 +55,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
         </div>
 
         {/* Memory Card */}
-        <div className="p-4 rounded-2xl bg-styx-900 border border-styx-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-syndae-900 border border-syndae-800 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span className="flex items-center space-x-1.5 text-cyan-400 font-bold">
               <MemoryStick className="w-4 h-4" />
@@ -69,7 +69,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
             </span>
             <span className="text-xs text-slate-400 font-mono">{memPct.toFixed(0)}% used</span>
           </div>
-          <div className="w-full h-2 bg-styx-950 rounded-full overflow-hidden">
+          <div className="w-full h-2 bg-syndae-950 rounded-full overflow-hidden">
             <div
               className="h-full bg-cyan-500 transition-all duration-500"
               style={{ width: `${Math.min(100, Math.max(2, memPct))}%` }}
@@ -79,7 +79,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
 
         {/* GPU / VRAM Card */}
         {gpu && (
-          <div className="p-4 rounded-2xl bg-styx-900 border border-styx-800 space-y-2 sm:col-span-2">
+          <div className="p-4 rounded-2xl bg-syndae-900 border border-syndae-800 space-y-2 sm:col-span-2">
             <div className="flex items-center justify-between text-xs font-mono text-slate-400">
               <span className="flex items-center space-x-1.5 text-purple-400 font-bold">
                 <Zap className="w-4 h-4" />
@@ -97,7 +97,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
                 {gpu.vram_pct.toFixed(0)}% Memory • AI Core {gpu.gpu_util_pct}%
               </span>
             </div>
-            <div className="w-full h-2 bg-styx-950 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-syndae-950 rounded-full overflow-hidden">
               <div
                 className="h-full bg-purple-500 transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.max(2, gpu.vram_pct))}%` }}
@@ -107,7 +107,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
         )}
 
         {/* Tokens & Queue */}
-        <div className="p-4 rounded-2xl bg-styx-900 border border-styx-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-syndae-900 border border-syndae-800 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span className="flex items-center space-x-1.5 text-amber-400 font-bold">
               <Activity className="w-4 h-4" />
@@ -122,7 +122,7 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
         </div>
 
         {/* Turn Queue Status */}
-        <div className="p-4 rounded-2xl bg-styx-900 border border-styx-800 space-y-2">
+        <div className="p-4 rounded-2xl bg-syndae-900 border border-syndae-800 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono text-slate-400">
             <span className="flex items-center space-x-1.5 text-emerald-400 font-bold">
               <Sliders className="w-4 h-4" />
@@ -145,14 +145,14 @@ export const DeviceDiagnosticsView: React.FC<DeviceDiagnosticsViewProps> = ({
         <button
           type="button"
           onClick={onBack}
-          className="flex-1 py-2.5 rounded-xl bg-styx-850 hover:bg-styx-800 text-slate-200 text-xs font-medium border border-styx-700 transition-all"
+          className="flex-1 py-2.5 rounded-xl bg-syndae-850 hover:bg-syndae-800 text-slate-200 text-xs font-medium border border-syndae-700 transition-all"
         >
           ← Back to Settings Menu
         </button>
         <button
           type="button"
           onClick={onOpenAudit}
-          className="py-2.5 px-4 rounded-xl bg-styx-900 hover:bg-styx-850 text-slate-300 text-xs font-medium border border-styx-800 transition-all"
+          className="py-2.5 px-4 rounded-xl bg-syndae-900 hover:bg-syndae-850 text-slate-300 text-xs font-medium border border-syndae-800 transition-all"
         >
           Security Audit Log
         </button>

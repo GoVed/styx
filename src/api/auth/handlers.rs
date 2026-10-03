@@ -107,7 +107,7 @@ pub async fn auth_setup_handler(
          ## Identity\n\
          - **Name:** {}\n\
          - **Focus / Interests:** {}\n\
-         - **System:** Styx Personal Assistant\n\
+         - **System:** Syndae Personal Assistant\n\
          - **Device:** Local Machine (100% Private)\n\n\
          ## How I Like to Communicate\n\
          - **Tone:** Friendly, conversational, clear, and direct. Avoid unnecessary developer jargon.\n\
@@ -121,7 +121,7 @@ pub async fn auth_setup_handler(
         .await;
 
     info!(
-        "Styx device initialized with access key and operator: {}",
+        "Syndae device initialized with access key and operator: {}",
         name
     );
 
@@ -231,7 +231,7 @@ pub async fn start_onboarding_handler(
     // Create onboarding session
     let session = match state
         .db
-        .create_session("[ONBOARDING] Welcome to Styx", "chat")
+        .create_session("[ONBOARDING] Welcome to Syndae", "chat")
         .await
     {
         Ok(s) => s,
@@ -259,7 +259,7 @@ pub async fn start_onboarding_handler(
     };
 
     let onboarding_starter_prompt = format!(
-        "Hello Styx! I just set up my personal assistant. Please start our friendly welcome and onboarding conversation for {}.\n\n\
+        "Hello Syndae! I just set up my personal assistant. Please start our friendly welcome and onboarding conversation for {}.\n\n\
          GUIDANCE FOR GENERAL PUBLIC INTERACTION:\n\
          You are talking to an everyday person, not a developer. Be warm, natural, and friendly. Never use technical jargon.\n\
          Keep your response short (1-2 sentences) and interactive:\n\
